@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Ice",
+    "color": "#d8fff5"
+  },
+  {
+    "name": "Yellow",
+    "color": "#f1c40f"
+  },
+  {
+    "name": "Coral",
+    "color": "#f08080"
+  },
+  {
+    "name": "Orange",
+    "color": "#f26f29"
+  },
+  {
+    "name": "Peach",
+    "color": "#ffdab9"
+  },
+  {
+    "name": "Candy",
+    "color": "#ffbad1"
+  },
+  {
+    "name": "Pink",
+    "color": "#ee7ae9"
+  },
+  {
+    "name": "Dark Pink",
+    "color": "#de488d"
+  },
+  {
+    "name": "Red",
+    "color": "#dc143c"
+  },
+  {
+    "name": "Lavender",
+    "color": "#c299fb"
+  },
+  {
+    "name": "Purple",
+    "color": "#843d8d"
+  },
+  {
+    "name": "Light Blue",
+    "color": "#69c0ee"
+  },
+  {
+    "name": "Dark Blue",
+    "color": "#4169e1"
+  },
+  {
+    "name": "Mint Green",
+    "color": "#99efbe"
+  },
+  {
+    "name": "Green",
+    "color": "#2ecc61"
+  },
+  {
+    "name": "Dark Green",
+    "color": "#1b7331"
+  },
+  {
+    "name": "Light Brown",
+    "color": "#81584c"
+  },
+  {
+    "name": "Brown",
+    "color": "#a04221"
+  }
+]

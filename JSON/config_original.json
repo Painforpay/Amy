@@ -1,0 +1,14 @@
+{
+  "token": "",
+  "tokendev": "",
+  "dev": true,
+  "verbose": true,
+  "prefix": "!",
+  "owners": [
+    ""
+  ],
+  "defaultPerms": "CONNECT",
+  "host": "",
+  "username": "",
+  "password": ""
+}
