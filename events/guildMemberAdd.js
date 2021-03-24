@@ -1,0 +1,110 @@
+const Event = require('../Structure/Event');
+const colors = require('colors/safe');
+module.exports = class extends Event {
+
+    constructor(...args) {
+        super(...args, {
+            once: false
+        });
+    }
+
+    async run(member) {
+        if (member.user.bot) return;
+        const client = this.client;
+        this.client.raidCounter += 1;
+
+
+        // To compare, we need to load the current invite list.
+        member.guild.fetchInvites().then(guildInvites => {
+            // This is the *existing* invites for the guild.
+
+
+            const ei = this.client.invites;
+            // Update the cached invites for the guild.
+
+            // Look through the invites, find the one for which the uses went up.
+            const invite = guildInvites.find(i => ei.get(i.code).uses < i.uses);
+
+            if (invite) {
+                client.invites = guildInvites;
+                const inviter = client.users.cache.get(invite.inviter.id);
+                // Get the log channel (change to your liking)
+                const logChannel = member.guild.channels.cache.find(channel => channel.id === (client.dev ? "800110139155546209" : "796000304873209866"));
+                // A real basic message with the information we need.
+                logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${invite.code}\` eingeladen. \`${invite.uses}\` Nutzungen seit seiner Erstellung. ${member.guild.memberCount} Mitglieder.`);
+
+            } else {
+                const logChannel = member.guild.channels.cache.find(channel => channel.id === (this.client.dev ? "800110139155546209" : "796000304873209866"));
+                // A real basic message with the information we need.
+            
+                //Trying to get the inviter by finding the code that has been deleted:
+                let msg;
+                ei.forEach(ei => {
+
+                    if (!guildInvites.find(i => i.code === ei.code)) {
+                        const inviter = client.users.cache.get(ei.inviter.id);
+                        // Get the log channel (change to your liking)
+                        client.invites = guildInvites;
+                        //Dieser Invite wurde genutzt
+                        msg = logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${ei.code}\` eingeladen. \`${ei.uses + 1}\` Nutzungen seit seiner Erstellung. - ${member.guild.memberCount} Mitglieder.`);
+                    }
+                });
+                if(!msg) {
+                    logChannel.send(`${member} ist beigetreten. Unbekannter Invite Code - ${member.guild.memberCount} Mitglieder.`);
+                }
+
+            }
+
+
+        });
+
+        if (this.client.raidMode) {
+            try {
+                await member.send("Sorry, die Raid Protection ist aktiv. Bitte versuche es später nochmal!")
+            } catch (e) {
+                // Der Bot kann dem User keine DMs schicken!
+            }
+
+            return member.kick();
+        } else {
+
+            try {
+                member.guild.channels.cache.get(this.client.dev ? "800110138027409501" : "793944435809189921").send(`Willkommen ${member} auf ${member.guild.name}! Wir hoffen, dass du dich hier wohlfühlst. <@&${this.client.dev ? "800110137553453108" : "795964429228703764"}>`);
+            } catch (e) {
+                console.error(e);
+            }
+
+
+            try {
+                if (this.client.dev) {
+
+                    let array = ["800110137632882778", "800110137544146962"];
+                    for (const roleid of array) {
+                        let role = member.guild.roles.cache.get(roleid);
+                        await member.roles.add(role);
+                    }
+
+                } else {
+                    let array = ["794158777435029535", "794154048827031583", "794154237273309194", "803039995342225429", "795398801551786025", "795419668067516417", "795692239263105056", "794685546307256370"];
+                    for (const roleid of array) {
+                        let role = member.guild.roles.cache.get(roleid);
+                        await member.roles.add(role);
+                    }
+                }
+            } catch (e) {
+                //Error
+                console.error(e);
+            }
+
+            this.client.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
+                if (err) console.log(colors.red(err.message));
+
+                console.log(`[${client.utils.getDateTime()}] [MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
+
+            });
+        }
+
+
+    }
+
+}

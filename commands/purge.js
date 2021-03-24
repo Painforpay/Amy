@@ -1,0 +1,47 @@
+﻿const Command = require('../Structure/Command');
+module.exports = class extends Command {
+
+
+    constructor(...args) {
+        super(...args, {
+            aliases: ['cleanchat', 'bulkdelete'],
+            description: 'Löscht eine bestimmte Anzahl an Nachrichten',
+            category: 'Utilities',
+            usage: `[<anzahl oder ping>]`,
+            userPerms: ['MANAGE_MESSAGES'],
+            guildOnly: true,
+            ownerOnly: false,
+            nsfw: false,
+            args: true
+        });
+    }
+
+
+    async run(message, args) {
+
+
+
+        await message.delete();
+
+        const deleteCount = Math.abs(args[0]);
+        const user = message.mentions.users.first();
+
+        if (!user && !deleteCount) return message.channel.send("Bitte gib einen User oder die anzahl der zu löschenden Nachrichten an, nach welchen gefiltert werden soll.");
+
+        const fetchedMessages = await message.channel.messages.fetch({ limit: 100, before: message.id });
+        let filteredMessages = fetchedMessages;
+
+        if (user) filteredMessages = fetchedMessages.filter(msg => msg.author.id === user.id);
+        else filteredMessages = filteredMessages.array().slice(0, deleteCount);
+
+        const deletedMessages = await message.channel.bulkDelete(filteredMessages, true).catch(() => null);
+        if (!deletedMessages) return message.channel.send("Ein Fehler ist aufgetreten, bitte versuche es nochmal!");
+
+        const deletedCount = deletedMessages.size;
+        message.channel.send(`${deletedCount} Nachricht${deletedCount === 1 ? "" : "en"} wurden gelöscht.`).then(m => m.delete({timeout: 5000}).catch(() => null))
+
+
+    }
+
+
+};

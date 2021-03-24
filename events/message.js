@@ -1,0 +1,240 @@
+const Event = require('../Structure/Event');
+let compliments = ['https://tenor.com/view/thank-you-so-much-hearts-pink-than-yyou-thanks-thank-you-gif-12086415', 'https://tenor.com/view/cute-bear-thank-you-thanks-gif-14105969', 'https://tenor.com/view/thank-you-alice-in-wonderland-thanks-gif-9790628', 'https://tenor.com/view/jonah-hill-yay-african-child-screaming-shouting-gif-7212866', 'https://tenor.com/view/cute-comfort-massage-gif-15134902', 'https://tenor.com/view/peach-cat-hug-hug-up-love-mochi-mochi-peach-cat-gif-16334628', 'https://tenor.com/view/hug-virtual-hug-hug-sent-gif-5026057']
+
+module.exports = class extends Event {
+
+    async run(message) {
+
+        if (message.partial) {
+
+            try {
+
+                await message.fetch();
+
+            } catch (error) {
+                console.error('Something went wrong when fetching the message: ', error);
+
+                return;
+            }
+        }
+
+
+        const mentionRegex = RegExp(`^<@!?${this.client.user.id}>$`);
+        const mentionRegexPrefix = RegExp(`^<@!?${this.client.user.id}> `);
+
+        if (message.type !== "DEFAULT") return;
+        if (message.system === true) return;
+        if (message.author.bot) return;
+        if (message.channel.type === "dm") {
+
+            if (message.content.toLowerCase().match(/.*(danke\n*.*amy).*/g)) {
+                let gif = compliments[Math.floor(Math.random() * compliments.length)]
+                return message.channel.send(gif).then(m => {
+                    try {
+                        m.delete({timeout: 3600000})
+                    } catch (e) {
+                        //Error
+                        console.error(e);
+                    }
+
+                });
+            }
+
+            return; //await this.client.utils.DeeptalkSender(message);
+        }//*/
+
+
+        if (message.content.match(mentionRegex)) message.channel.send(`Mein prefix ist \`${this.client.prefix}\`.`);
+
+        const prefix = message.content.match(mentionRegexPrefix) ?
+            message.content.match(mentionRegexPrefix)[0] : this.client.prefix;
+
+        if (message.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
+            try {
+                message.delete()
+            } catch (e) {
+                //Error
+                console.error(e);
+            }
+        }
+
+        if (message.channel.id === (this.client.dev ? "800110137820971047" : "797833037022363659")) {
+
+            await this.client.utils.colorgiver(message);
+
+        }
+
+
+        if (message.channel.id === (this.client.dev ? "800110138027409501" : "793944435809189921") && !message.member.permissions.has("MANAGE_MESSAGES")) {
+            if (message.attachments.size || message.content.includes("cdn.discordapp.com/attachments/")) {
+                if (this.client.picCooldown.has(message.author.id)) {
+
+                    // let timespentmills = Date.parse(new Date()) - this.client.picCooldown.get(message.author.id);
+
+                    //message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(10-timespentmills/1000)} Sekunden!`);
+                    try {
+                        message.delete()
+                    } catch (e) {
+                        //Error
+                        console.error(e);
+                    }
+                } else {
+
+                    this.client.picCooldown.set(message.author.id, Date.parse(new Date().toString()));
+                    setTimeout(() => {
+                        // Removes the user from the set after a minute
+                        this.client.picCooldown.delete(message.author.id);
+                    }, 10000);
+
+
+                }
+
+            }
+
+
+        }
+
+
+        if (!message.content.startsWith(prefix || "+")) {
+
+            if (message.channel.parentID === (this.client.dev ? "800110139155546210" : "796204539911864340")) {
+
+                await message.channel.setParent(message.guild.channels.cache.get(this.client.dev ? "800110137820971039" : "796198520616517652"));
+                let mod = message.guild.roles.cache.get(this.client.dev ? "800110137632882781" : "798293308937863219")
+                let user = await message.guild.members.fetch(`${message.channel.topic}`, true, true);
+                await message.channel.overwritePermissions([{id: message.guild.id, deny: "VIEW_CHANNEL"}, {
+                    id: user.id,
+                    allow: "VIEW_CHANNEL"
+                }, {id: mod.id, allow: "VIEW_CHANNEL"}])
+                message.channel.send(`${user}, dein Ticket wurde neu eröffnet von ${message.member}!`);
+
+            }
+
+
+            await this.client.utils.xpadd(message.member, this.client.xpMessages);
+            switch (message.channel.name) {
+                case "ideen": {
+                    return message.client.utils.reactvoting(message);
+                }
+
+                case "voice-kontext": {
+                    try {
+                        message.delete({timeout: 3600000});
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+                break;
+            }
+
+            if (message.content.toLowerCase().match(/.*(script\n*.*kiddie).*/g) && message.channel.name !== "ideen") {
+                message.react("✅");
+                message.channel.send("Echt So, Pain!").then(m => {
+                    try {
+                        message.delete();
+                        return m.delete({timeout: 120000});
+                    } catch (e) {
+                        //Error
+                        console.error(e);
+                    }
+                });
+            }
+
+        } else {
+
+            if (!this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
+                await message.channel.send("Befehle sind hier deaktviert!").then(m => {
+                    try {
+                        message.delete();
+                        return m.delete({timeout: 5000});
+                    } catch (e) {
+                        //Error
+                        console.error(e);
+                    }
+                });
+            } else {
+                const [cmd, ...args] = message.content.slice(prefix.length).trim().split(/ +/g);
+
+                const command = this.client.commands.get(cmd.toLowerCase()) || this.client.commands.get(this.client.aliases.get(cmd.toLowerCase()));
+                if (command) {
+
+                    if (command.ownerOnly && !this.client.utils.checkOwner(message.author.id)) {
+                        message.reply('diesen Befehl darf nur der BotOwner nutzen!').then(m => {
+                            try {
+                                m.delete({timeout: 60000});
+                            } catch (e) {
+                                //Error
+                                console.error(e);
+                            }
+                        });
+                        return message.delete();
+                    }
+
+                    if (command.guildOnly && !message.guild) {
+                        message.reply('dieser Befehl ist nur auf dem Server nutzbar!').then(m => {
+                            try {
+                                m.delete({timeout: 60000});
+                            } catch (e) {
+                                //Error
+                                console.error(e);
+                            }
+                        });
+                        return message.delete();
+                    }
+
+                    if (command.nsfw && !message.channel.nsfw) {
+                        message.reply('dieser Befehl kann nur in NSFW-Kanälen genutzt werden!').then(m => {
+                            try {
+                                m.delete({timeout: 60000});
+                            } catch (e) {
+                                //Error
+                                console.error(e);
+                            }
+                        });
+                        return message.delete();
+                    }
+
+                    if (command.args && !args.length) {
+
+                        message.reply(`bitte gib weitere Argumente an. Nutzung des Befehls: ${command.usage ?
+                            `\`${command.usage}\`` : '\`fehlt\`'}`).then(m => {
+                            try {
+                                m.delete({timeout: 60000});
+                            } catch (e) {
+                                //Error
+                                console.error(e);
+                            }
+                            });
+                        return message.delete();
+                    }
+
+                    if (message.guild) {
+                        const userPermCheck = command.userPerms ? this.client.defaultPerms.add(command.userPerms) : this.client.defaultPerms;
+                        if (userPermCheck) {
+                            const missing = message.channel.permissionsFor(message.member).missing(userPermCheck);
+                            if (missing.length) {
+                                message.reply(`Dir fehlt die folgende Berechtigung um diesen Befehl auszuführen: \`${this.client.utils.formatArray(missing.map(this.client.utils.formatPerms))}\`.`).then(m => {
+                                    try {
+                                        m.delete({timeout: 60000});
+                                    } catch (e) {
+                                        //Error
+                                        console.error(e);
+                                    }
+                                });
+                                return message.delete();
+                            }
+                        }
+
+                    }
+
+                    command.run(message, args);
+                }
+            }
+
+
+        }
+
+
+    }
+
+};
