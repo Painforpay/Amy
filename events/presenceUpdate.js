@@ -35,7 +35,7 @@ module.exports = class extends Event {
         }
 
 
-        let activities = newPresence.activities.filter(a => a.type === "Playing")
+        let activities = newPresence.activities.filter(a => a.type === "PLAYING")
 
         activities.forEach(activity => {
 
@@ -45,7 +45,14 @@ module.exports = class extends Event {
                 //Error
                 if (err) return console.error(err);
 
-                !client.dev ? await newPresence.member.roles.add(result[0].roleid) : null;
+                const { roleid } = result[0];
+
+                try {
+                    await newPresence.member.roles.add(`${roleid}`);
+                } catch (e) {
+                    console.error(e)
+                }
+
                 await newPresence.member.roles.add(client.dev ? "800110137582026757" : "795692239263105056");
 
             });
