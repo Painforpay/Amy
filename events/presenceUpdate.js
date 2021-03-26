@@ -44,16 +44,20 @@ module.exports = class extends Event {
             this.client.con.query(`SELECT * FROM \`activityroles\` WHERE \`name\` = '${rolename}'`, async function (err, result) {
                 //Error
                 if (err) return console.error(err);
+                if(result[0]) {
+                    const { roleid } = result[0];
 
-                const { roleid } = result[0];
+                    try {
+                        await newPresence.member.roles.add(`${roleid}`);
+                    } catch (e) {
+                        console.log(newPresence.member.username)
+                        console.error(e)
+                        console.log(rolename)
+                    }
 
-                try {
-                    await newPresence.member.roles.add(`${roleid}`);
-                } catch (e) {
-                    console.error(e)
+                    await newPresence.member.roles.add(client.dev ? "800110137582026757" : "795692239263105056");
+
                 }
-
-                await newPresence.member.roles.add(client.dev ? "800110137582026757" : "795692239263105056");
 
             });
         })
