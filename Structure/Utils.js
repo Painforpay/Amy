@@ -2,8 +2,9 @@ const path = require('path');
 const {promisify} = require('util');
 const glob = promisify(require('glob'));
 const Command = require('./Command.js');
+const SubCommand = require('./SubCommand.js');
 const Event = require('./Event.js');
-const Discord = require('discord.js');
+const { MessageEmbed, Collection, MessageAttachment } = require('discord.js');
 const { inspect } = require('util');
 const { Type } = require('@anishshobith/deeptype')
 const colors = require("../JSON/colors.json");
@@ -62,8 +63,27 @@ module.exports = class Util {
         return this.client.owners.includes(target);
     }
 
+    async getOwners(ArrOwners) {
+        let {users} = this.client;
+
+        let OwnerObj = [];
+
+        for (const id of ArrOwners) {
+            OwnerObj.push(await this.client.users.fetch(id))
+        }
+        return OwnerObj;
+    }
+
+
     comparePerms(member, target) {
         return member.roles.highest.position > target.roles.highest.position;
+    }
+
+    getSubCommands(cmd) {
+
+        return this.client.subCommands.filter((v, k) => v.parent === cmd);
+
+
     }
 
     clean(text) {
@@ -102,9 +122,25 @@ module.exports = class Util {
 
     }
 
+    async getUserData(id) {
+        let client = this.client;
+        return new Promise((resolve, reject) => {
+
+            client.con.query(`SELECT * FROM users WHERE id = ${id}`, function (err, result) {
+                if(err) reject(err.name);
+
+                if(result[0]) {
+                    resolve(result[0]);
+                }
+
+            })
+
+        })
+
+    }
 
     async loadCommands() {
-        return glob(`${this.directory}commands/**/*.js`).then(commands => {
+        return glob(`${this.directory}commands/*/*.js`).then(commands => {
             for (const commandFile of commands) {
                 delete require.cache[commandFile];
                 const {name} = path.parse(commandFile);
@@ -113,11 +149,22 @@ module.exports = class Util {
                 const command = new File(this.client, name.toLowerCase());
                 if (!(command instanceof Command)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von Command.`);
                 this.client.commands.set(command.name, command);
-                if (command.aliases.length) {
-                    for (const alias of command.aliases) {
-                        this.client.aliases.set(alias, command.name);
-                    }
-                }
+
+            }
+        });
+    }
+
+
+    async loadSubCommands() {
+        return glob(`${this.directory}commands/*/*/*.js`).then(subCommands => {
+            for (const commandFile of subCommands) {
+                delete require.cache[commandFile];
+                const {name} = path.parse(commandFile);
+                const File = require(commandFile);
+                if (!this.isClass(File)) throw new TypeError(`Der Befehl ${name} exportiert keine Klasse.`);
+                const command = new File(this.client, name.toLowerCase());
+                if (!(command instanceof SubCommand)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von SubCommand.`);
+                this.client.subCommands.set(command.name, command);
             }
         });
     }
@@ -135,6 +182,83 @@ module.exports = class Util {
                 event.emitter[event.type](name, (...args) => event.run(...args));
             }
         });
+    }
+
+    async handleWrongInput(args, cmdFile) {
+
+
+        let embed = new MessageEmbed()
+            .setTitle(`Oh, oh!`)
+            .setTimestamp();
+
+        let desc = `Leider gibt es keinen \`${args}\` Unterbefehl für den \`${this.capitalise(cmdFile.name)}\` Befehl!`;
+        console.log(cmdFile.children)
+        if (cmdFile.children.size > 0) {
+            desc += `\nMögliche Unterbefehle sind:`
+            cmdFile.children.forEach(child => {
+                embed.addField(`${this.client.prefix}${cmdFile.name} ${child.name}`, `${child.description}`);
+            })
+        }
+
+        embed.setDescription(desc)
+
+        return embed;
+
+    }
+
+    //This creates an Embed if a NSFW Command was executed in a non NSFW Channel
+    async NSFWEmbed(message, cmdFile) {
+
+        //create a base Embed
+        let embed = new MessageEmbed()
+            .setTimestamp()
+            .setColor("#D12D42")
+            .setTitle(`🔞 NSFW-Channel Only`);
+
+
+        //Check if the member has rights to change the NSFW Option to tell him how to enable it
+        if (message.member.hasPermission('MANAGE_CHANNELS')) {
+
+            //Set the Description and set a Image
+            embed.setDescription(`The \`${this.capitalise(cmdFile.name)}\` command is a NSFW-tagged Command.\nPlease enable NSFW-Mode on this Channel to use it!`)
+                .setImage(`https://cdn.discordapp.com/attachments/821157975246241822/821158154447355964/ChannelNSFWEnable.gif`)
+        } else {
+
+            //Set the Description and set a Image
+            embed.setDescription(`The \`${this.capitalise(cmdFile.name)}\` command is a NSFW-tagged Command.\nPlease use it in a NSFW Channel!`)
+        }
+
+        //return the embed
+        return embed;
+
+    }
+
+    //This creates an Embed if a Search Query for AdultContent was executed in a non NSFW Channel
+    async MediaNSFW(message, title) {
+
+        //create a base Embed
+        let embed = new MessageEmbed()
+            .setTimestamp()
+            .setColor("#D12D42")
+            .setTitle(`🔞 NSFW-Content`);
+
+
+        //Check if the member has rights to change the NSFW Option to tell him how to enable it
+        if (message.member.hasPermission('MANAGE_CHANNELS')) {
+
+            //Set the Description and set a Image
+            embed.setDescription(`The Title (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease enable NSFW-Mode on this Channel to use it!`)
+
+                .setImage(`https://cdn.discordapp.com/attachments/821157975246241822/821158154447355964/ChannelNSFWEnable.gif`)
+        } else {
+
+            //Set the Description and set a Image
+            embed.setDescription(`The Title (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease use it in a NSFW Channel!`)
+        }
+
+        //return the embed
+        message.channel.send(embed).then(m => m.delete({timeout: 60000}).catch(() => null));
+
     }
 
     async evaluate(message, code) {
@@ -159,7 +283,7 @@ module.exports = class Util {
                 `⏲️ Bearbeitungszeit: ${(((stop[0]*1e9)+stop[1]))/1e6}ms`
             ]
 
-            let embed = new Discord.MessageEmbed()
+            let embed = new MessageEmbed()
                 .setTitle(`Erfolg!`)
                 .setColor("#FFD700")
                 .addField(response[0], response[1])
@@ -179,7 +303,7 @@ module.exports = class Util {
                     .replace("📥 **Input:**", "Input:")
                     .replace("📤 **Output:**", "Output:")
                     .replace("🔎 **Typ:**", "Typ:")
-                return new Discord.MessageAttachment(Buffer.from(res), 'output.txt')
+                return new MessageAttachment(Buffer.from(res), 'output.txt')
 
             }
 
@@ -187,7 +311,7 @@ module.exports = class Util {
         } catch (e) {
             //Error
 
-            let errorEmbed = new Discord.MessageEmbed()
+            let errorEmbed = new MessageEmbed()
                 .setTitle(`Fehler!`)
                 .setColor("#CD322F")
                 .addField(`📥 **Input:**`, `\`\`\`js\n${code}\n\nCleaned: ${code}\`\`\``)
@@ -208,7 +332,7 @@ module.exports = class Util {
                 ]
                 let res = response.join('\n');
 
-                return new Discord.MessageAttachment(Buffer.from(res), 'output.txt')
+                return new MessageAttachment(Buffer.from(res), 'output.txt')
 
             }
 
@@ -379,7 +503,7 @@ module.exports = class Util {
 
     async birthdayembed(message) {
         let client = this.client;
-        let birthdaylist = new Discord.Collection();
+        let birthdaylist = new Collection();
         let embedwaiting = await message.channel.send("Embed wird geladen...");
 
         await this.client.con.query(`SELECT * FROM users WHERE bday > 0 ORDER BY bmonth ASC, bday ASC`, async function (err, result) {
@@ -392,7 +516,7 @@ module.exports = class Util {
                 }
             }
 
-            let embed = new Discord.MessageEmbed()
+            let embed = new MessageEmbed()
                 .setTimestamp()
                 .setColor("#ffdab9")
                 .setTitle("Geburtstagsliste")
@@ -583,7 +707,7 @@ module.exports = class Util {
 
 
                 if (currentlevel !== leveluserhastoget) {
-                    let embed = new Discord.MessageEmbed()
+                    let embed = new MessageEmbed()
                         .setTitle("**Levelup!**")
                         .setColor("#FFD700")
                         .setFooter(`Du benötigst nun ${(Math.round((nextlevel - (togive)) * 100) / 100).toFixed(0)} Erfahrungspunkte für Level ${leveluserhastoget + 1}!`)
@@ -796,7 +920,7 @@ module.exports = class Util {
         }
 
 
-        let embed = new Discord.MessageEmbed()
+        let embed = new MessageEmbed()
             .setColor("RANDOM")
             .setFooter(`Vorgeschlagen von ${message.author.username} [${message.author.id}]`)
             .setTimestamp();
@@ -851,7 +975,7 @@ module.exports = class Util {
 
     async purgeMessagesforMember(member) {
 
-        let lol = new Discord.Collection();
+        let lol = new Collection();
 
         member.guild.channels.cache.forEach(async channel => {
             let message_cache = await channel.messages.fetch({ limit: 100 });

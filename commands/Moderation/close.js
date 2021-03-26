@@ -1,4 +1,4 @@
-const Command = require('../Structure/Command');
+const Command = require('../../Structure/Command');
 
 
 module.exports = class extends Command {
@@ -6,15 +6,11 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ['closeticket'],
-            description: 'Schließt ein Ticket',
-            category: 'Utilities',
-            usage: ``,
+
+            description: 'Schließt ein Ticket [Kann nur in SupportChanneln genutzt werden!]',
+            category: 'moderation',
             userPerms: ['KICK_MEMBERS'],
-            guildOnly: true,
-            ownerOnly: false,
-            nsfw: false,
-            args: false
+            guildOnly: true
         });
     }
 
@@ -22,7 +18,7 @@ module.exports = class extends Command {
     async run(message) {
 
         if (message.channel.id !== (this.client.dev ? "800110137820971040" : "796119563803689050") && message.channel.parentID === (this.client.dev ? "800110137820971039" : "796198520616517652")) {
-            await message.channel.send(`Ticket wurde von ${message.author} geschlossen!`);
+            await message.channel.send(`Dieses Ticket wurde von ${message.author} geschlossen!`);
             await message.channel.setParent(this.client.dev ? "800110139155546210" : "796204539911864340");
             let category = message.channel.guild.channels.cache.get(this.client.dev ? "800110139155546210" : "796204539911864340");
 
@@ -35,8 +31,6 @@ module.exports = class extends Command {
                 //Error
                 console.error(e);
             }
-
-
         } else {
 
             message.channel.send("Dies ist kein Supportticket!")

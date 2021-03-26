@@ -142,7 +142,7 @@ module.exports = class extends Event {
 
         } else {
 
-            if (!this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
+            if (message.guild && !this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
                 await message.channel.send("Befehle sind hier deaktviert!").then(m => {
                     try {
                         message.delete();
@@ -159,74 +159,58 @@ module.exports = class extends Event {
                 if (command) {
 
                     if (command.ownerOnly && !this.client.utils.checkOwner(message.author.id)) {
-                        message.reply('diesen Befehl darf nur der BotOwner nutzen!').then(m => {
-                            try {
-                                m.delete({timeout: 60000});
-                            } catch (e) {
-                                //Error
-                                console.error(e);
-                            }
-                        });
-                        return message.delete();
+
+                        //User is not allowed to use this command, we don't want to do anything as it is not needed
+
+                        return message.delete().catch(() => null);
                     }
 
+
+                    //Check if this command is guildOnly. This will never be true as the Bot skips DMs
                     if (command.guildOnly && !message.guild) {
-                        message.reply('dieser Befehl ist nur auf dem Server nutzbar!').then(m => {
-                            try {
-                                m.delete({timeout: 60000});
-                            } catch (e) {
-                                //Error
-                                console.error(e);
-                            }
-                        });
-                        return message.delete();
+
+                        //We cannot delete Messages in DMs other than ours so we skip deleting the message
+                        return message.channel.send('Entschuldige, aber dieser Befehl kann nicht im Privatchat ausgeführt werden.').then(m => m.delete({timeout: 60000}).catch(() => null));
                     }
 
+
+                    //Check if the Command is a NSFW Type Command and skip if the Channels is not suited for it.
                     if (command.nsfw && !message.channel.nsfw) {
-                        message.reply('dieser Befehl kann nur in NSFW-Kanälen genutzt werden!').then(m => {
-                            try {
-                                m.delete({timeout: 60000});
-                            } catch (e) {
-                                //Error
-                                console.error(e);
-                            }
-                        });
-                        return message.delete();
+                        message.delete().catch(() => null);
+                        return message.channel.send((await this.client.utils.NSFWEmbed(message, command))).then(m => m.delete({timeout: 60000}).catch(() => null))
+
                     }
 
-                    if (command.args && !args.length) {
-
-                        message.reply(`bitte gib weitere Argumente an. Nutzung des Befehls: ${command.usage ?
-                            `\`${command.usage}\`` : '\`fehlt\`'}`).then(m => {
-                            try {
-                                m.delete({timeout: 60000});
-                            } catch (e) {
-                                //Error
-                                console.error(e);
-                            }
-                            });
-                        return message.delete();
+                    // Check if the Command has a specified minimal Number of Args and then check if the message contains the right amount
+                    if (command.minArgs && args.length < command.minArgs) {
+                        message.delete().catch(() => null);
+                        return message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Abgegeben: ${args.length}, Benötigt: ${command.minArgs}`).then(m => m.delete({timeout: 60000}).catch(() => null));
                     }
 
+                    //Check if the Message was sent to a Guild - Always true
                     if (message.guild) {
+
+
                         const userPermCheck = command.userPerms ? this.client.defaultPerms.add(command.userPerms) : this.client.defaultPerms;
+
+                        //Check if the Command needs special Permissions
                         if (userPermCheck) {
+
+                            //Check if the Member has missing Permissions
                             const missing = message.channel.permissionsFor(message.member).missing(userPermCheck);
                             if (missing.length) {
-                                message.reply(`Dir fehlt die folgende Berechtigung um diesen Befehl auszuführen: \`${this.client.utils.formatArray(missing.map(this.client.utils.formatPerms))}\`.`).then(m => {
-                                    try {
-                                        m.delete({timeout: 60000});
-                                    } catch (e) {
-                                        //Error
-                                        console.error(e);
-                                    }
-                                });
-                                return message.delete();
+                                message.delete();
+                                return message.channel.send(`Entschuldige, aber dir fehlt die folgende Berechtigung für diesen Befehl: \`${this.client.utils.formatArray(missing.map(this.client.utils.formatPerms))}\`.`).then(m => m.delete({timeout: 60000}).catch(() => null));
+
                             }
                         }
 
                     }
 
+                    /*
+                    * Everything went fine:
+                    * Call the Command file and run the message
+                    */
                     command.run(message, args);
                 }
             }

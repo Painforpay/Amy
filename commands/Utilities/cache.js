@@ -1,4 +1,4 @@
-﻿const Command = require('../Structure/Command');
+﻿const Command = require('../../Structure/Command');
 
 
 module.exports = class extends Command {
@@ -6,15 +6,13 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ['cacheadd', 'getmessage'],
-            description: 'Bannt einen User',
-            category: 'Utilities',
-            usage: `[<User>] [<Grund>]`,
+            description: 'Cached eine Nachricht',
+            category: 'utilities',
             userPerms: ['ADMINISTRATOR'],
             guildOnly: true,
-            ownerOnly: true,
+            ownerOnly: false,
             nsfw: false,
-            args: true
+            minArgs: 1
         });
     }
 
@@ -37,7 +35,7 @@ module.exports = class extends Command {
 
         } catch (e) {
             //Error
-            message.channel.send(`Es gab einen Fehler beim Cachen der Nachricht! ID: ${args[0]}${e.httpStatus === 404 ? "\nNachricht konnte nicht gefunden werden. (404 Not Found)" : e.httpStatus}`).then(m => {
+            this.client.utils.log(`Es gab einen Fehler beim Cachen der Nachricht! ID: ${args[0]}${e.httpStatus === 404 ? "\nNachricht konnte nicht gefunden werden. (404 Not Found)" : e.httpStatus}`).then(m => {
                 try {
                     m.delete({timeout: 10000});
                 } catch (e) {

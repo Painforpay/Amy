@@ -29,6 +29,8 @@ module.exports = class Bot extends Client {
 
         this.events = new Collection();
 
+        this.subCommands = new Collection();
+
         this.utils = new Util(this);
 
         this.owners = options.owners;
@@ -91,6 +93,7 @@ module.exports = class Bot extends Client {
 
 
         new RESTApi(this).createServer();
+        await this.utils.loadSubCommands();
         await this.utils.loadCommands();
         await this.utils.loadEvents();
         await super.login(token);

@@ -43,6 +43,8 @@ module.exports = class extends Event {
 
             this.client.con.query(`SELECT * FROM \`activityroles\` WHERE \`name\` = '${rolename}'`, async function (err, result) {
                 //Error
+                if(client.dev) return;
+
                 if (err) return console.error(err);
                 if(result[0]) {
                     const { roleid } = result[0];

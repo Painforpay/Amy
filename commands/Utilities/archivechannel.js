@@ -1,4 +1,4 @@
-const Command = require("../Structure/Command");
+const Command = require("../../Structure/Command");
 
 // noinspection JSUnresolvedVariable
 module.exports = class extends Command {
@@ -6,14 +6,12 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["archive"],
-            description: 'archiviert Textkanäle',
-            category: 'administration',
-            userPerms: ["ADMINISTRATOR"],
-            guildOnly: false,
+            description: 'Archiviert Textkanäle',
+            category: 'utilities',
+            userPerms: ["MANAGE_CHANNELS"],
+            guildOnly: true,
             ownerOnly: false,
-            nsfw: false,
-            args: false
+            nsfw: false
         });
     }
 
@@ -32,24 +30,15 @@ module.exports = class extends Command {
                     let category = r.message.channel.guild.channels.cache.get(this.client.dev ? "800110139155546212" : "796511159779065886");
                     r.message.channel.overwritePermissions(category.permissionOverwrites, "Channel ins Archiv verschoben")
                     r.message.channel.send(`Channel wurde von ${message.author} archiviert!`);
-                    try {
-                        message.delete();
-                        return m.delete();
-                    } catch (e) {
-                        //Error
-                        console.error(e);
-                    }
-
-                } else {
-                    try {
-                        message.delete();
-                        return m.delete();
-                    } catch (e) {
-                        //Error
-                        console.error(e);
-                    }
 
 
+                }
+                try {
+                    message.delete();
+                    return m.delete();
+                } catch (e) {
+                    //Error
+                    console.error(e);
                 }
             });
 

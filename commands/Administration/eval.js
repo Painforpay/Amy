@@ -1,4 +1,4 @@
-﻿const Command = require('../Structure/Command');
+﻿const Command = require('../../Structure/Command');
 const { MessageAttachment, MessageEmbed } = require('discord.js');
 const fetch = require('node-fetch')
 
@@ -8,15 +8,13 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ['evaluate', 'botexec'],
-            description: 'Evaluiert einen Command',
-            category: 'Utilities',
+            description: 'Evaluiert eine Eingabe',
+            category: 'administration',
             usage: `[code]`,
             userPerms: ['ADMINISTRATOR'],
             guildOnly: true,
             ownerOnly: true,
-            nsfw: false,
-            args: false
+            minArgs: 1
         });
     }
 
@@ -34,14 +32,12 @@ module.exports = class extends Command {
             })
 
         } else {
-
-            if(!args[0]) return message.reply(` bitte gib weitere Argumente an. Nutzung des Befehls: \`!eval [code]\``)
             code = args.join(' ');
         }
 
 
 
-        let m = await message.channel.send(`Processing...`);
+        let m = await message.channel.send(`Bearbeite...`);
        let response = await this.client.utils.evaluate(message, (await code));
        let evalresponse;
        if(response instanceof MessageEmbed) {
