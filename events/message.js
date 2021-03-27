@@ -51,7 +51,8 @@ module.exports = class extends Event {
 
         if (message.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
             try {
-                message.delete()
+                message.delete();
+                message.channel.send(`${message.member}, du darfst keine Invites posten!`);
             } catch (e) {
                 //Error
                 console.error(e);

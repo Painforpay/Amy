@@ -13,6 +13,7 @@ module.exports = class extends Event {
         const client = this.client;
         this.client.raidCounter += 1;
 
+        const logChannel = member.guild.channels.cache.find(channel => channel.id === (this.client.dev ? "800110139155546209" : "796000304873209866"));
 
         // To compare, we need to load the current invite list.
         member.guild.fetchInvites().then(guildInvites => {
@@ -34,24 +35,21 @@ module.exports = class extends Event {
                 logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${invite.code}\` eingeladen. \`${invite.uses}\` Nutzungen seit seiner Erstellung. ${member.guild.memberCount} Mitglieder.`);
 
             } else {
-                const logChannel = member.guild.channels.cache.find(channel => channel.id === (this.client.dev ? "800110139155546209" : "796000304873209866"));
                 // A real basic message with the information we need.
             
                 //Trying to get the inviter by finding the code that has been deleted:
                 let msg;
-                ei.forEach(ei => {
+                ei.forEach(async ei => {
 
                     if (!guildInvites.find(i => i.code === ei.code)) {
                         const inviter = client.users.cache.get(ei.inviter.id);
                         // Get the log channel (change to your liking)
                         client.invites = guildInvites;
                         //Dieser Invite wurde genutzt
-                        msg = logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${ei.code}\` eingeladen. \`${ei.uses + 1}\` Nutzungen seit seiner Erstellung. - ${member.guild.memberCount} Mitglieder.`);
+                        msg = await logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${ei.code}\` eingeladen. \`${ei.uses + 1}\` Nutzungen seit seiner Erstellung. - ${member.guild.memberCount} Mitglieder.`);
                     }
                 });
-                if(!msg) {
-                    logChannel.send(`${member} ist beigetreten. Unbekannter Invite Code - ${member.guild.memberCount} Mitglieder.`);
-                }
+
 
             }
 
@@ -67,6 +65,16 @@ module.exports = class extends Event {
 
             return member.kick();
         } else {
+
+            if((Date.parse(new Date()) - member.user.createdTimestamp) < 259200000) {
+
+                let vor = Date.parse(new Date()) - member.user.createdTimestamp;
+
+
+
+                logChannel.send(`Achtung: Der Account von ${member} ist ziemlich jung. Erstellt am: ${await this.client.utils.getDateTime(member.user.createdTimestamp)}`);
+            }
+
 
             try {
                 member.guild.channels.cache.get(this.client.dev ? "800110138027409501" : "793944435809189921").send(`Willkommen ${member} auf ${member.guild.name}! Wir hoffen, dass du dich hier wohlfühlst. <@&${this.client.dev ? "800110137553453108" : "795964429228703764"}>`);

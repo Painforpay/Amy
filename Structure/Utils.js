@@ -973,18 +973,6 @@ module.exports = class Util {
         return i - 1;
     }
 
-    async purgeMessagesforMember(member) {
-
-        let lol = new Collection();
-
-        member.guild.channels.cache.forEach(async channel => {
-            let message_cache = await channel.messages.fetch({ limit: 100 });
-            let filter = message_cache.filter(m => m.author.id === (message.mentions.users.first()).id);
-            lol = lol.concat((await message.channel.bulkDelete(filter, true)));
-        })
-
-        return lol;
-    }
 
 
 

@@ -49,8 +49,6 @@ module.exports = class extends Command {
         await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``)
 
         //ARMED
-        await this.client.utils.purgeMessagesforMember(member);
-
         await member.kick(reason);
 
 

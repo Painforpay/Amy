@@ -156,15 +156,15 @@ module.exports = class extends Event {
                         let xploss = 0.5 * (days / 100);
                         let originxp = r.originxp == null ? xp : r.originxp; //ist standartmäßig 0
                         let xptoloose = originxp * xploss;
-
+                        let newXP = originxp - xptoloose
                         let currentlevel = await client.utils.getLevelforXp(xp);
-                        let leveluserhastoget = await client.utils.getLevelforXp(originxp - xptoloose);
+                        let leveluserhastoget = await client.utils.getLevelforXp(newXP);
 
 
-                        //update xp for User
-                        client.con.query(`UPDATE users SET \`xp\` = \`originxp\` - ${xptoloose} ${days === 0 || days === 100 ? `,\`originxp\` = ` + xp : ""} WHERE id = ${r.id};`, function (err) {
+                        //Update xp for User
+                        client.con.query(`UPDATE users SET ${days === 0 ? `\`originxp\` = ${xp}` : `\`xp\` = ${newXP}`} WHERE id = ${r.id};`, function (err) {
                             if (err) throw err;
-                            console.log(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${originxp - xptoloose}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
+                            console.log(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${newXP}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
                         });
 
 

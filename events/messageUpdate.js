@@ -27,6 +27,16 @@ module.exports = class extends Event {
 
         if (!oldMessage.guild || newMessage.author.bot) return;
 
+        if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
+            try {
+                newMessage.delete();
+                newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
+            } catch (e) {
+                //Error
+                console.error(e);
+            }
+        }
+
 
         if (newMessage.content.startsWith(this.client.prefix)) {
 
