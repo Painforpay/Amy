@@ -64,7 +64,7 @@ module.exports = class Util {
     }
 
     async getOwners(ArrOwners) {
-        let {users} = this.client;
+        let { users } = this.client;
 
         let OwnerObj = [];
 
@@ -82,8 +82,6 @@ module.exports = class Util {
     getSubCommands(cmd) {
 
         return this.client.subCommands.filter((v, k) => v.parent === cmd);
-
-
     }
 
     clean(text) {
@@ -562,7 +560,7 @@ module.exports = class Util {
 
     async checkLevelRole(level) {
 
-        // level -> current (newest) Level user has
+        // level -> current (newest) Level User has
         //let levels = [0, 2, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 

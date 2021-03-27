@@ -61,7 +61,7 @@ module.exports = class extends Command {
                     .addField(`Dein Levelfortschritt liegt bei`, `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀**${Math.floor(progress)}%**\n${currentLevelMinXP}${progressbar}${nextLevelMinXP}\n`)
                     .setAuthor(message.author.tag);
 
-                //set Placement if user has more than 0 xp
+                //set Placement if User has more than 0 xp
                 currentXP > 0 ? embed.setDescription(`🏁 Du belegst den **${placement}.** Platz aller User`) : null;
 
 

@@ -10,22 +10,22 @@ module.exports = class extends SubCommand {
             guildOnly: true,
             parent: 'xp',
             minArgs: 2,
-            argsDef: ["User", "Menge"]
+            argsDef: ["<User>", "<Menge>"]
         });
     }
 
     async run(message, args) {
         const client = this.client;
 
+        let memberID = message.mentions.members.first() || args[0];
 
+        let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(err => {
+            this.client.utils.log(`Fehler beim Fetchen des Nutzers.\n\`\`\`${err}\`\`\``)
+            message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
 
-        let member;
-        try {
-            member = message.mentions.members.first() || await message.guild.members.fetch(args[0]);
-        } catch(e) {
-            client.utils.log(`Fehler bein fetchen eines Nutzers!\n\`\`\`${e}\`\`\``)
-            return message.channel.send(`Der Nutzer konnte nicht gefunden werden.`);
-        }
+        });
+        if (!user) return;
+        let member = message.guild.member(user);
         let value = args.pop();
 
         let UserData = await this.client.utils.getUserData(member.id);

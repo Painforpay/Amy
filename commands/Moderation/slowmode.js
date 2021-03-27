@@ -1,4 +1,4 @@
-﻿const Command = require('../Structure/Command');
+﻿const Command = require('../../Structure/Command');
 const Discord = require('discord.js')
 let test = new Discord.Collection();
 
@@ -7,15 +7,12 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ['sm', 'slow'],
             description: 'Aktiviert den Slowmode in einem Channel für bestimmte Zeit',
             category: 'Utilities',
             usage: `[Zeit in Sekunden (120 Maximal)] [Sekunden pro Nachricht (30 Maximal)]`,
             userPerms: ['MANAGE_CHANNELS'],
             guildOnly: true,
-            ownerOnly: false,
-            nsfw: false,
-            args: true
+            minArgs: 1
         });
     }
 
@@ -59,7 +56,7 @@ module.exports = class extends Command {
 
         test.set(channel.id, time.toString());
         setTimeout(() => {
-            // Removes the user from the set after a minute
+            // Removes the User from the set after a minute
             this.client.picCooldown.delete(message.author.id);
         }, 10000);
 

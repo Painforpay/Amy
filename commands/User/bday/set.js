@@ -1,4 +1,5 @@
 const SubCommand = require('../../../Structure/SubCommand');
+const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 
 module.exports = class extends SubCommand {
@@ -10,7 +11,7 @@ module.exports = class extends SubCommand {
             guildOnly: true,
             parent: 'bd',
             minArgs: 1,
-            argsDef: ["TT.MM"]
+            argsDef: ["<TT.MM>"]
         });
     }
 

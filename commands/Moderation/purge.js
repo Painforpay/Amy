@@ -1,25 +1,20 @@
-﻿const Command = require('../Structure/Command');
+﻿const Command = require('../../Structure/Command');
 module.exports = class extends Command {
 
 
     constructor(...args) {
         super(...args, {
-            aliases: ['cleanchat', 'bulkdelete'],
             description: 'Löscht eine bestimmte Anzahl an Nachrichten',
-            category: 'Utilities',
-            usage: `[<anzahl oder ping>]`,
+            category: 'moderation',
             userPerms: ['MANAGE_MESSAGES'],
             guildOnly: true,
-            ownerOnly: false,
-            nsfw: false,
-            args: true
+            minArgs: 1,
+            argsDef: ['Anzahl/UserPing']
         });
     }
 
 
     async run(message, args) {
-
-
 
         await message.delete();
 

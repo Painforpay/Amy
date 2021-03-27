@@ -1,4 +1,4 @@
-﻿const Command = require('../Structure/Command');
+﻿const Command = require('../../Structure/Command');
 
 
 module.exports = class extends Command {
@@ -6,14 +6,11 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ['restart', 'stop'],
-            description: 'Fährt mich herunter',
-            category: 'Utilities',
-            userPerms: ['BAN_MEMBERS'],
+            description: 'Fährt Amy herunter.',
+            category: 'administration',
+            userPerms: ['ADMINISTRATOR'],
             guildOnly: true,
-            ownerOnly: true,
-            nsfw: false,
-            args: false
+            ownerOnly: true
         });
     }
 

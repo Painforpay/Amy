@@ -10,20 +10,22 @@ module.exports = class extends SubCommand {
             guildOnly: true,
             parent: 'xp',
             minArgs: 2,
-            argsDef: ["User", "Menge"]
+            argsDef: ["<User>", "<Menge>"]
         });
     }
 
     async run(message, args) {
         const client = this.client;
 
+        let memberID = message.mentions.members.first() || args[0];
 
+        let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(err => {
+            this.client.utils.log(`Fehler beim Fetchen des Nutzers.\n\`\`\`${err}\`\`\``)
+            message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
 
-        let member = message.mentions.members.first() || await message.guild.members.fetch(args[0]) || args[0];
-
-        if(!member) {
-            return message.channel.send(`Der Nutzer konnte nicht gefunden werden.`);
-        }
+        });
+        if (!user) return;
+        let member = message.guild.member(user);
         let value = args.pop();
         let valueToTake = value;
         const UserData = this.client.utils.getUserData(member.id);
@@ -36,7 +38,7 @@ module.exports = class extends SubCommand {
 
         }
 
-        client.con.query(`UPDATE users SET \`xp\` = \`xp\` - \`${valueToTake}\` WHERE id = ${member.id};`,function (err,result) {
+        client.con.query(`UPDATE users SET \`xp\` = \`xp\` - \`${valueToTake}\` WHERE id = ${member.id};`,function (err) {
             if(err) {
                 client.utils.log(e.stack);
                 return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)

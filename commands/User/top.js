@@ -1,18 +1,14 @@
 ﻿const Discord = require('discord.js');
-const Command = require("../Structure/Command");
+const Command = require("../../Structure/Command");
 
 module.exports = class extends Command {
 
 
     constructor(...args) {
         super(...args, {
-            aliases: ["lvltop", "top", "ranktop", "leveltop"],
-            description: 'Zeigt das Leaderboard für Erfahrungspunkte an! TOP 10',
-            category: 'roles',
-            guildOnly: true,
-            ownerOnly: false,
-            nsfw: false,
-            args: false
+            description: 'Zeigt das Leaderboard für Erfahrungspunkte an!',
+            category: 'user',
+            guildOnly: true
         });
     }
 

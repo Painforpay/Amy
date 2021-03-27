@@ -1,19 +1,16 @@
 ﻿const Discord = require('discord.js');
-const Command = require("../Structure/Command");
+const Command = require("../../Structure/Command");
 
 module.exports = class extends Command {
 
 
     constructor(...args) {
         super(...args, {
-            aliases: ["games", "go"],
             description: 'Zeigt jede Person an die Besagte Rolle hat',
             category: 'roles',
-            usage: '<RollenName>',
             guildOnly: true,
-            ownerOnly: false,
-            nsfw: false,
-            args: true
+            minArgs: 1,
+            argsDef: ['RollenName-(Kein Ping!)']
         });
     }
 

@@ -49,6 +49,8 @@ module.exports = class Bot extends Client {
 
         this.raidMode = false;
 
+        this.disabledCommands = [];
+
         this.conceptDevelopment = false;
 
         this.deletedAudits = new Collection();
@@ -91,7 +93,7 @@ module.exports = class Bot extends Client {
 
     async start(token = this.token) {
 
-
+        this.owners = await this.utils.getOwners(this.owners);
         new RESTApi(this).createServer();
         await this.utils.loadSubCommands();
         await this.utils.loadCommands();

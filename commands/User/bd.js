@@ -1,5 +1,4 @@
 const Command = require("../../Structure/Command");
-const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 module.exports = class extends Command {
 
@@ -15,10 +14,6 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-
-
-
-
         let subCommand = args[0];
         const command = this.client.subCommands.get(subCommand.toLowerCase());
 
@@ -37,38 +32,5 @@ module.exports = class extends Command {
             return message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))
         }
 
-
-
-
-
-
-
-
-
-
-
-
-        if (!args.length) return message.channel.send(`Bitte gib deinen Geburtstag im Format TT.MM ein!`);
-
-        message.delete();
-        switch (args[0]) {
-            case "list": {
-                return this.client.utils.birthdayembed(message);
-            }
-            case "set": {
-
-            }
-                break;
-            default: {
-                return message.channel.send("Dieser Unterbefehl existiert nicht. Bitte nutze \`!bd list\` oder \`!bday set\`").then(m => {
-                    try {
-                        m.delete({timeout: 10000});
-                    } catch (e) {
-                        //Error
-                        console.error(e);
-                    }
-                });
-            }
-        }
     }
 }

@@ -82,7 +82,7 @@ module.exports = class extends Event {
 
                     this.client.picCooldown.set(message.author.id, Date.parse(new Date().toString()));
                     setTimeout(() => {
-                        // Removes the user from the set after a minute
+                        // Removes the User from the set after a minute
                         this.client.picCooldown.delete(message.author.id);
                     }, 10000);
 
@@ -205,7 +205,18 @@ module.exports = class extends Event {
                             }
                         }
 
+                        //Lastly - Check if Command was Disabled
+                        if(this.client.disabledCommands.find(element => element === command.name) && command.name !== "eval") {
+                            message.delete();
+                            return message.channel.send(`Entschuldige, aber dieser Befehl ist gegenwärtig deaktiviert!`).then(m => m.delete({timeout: 60000}).catch(() => null));
+
+                        }
+
+
                     }
+
+
+
 
                     /*
                     * Everything went fine:

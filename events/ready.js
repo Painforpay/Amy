@@ -29,8 +29,8 @@ module.exports = class extends Event {
 
 
         let charlie = await this.client.users.cache.find(u => u.id === "795406184177860628");
-
-        setInterval(async () => this.client.user.setActivity(`${(charlie.presence.status === "online") ? `${this.client.prefix}help | ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} usern zu!` : "wo Charlie hin ist :("}`, {type: 'WATCHING'}), 15000);
+        //${this.client.prefix}help | ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} usern zu!
+        setInterval(async () => this.client.user.setActivity(`${(charlie.presence.status === "online") ? `v2 BETATEST` : "wo Charlie hin ist :("}`, {type: 'WATCHING'}), 15000);
 
         let client = this.client;
 
@@ -39,7 +39,7 @@ module.exports = class extends Event {
 
             client.invites = await client.guilds.cache.get((client.dev ? "800110137544146954" : "793944435809189919")).fetchInvites();
 
-        }, 4000);
+        }, 1000);
 
         //Cache Reactionroles and Messages
         console.log("Caching reactionroles...")
@@ -161,7 +161,7 @@ module.exports = class extends Event {
                         let leveluserhastoget = await client.utils.getLevelforXp(originxp - xptoloose);
 
 
-                        //update xp for user
+                        //update xp for User
                         client.con.query(`UPDATE users SET \`xp\` = \`originxp\` - ${xptoloose} ${days === 0 || days === 100 ? `,\`originxp\` = ` + xp : ""} WHERE id = ${r.id};`, function (err) {
                             if (err) throw err;
                             console.log(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${originxp - xptoloose}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
@@ -325,7 +325,7 @@ module.exports = class extends Event {
             }).then(res => res.json().then(result => result.data.Catalog.searchStore.elements.forEach(game => {
                 if (game.promotions && game.promotions.promotionalOffers && game.promotions.promotionalOffers.length > 0) {
 
-                    messages = messages.filter(message => message.author.id === this.client.user.id)
+                    messages = messages.filter(message => message.author.id === this.client.User.id)
 
                     if (!messages.first() || !messages.first().embeds[0] || messages.first().embeds[0].title !== game.title) {
                         //game was not announced yet

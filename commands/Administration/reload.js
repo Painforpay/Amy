@@ -1,27 +1,24 @@
-const Command = require("../Structure/Command");
+const Command = require("../../Structure/Command");
 
 module.exports = class extends Command {
 
 
     constructor(...args) {
         super(...args, {
-            aliases: ['rl'],
-            description: 'lädt einen Command neu',
-            category: 'Debug',
-            usage: `[cmdName]`,
+            description: 'Lädt einen Befehl neu in den Speicher',
+            category: 'administration',
             userPerms: ['ADMINISTRATOR'],
-            guildOnly: false,
             ownerOnly: true,
-            nsfw: false,
-            args: true
+            minArgs: 1,
+            argsDef: ['Befehlsname']
         });
     }
 
 
-    async run(message, args) {
-
-        if (!args.length) return message.channel.send(`Bitte gib einen Befehl zum neuladen ein!`);
-        const commandName = args[0].toLowerCase();
+    async run(message) { //, args) {
+        return message.channel.send(`Dieser Befehl ist zur Zeit deaktiviert.`);
+        //TODO
+        /*const commandName = args[0].toLowerCase();
         const command = message.client.commands.get(commandName) || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) return message.channel.send(`Es gibt keinen Befehl mit dem Namen \`${commandName}\`!`);
@@ -32,8 +29,8 @@ module.exports = class extends Command {
             message.channel.send(`Der Befehl wurde neu geladen.`);
         } catch (error) {
             console.error(error);
-            message.channel.send(`Es gab einen Fehler beim reloaded von \`${command.name}\`:\n\`${error.message}\``);
-        }
+            message.channel.send(`Es gab einen Fehler beim neueinlesen von \`${command.name}\`:\n\`${error.message}\``);
+        }*/
 
     }
 
