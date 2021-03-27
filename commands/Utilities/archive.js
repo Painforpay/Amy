@@ -6,6 +6,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
+            aliases: ["archivechannel"],
             description: 'Archiviert Textkanäle',
             category: 'utilities',
             userPerms: ["MANAGE_CHANNELS"],

@@ -145,7 +145,11 @@ module.exports = class Util {
                 const command = new File(this.client, name.toLowerCase());
                 if (!(command instanceof Command)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von Command.`);
                 this.client.commands.set(command.name, command);
-
+                if (command.aliases.length) {
+                    for (const alias of command.aliases) {
+                        this.client.aliases.set(alias, command.name);
+                    }
+                }
             }
         });
     }

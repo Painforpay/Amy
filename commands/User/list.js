@@ -6,6 +6,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
+
             description: 'Zeigt jede Person an die Besagte Rolle hat',
             category: 'roles',
             guildOnly: true,
