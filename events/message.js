@@ -128,7 +128,7 @@ module.exports = class extends Event {
             }
 
             if (message.content.toLowerCase().match(/.*(script\n*.*kiddie).*/g) && message.channel.name !== "ideen") {
-                message.react("✅");
+                await message.react("✅");
                 message.channel.send("Echt So, Pain!").then(m => {
                     try {
                         message.delete();

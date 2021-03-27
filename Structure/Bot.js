@@ -21,7 +21,7 @@ module.exports = class Bot extends Client {
 
         this.datetimeformat = {  year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: 'CET' }
 
-        this.hashingsalt = "fD0UtRLmTn";
+
 
         this.verbose = options.verbose;
 

@@ -64,7 +64,6 @@ module.exports = class Util {
     }
 
     async getOwners(ArrOwners) {
-        let { users } = this.client;
 
         let OwnerObj = [];
 
@@ -74,14 +73,13 @@ module.exports = class Util {
         return OwnerObj;
     }
 
-
     comparePerms(member, target) {
         return member.roles.highest.position > target.roles.highest.position;
     }
 
     getSubCommands(cmd) {
 
-        return this.client.subCommands.filter((v, k) => v.parent === cmd);
+        return this.client.subCommands.filter((v) => v.parent === cmd);
     }
 
     clean(text) {
@@ -602,7 +600,7 @@ module.exports = class Util {
             try {
 
                 let chan = await this.client.channels.fetch(this.client.PVoices.get(newState.member.user.id).channelid, true)
-                newState.setChannel(chan);
+                await newState.setChannel(chan);
             } catch (e) {
                 // Der Bot kann den User nicht moven
             }
@@ -626,7 +624,7 @@ module.exports = class Util {
                 // Der Bot kann dem User keine DMs schicken!
             }
 
-            newState.setChannel(chan);
+            await newState.setChannel(chan);
 
 
             this.client.PVoices.set(newState.member.user.id, {

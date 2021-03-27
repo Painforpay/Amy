@@ -14,7 +14,7 @@ module.exports = class extends Event {
 
         if (this.client.PVoices.has(newChannel.id)) {
             if (newChannel.userLimit > this.client.maxChanSize || newChannel.userLimit == 0) {
-                newChannel.setUserLimit(this.client.maxChanSize);
+                await newChannel.setUserLimit(this.client.maxChanSize);
             }
         }
 

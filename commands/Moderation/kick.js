@@ -46,12 +46,22 @@ module.exports = class extends Command {
 
         let reason = args.join(" ") || '[Kein Grund angegeben]'
 
-        member.kick(reason);
+        await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``)
+
+        //ARMED
+        await this.client.utils.purgeMessagesforMember(member);
+
+        await member.kick(reason);
+
+
 
         let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195": "795773658916061264");
         let Modlog = message.guild.channels.cache.get(this.client.dev ? "800110139155546203": "795773686064873542");
 
-        internerModlog.send(`🥾 ${member.user.tag} [${user.id}] wurde von ${message.author} wegen \`${reason}\` gekickt!`);
+        let userData = await this.client.utils.getUserData(user.id);
+
+
+        internerModlog.send(`🥾 ${member.user.tag} [${user.id}] wurde von ${message.author} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
         Modlog.send(`🥾 ${member.user.tag} [${user.id}] wurde gekickt!`);
 
     }
