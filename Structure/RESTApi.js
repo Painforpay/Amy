@@ -20,7 +20,7 @@ module.exports = class RESTApi {
         app.post('/xp', async (req, res) => {
             const body = req.body;
 
-            console.log(body)
+            return;
 
             let ref;
             switch (body.auth) {
