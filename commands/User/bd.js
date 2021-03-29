@@ -19,7 +19,7 @@ module.exports = class extends Command {
         const command = this.client.subCommands.get(subCommand.toLowerCase());
 
 
-        if (command) {
+        if (command && command.parent === this.name) {
             let cutArgs = args.slice(1);
             if (command.minArgs && cutArgs < command.minArgs) {
                 message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Angegeben: ${args.length}, Benötigt: ${command.minArgs+1}\nNutzung: \`${this.client.prefix}${this.name} ${command.name} ${command.argsDef.join(" ")}\``).then(m => {

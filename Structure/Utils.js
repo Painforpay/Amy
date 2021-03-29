@@ -192,7 +192,7 @@ module.exports = class Util {
             .setTimestamp();
 
         let desc = `Leider gibt es keinen \`${args}\` Unterbefehl für den \`${this.capitalise(cmdFile.name)}\` Befehl!`;
-        console.log(cmdFile.children)
+
         if (cmdFile.children.size > 0) {
             desc += `\nMögliche Unterbefehle sind:`
             cmdFile.children.forEach(child => {

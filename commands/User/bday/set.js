@@ -64,6 +64,8 @@ module.exports = class extends SubCommand {
             case 6:
             case 9:
             case 11: {
+
+                if(month > 30) {
                 return message.channel.send("Uhm... Der " + months[month - 1] + " hat nur maximal 30 Tage. Bitte versuch es erneut.").then(m => {
                     try {
                         m.delete({timeout: 10000});
@@ -72,6 +74,7 @@ module.exports = class extends SubCommand {
                         console.error(e);
                     }
                 });
+                }
             }
         }
         await this.client.utils.setBirthday(message, day, month);
