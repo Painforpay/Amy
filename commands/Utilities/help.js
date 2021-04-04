@@ -76,12 +76,11 @@ module.exports = class extends Command {
                 let description = `${command.description}`
 
                 if (command.aliases.length > 0) {
-                    embed.addField(`\n\n**Alternative Namen:**`,`${command.name}, ${command.aliases.join(", ")}`)
+                    embed.addField(`\n\n**Alternative Namen:**`, `${command.name}, ${command.aliases.join(", ")}`)
                 }
 
 
-
-                    embed.addField(`**Nutzung:**`, `${this.client.prefix}${args[0]} ${command.argsDef.length > 0 ? " " + command.argsDef.join(" ") : ""}`)
+                embed.addField(`**Nutzung:**`, `${this.client.prefix}${args[0]} ${command.argsDef.length > 0 ? " " + command.argsDef.join(" ") : ""}`)
 
                 let subcommands = [];
                 if (command.children.size > 0) {
@@ -96,9 +95,9 @@ module.exports = class extends Command {
 
                 embed.addField(`Unterbefehle: `, subcommands.join("\n") || `Dieser Befehl besitzt keine Unterbefehle.`)
 
-                if(command.additionalinfo.length > 0 ) {
+                if (command.additionalinfo.length > 0) {
 
-                    embed.setFooter(`Achtung: `+command.additionalinfo);
+                    embed.setFooter(`Achtung: ` + command.additionalinfo);
                 }
 
                 embed.setDescription(description)
