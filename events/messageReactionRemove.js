@@ -28,16 +28,24 @@ module.exports = class extends Event {
 
         this.client.con.query(`SELECT * FROM rroles WHERE messageid = '${reaction.message.id}'`, function (err, result) {
             if (err) throw err;
-            let member = reaction.message.guild.members.cache.get(user.id);
+            let member = reaction.client.users.fetch(user.id);
 
-            result.forEach(r => {
 
-                if (r.emoji === reaction.emoji.name) {
+            if(member) {
+                result.forEach(r => {
 
-                    member.roles.remove(r.roleid);
-                }
+                    if (r.emoji === reaction.emoji.name) {
+                        try {
+                            member.roles.remove(r.roleid);
+                        } catch (e) {
+                            console.error(e)
+                        }
 
-            })
+                    }
+
+                })
+            }
+
 
 
         });
