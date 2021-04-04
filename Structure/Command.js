@@ -15,6 +15,7 @@ module.exports = class Command {
         this.nsfw = options.nsfw || false;
         this.minArgs = options.minArgs || 0;
         this.argsDef = options.argsDef || [];
+        this.additionalinfo = options.additionalinfo || "";
         this.children = client.utils.getSubCommands(name);
     }
 

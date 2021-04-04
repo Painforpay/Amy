@@ -6,7 +6,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["leaderboard", "top10"],
+            aliases: ["top10","t"],
             description: 'Zeigt das Leaderboard für Erfahrungspunkte an!',
             category: 'user',
             guildOnly: true

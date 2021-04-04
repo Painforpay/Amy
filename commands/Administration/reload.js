@@ -10,7 +10,7 @@ module.exports = class extends Command {
             userPerms: ['ADMINISTRATOR'],
             ownerOnly: true,
             minArgs: 1,
-            argsDef: ['Befehlsname']
+            argsDef: ['<befehlsname>']
         });
     }
 

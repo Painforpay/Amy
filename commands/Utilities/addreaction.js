@@ -12,7 +12,7 @@ module.exports = class extends Command {
             guildOnly: true,
             ownerOnly: false,
             nsfw: false,
-            argsDef: ["MessageID", "Emoji"],
+            argsDef: ["<messageid>", "<emoji>"],
             minArgs: 2
         });
     }

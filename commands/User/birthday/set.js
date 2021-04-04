@@ -6,10 +6,10 @@ module.exports = class extends SubCommand {
 
     constructor(...args) {
         super(...args, {
-            description: 'Setzt die XP für einen User',
+            description: 'Setzt den Geburtstag eines Users',
             category: 'users',
             guildOnly: true,
-            parent: 'bd',
+            parent: 'birthday',
             minArgs: 1,
             argsDef: ["<TT.MM>"]
         });

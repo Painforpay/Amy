@@ -28,7 +28,7 @@ module.exports = class extends Event {
 
 
 
-        let charlie = await this.client.users.cache.find(u => u.id === "795406184177860628");
+        let charlie = await this.client.users.fetch("795406184177860628");
         //${this.client.prefix}help | ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} usern zu!
         setInterval(async () => this.client.user.setActivity(`${(charlie.presence.status === "online") ? `v2 BETATEST` : "wo Charlie hin ist :("}`, {type: 'WATCHING'}), 15000);
 

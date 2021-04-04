@@ -7,9 +7,10 @@ module.exports = class extends Command {
     constructor(...args) {
         super(...args, {
 
-            description: 'Schließt ein Ticket [Kann nur in SupportChanneln genutzt werden!]',
+            description: 'Schließt ein Ticket',
             category: 'moderation',
             userPerms: ['KICK_MEMBERS'],
+            additionalinfo: "Kann nur in der Supportkategorie genutzt werden!",
             guildOnly: true
         });
     }

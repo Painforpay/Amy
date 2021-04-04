@@ -8,13 +8,15 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
+            aliases: ["dothingys", "evaluate", "scooby-doo"],
             description: 'Evaluiert eine Eingabe',
             category: 'administration',
             usage: `[code]`,
             userPerms: ['ADMINISTRATOR'],
             guildOnly: true,
             ownerOnly: true,
-            minArgs: 1
+            minArgs: 1,
+            argsDef: ["<code>"]
         });
     }
 

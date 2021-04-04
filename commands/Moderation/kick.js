@@ -13,7 +13,7 @@ module.exports = class extends Command {
             ownerOnly: false,
             nsfw: false,
             minArgs: 1,
-            argsDef: ["ID/Ping", "Grund"]
+            argsDef: ["<id/ping>", "<grund>"]
         });
     }
 

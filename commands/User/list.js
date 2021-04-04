@@ -7,11 +7,13 @@ module.exports = class extends Command {
     constructor(...args) {
         super(...args, {
 
-            description: 'Zeigt jede Person an die Besagte Rolle hat',
+            description: 'Zeigt jede Person an die Besagte Rolle hat.',
+            aliases: ["lu"],
             category: 'roles',
             guildOnly: true,
             minArgs: 1,
-            argsDef: ['RollenName-(Kein Ping!)']
+            argsDef: ['<rollenname>'],
+            additionalinfo: "Es kann darf keine Rolle gepingt werden - Der exakte Name reicht."
         });
     }
 

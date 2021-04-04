@@ -5,33 +5,33 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["help"],
-            description: 'Zeigt diese Hilfeseite an',
+            aliases: ["cmds", "hilfe"],
+            description: 'Zeigt die Hilfeseite an',
             category: 'utilities',
             minArgs: 0,
-            argsDef: ['Befehlsname']
+            argsDef: ['<befehlsname>']
         });
     }
 
     async run(message, args) {
 
-        if(!args.length) {
+        if (!args.length) {
 
 
             let embed = new MessageEmbed()
                 .setAuthor("Hier findest du eine Liste mit allen wichtigen Befehlen.")
-                .setDescription(`\` | \` ist ein trenner für Aliases`)
+                .setDescription(`Mit ${this.client.prefix}${this.name} ${this.argsDef.join(" ")} kann mehr Information angezeigt werden!`)
                 .setColor("#FFD700");
 
             let accessibleCommands = [];
 
             this.client.commands.map(x => {
 
-                if(message.member.hasPermission(x.userPerms)) {
-                    if(!x.ownerOnly) {
+                if (message.member.hasPermission(x.userPerms)) {
+                    if (!x.ownerOnly) {
                         return accessibleCommands.push(x);
                     } else {
-                        if(!this.client.utils.checkOwner(message.author)) return;
+                        if (!this.client.utils.checkOwner(message.author)) return;
                         return accessibleCommands.push(x);
                     }
                 }
@@ -40,11 +40,9 @@ module.exports = class extends Command {
 
 
             for await (let command of accessibleCommands) {
-                let name = [`${this.client.prefix}${command.name}`];
-                for await (let alias of command.aliases) {
-                    name.push(alias);
-                }
-                embed.addField(name.join(" | "), `${command.description}`);
+                let name = `${this.client.prefix}${command.name}`;
+
+                embed.addField(name, `${command.description}`);
 
             }
 
@@ -60,7 +58,6 @@ module.exports = class extends Command {
             })
 
 
-
         } else {
 
 
@@ -73,25 +70,38 @@ module.exports = class extends Command {
 
                 let embed = new MessageEmbed()
                     .setColor("#FFD700")
-                    .setTitle(args[0]);
+                    .setTitle(this.client.utils.capitalise(command.name));
 
 
-                let description = [`**${command.description}**`]
+                let description = `${command.description}`
 
-                if(command.children.size > 0) {
-                    description.push(`Unterbefehle:`)
-                    for await (const SubCommand of command.children) {
-
-                        description.push(`${this.client.prefix}${args[0]} ${SubCommand[1].name}${SubCommand[1].argsDef ? " " + SubCommand[1].argsDef.join(" ") : ""}`)
-                    }
-                } else {
-                    description.push(`Dieser Befehl besitzt keine Unterbefehle.`)
+                if (command.aliases.length > 0) {
+                    embed.addField(`\n\n**Alternative Namen:**`,`${command.name}, ${command.aliases.join(", ")}`)
                 }
 
 
 
+                    embed.addField(`**Nutzung:**`, `${this.client.prefix}${args[0]} ${command.argsDef.length > 0 ? " " + command.argsDef.join(" ") : ""}`)
 
-                embed.setDescription(description.join("\n"))
+                let subcommands = [];
+                if (command.children.size > 0) {
+
+                    for await (const SubCommand of command.children) {
+                        subcommands.push(`${this.client.prefix}${args[0]} ${SubCommand[1].name}${SubCommand[1].argsDef ? " " + SubCommand[1].argsDef.join(" ") : ""}`);
+
+                    }
+
+
+                }
+
+                embed.addField(`Unterbefehle: `, subcommands.join("\n") || `Dieser Befehl besitzt keine Unterbefehle.`)
+
+                if(command.additionalinfo.length > 0 ) {
+
+                    embed.setFooter(`Achtung: `+command.additionalinfo);
+                }
+
+                embed.setDescription(description)
 
 
                 message.channel.send(embed).then(m => m.delete({timeout: 15000}).catch(() => null));

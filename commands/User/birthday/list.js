@@ -6,10 +6,10 @@ module.exports = class extends SubCommand {
 
     constructor(...args) {
         super(...args, {
-            description: 'Zeigt alle Geburtstage, welche zur Zeit eingetragen sind!',
+            description: 'Zeigt alle Geburtstage an, welche zur Zeit eingetragen sind!',
             category: 'users',
             guildOnly: true,
-            parent: 'bd'
+            parent: 'birthday'
         });
     }
 

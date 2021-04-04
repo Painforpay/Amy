@@ -5,7 +5,7 @@ module.exports = class extends SubCommand {
 
     constructor(...args) {
         super(...args, {
-            description: 'Erhöht die XP für einen User',
+            description: 'Erhöht die XP für einen Nutzer',
             category: 'users',
             guildOnly: true,
             parent: 'xp',

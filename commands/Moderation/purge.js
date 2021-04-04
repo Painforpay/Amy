@@ -7,9 +7,11 @@ module.exports = class extends Command {
             description: 'Löscht eine bestimmte Anzahl an Nachrichten',
             category: 'moderation',
             userPerms: ['MANAGE_MESSAGES'],
+            aliases: ["clearchat", "clear"],
             guildOnly: true,
             minArgs: 1,
-            argsDef: ['Anzahl/UserPing']
+            argsDef: ['<anzahl/ping>'],
+            additionalinfo: "Es kann die Anzahl der Nachrichten spezifiziert werden, oder der Nutzer gepingt."
         });
     }
 

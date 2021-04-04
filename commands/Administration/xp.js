@@ -11,6 +11,7 @@ module.exports = class extends Command {
             guildOnly: true,
             ownerOnly: false,
             nsfw: false,
+            aliases: ["xpManage", "exp"],
             minArgs: 1
         });
     }

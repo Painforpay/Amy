@@ -9,10 +9,11 @@ module.exports = class extends Command {
         super(...args, {
             description: 'Aktiviert den Slowmode in einem Channel für bestimmte Zeit',
             category: 'Utilities',
-            usage: `[Zeit in Sekunden (120 Maximal)] [Sekunden pro Nachricht (30 Maximal)]`,
+            aliases: ["sm", "slow"],
+            argsDef: [`<Zeit in Sekunden>`,`<Sekunden pro Nachricht>`],
             userPerms: ['MANAGE_CHANNELS'],
             guildOnly: true,
-            minArgs: 1
+            minArgs: 0
         });
     }
 

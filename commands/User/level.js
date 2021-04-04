@@ -6,7 +6,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["level", "rank"],
+            aliases: ["lvl", "l"],
             description: 'Zeigt dir Informationen zu deinem Level an!',
             category: 'user',
             guildOnly: true

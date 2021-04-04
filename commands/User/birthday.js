@@ -5,7 +5,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["bday", "birthday"],
+            aliases: ["bday", "bd", "gb"],
             description: 'Verwaltet deinen Geburtstag',
             category: 'user',
             minArgs: 1,
