@@ -36,7 +36,7 @@ module.exports = class extends Command {
         }
 
         if (!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
-            return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
+            return message.channel.send(`Ich kann diesen Nutzer nicht bannen!`)
         }
 
         await args.shift();

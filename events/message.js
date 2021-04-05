@@ -162,7 +162,7 @@ module.exports = class extends Event {
                     if (command.ownerOnly && !this.client.utils.checkOwner(message.author)) {
 
                         //User is not allowed to use this command, we don't want to do anything as it is not needed
-                        console.log("lol")
+
                         return message.delete().catch(() => null);
                     }
 

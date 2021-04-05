@@ -48,16 +48,11 @@ module.exports = class extends Event {
             if (command) {
 
 
-                if (command.ownerOnly && !this.client.utils.checkOwner(newMessage.author.id)) {
-                    newMessage.reply('diesen Befehl darf nur der BotOwner nutzen!').then(m => {
-                        try {
-                            newMessage.delete()
-                            m.delete({timeout: 60000});
-                        } catch (e) {
-                            //Error
-                            console.error(e);
-                        }
-                    });
+                if (command.ownerOnly && !this.client.utils.checkOwner(message.author)) {
+
+                    //User is not allowed to use this command, we don't want to do anything as it is not needed
+
+                    return message.delete().catch(() => null);
                 } else {
 
                     if (cmd.toLowerCase() != "eval") return;

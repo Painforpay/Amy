@@ -225,6 +225,28 @@ module.exports = class Util {
 
     }
 
+    async muteMember(member, time, mod) {
+        let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
+        try {
+            member.roles.add(this.client.dev ? "828709057103003678" : "828708084674199632");
+            internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted!`)
+
+        } catch (e) {
+            console.error(e);
+        }
+
+        setTimeout(async () => {
+            try {
+                member.roles.remove(this.client.dev ? "828709057103003678" : "828708084674199632");
+                internerModlog.send(`🙉 ${member.user.tag} [${member.user.id}] wurde entmuted!`)
+
+            } catch (e) {
+                null;
+            }
+
+        }, time * 60000);
+    }
+
     //This creates an Embed if a NSFW Command was executed in a non NSFW Channel
     async NSFWEmbed(message, cmdFile) {
 
