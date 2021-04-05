@@ -1,0 +1,27 @@
+[
+  {
+    "name": "administration",
+    "description": "Verwaltung des Servers",
+    "emoji": "\uD83D\uDCBC"
+  },
+  {
+    "name": "moderation",
+    "description": "Verhängen von Strafen auf diesem Server",
+    "emoji": "⚒"
+  },
+  {
+    "name": "user",
+    "description": "Befehle die jeder nutzen kann",
+    "emoji": "\uD83D\uDC8E"
+  },
+  {
+    "name": "gesten",
+    "description": "Aktionen ausdrücken",
+    "emoji": "\uD83C\uDF9E"
+  },
+  {
+    "name": "utilities",
+    "description": "Allgemeine Befehle",
+    "emoji": "\uD83D\uDCA1"
+  }
+]

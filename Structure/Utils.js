@@ -60,7 +60,12 @@ module.exports = class Util {
     }
 
     checkOwner(target) {
-        return this.client.owners.includes(target);
+        return this.client.owners.find(t => t === target);
+    }
+
+    getRandom(array) {
+
+        return array[Math.floor(Math.random() * array.length)];
     }
 
     async getOwners(ArrOwners) {
@@ -125,13 +130,25 @@ module.exports = class Util {
             client.con.query(`SELECT * FROM users WHERE id = ${id}`, function (err, result) {
                 if(err) reject(err.name);
 
-                if(result[0]) {
+                if (result[0]) {
                     resolve(result[0]);
                 }
 
             })
 
         })
+
+    }
+
+    async loadCategories() {
+        let test = require("../JSON/categories.json");
+
+
+        test.forEach(i => {
+
+            this.client.categories.set(i.name, i);
+        })
+
 
     }
 
@@ -145,6 +162,8 @@ module.exports = class Util {
                 const command = new File(this.client, name.toLowerCase());
                 if (!(command instanceof Command)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von Command.`);
                 this.client.commands.set(command.name, command);
+
+
                 if (command.aliases.length) {
                     for (const alias of command.aliases) {
                         this.client.aliases.set(alias, command.name);

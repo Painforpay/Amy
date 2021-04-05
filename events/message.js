@@ -28,7 +28,7 @@ module.exports = class extends Event {
         if (message.channel.type === "dm") {
 
             if (message.content.toLowerCase().match(/.*(danke\n*.*amy).*/g)) {
-                let gif = compliments[Math.floor(Math.random() * compliments.length)]
+                let gif = this.client.utils.getRandom(compliments)
                 return message.channel.send(gif).then(m => {
                     try {
                         m.delete({timeout: 3600000})
@@ -159,10 +159,10 @@ module.exports = class extends Event {
                 const command = this.client.commands.get(cmd.toLowerCase()) || this.client.commands.get(this.client.aliases.get(cmd.toLowerCase()));
                 if (command) {
 
-                    if (command.ownerOnly && !this.client.utils.checkOwner(message.author.id)) {
+                    if (command.ownerOnly && !this.client.utils.checkOwner(message.author)) {
 
                         //User is not allowed to use this command, we don't want to do anything as it is not needed
-
+                        console.log("lol")
                         return message.delete().catch(() => null);
                     }
 
@@ -207,7 +207,7 @@ module.exports = class extends Event {
                         }
 
                         //Lastly - Check if Command was Disabled
-                        if(this.client.disabledCommands.find(element => element === command.name) && command.name !== "eval") {
+                        if (this.client.disabledCommands.find(element => element === command.name) && command.name !== "eval") {
                             message.delete();
                             return message.channel.send(`Entschuldige, aber dieser Befehl ist gegenwärtig deaktiviert!`).then(m => m.delete({timeout: 60000}).catch(() => null));
 
@@ -216,7 +216,20 @@ module.exports = class extends Event {
 
                     }
 
+                    if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) && !message.member.hasPermission("ADMINISTRATOR")) {
+                        message.delete();
+                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf diesem Befehl!`).then(m => m.delete({timeout: 60000}).catch(() => null));
 
+
+                    }
+                    if (command.cooldown > 0) {
+                        command.cooldownPeople.set(message.author.id, command.cooldown);
+
+                        setTimeout(async () => {
+                            command.cooldownPeople.delete(message.author.id);
+                        }, command.cooldown)
+
+                    }
 
 
                     /*

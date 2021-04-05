@@ -1,4 +1,4 @@
-const { Permissions } = require('discord.js');
+const {Permissions, Collection} = require('discord.js');
 
 module.exports = class Command {
 
@@ -17,6 +17,8 @@ module.exports = class Command {
         this.argsDef = options.argsDef || [];
         this.additionalinfo = options.additionalinfo || "";
         this.children = client.utils.getSubCommands(name);
+        this.cooldown = options.cooldown * 1000 || 0;
+        this.cooldownPeople = new Collection();
     }
 
     async run(message, args) {

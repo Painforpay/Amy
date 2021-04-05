@@ -21,7 +21,7 @@ module.exports = class Bot extends Client {
 
         this.datetimeformat = {  year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: 'CET' }
 
-
+        this.categories = new Collection();
 
         this.verbose = options.verbose;
 
@@ -95,6 +95,8 @@ module.exports = class Bot extends Client {
 
         this.owners = await this.utils.getOwners(this.owners);
         new RESTApi(this).createServer();
+
+        await this.utils.loadCategories();
         await this.utils.loadSubCommands();
         await this.utils.loadCommands();
         await this.utils.loadEvents();

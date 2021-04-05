@@ -19,96 +19,128 @@ module.exports = class extends Command {
 
 
             let embed = new MessageEmbed()
-                .setAuthor("Hier findest du eine Liste mit allen wichtigen Befehlen.")
-                .setDescription(`Mit ${this.client.prefix}${this.name} ${this.argsDef.join(" ")} kann mehr Information angezeigt werden!`)
-                .setColor("#FFD700");
+                .setColor("#FFD700")
+                .setTitle(`:question: Hilfe`)
+                .setDescription(`Hier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!`);
 
-            let accessibleCommands = [];
-
-            this.client.commands.map(x => {
-
-                if (message.member.hasPermission(x.userPerms)) {
-                    if (!x.ownerOnly) {
-                        return accessibleCommands.push(x);
-                    } else {
-                        if (!this.client.utils.checkOwner(message.author)) return;
-                        return accessibleCommands.push(x);
-                    }
-                }
-
-            })
-
-
-            for await (let command of accessibleCommands) {
-                let name = `${this.client.prefix}${command.name}`;
-
-                embed.addField(name, `${command.description}`);
-
+            for await (let category of this.client.categories) {
+                console.log(category)
+                embed.addField(`${category[1].emoji} ${this.client.utils.capitalise(category[1].name)}`, `**${category[1].description}**`)
             }
 
+            embed.setFooter(`Beispiel: !help ${this.client.categories.first().name}`);
 
-            message.channel.send({embed: embed}).then(m => {
-                try {
-                    m.delete({timeout: (accessibleCommands.length * 3000)})
-                } catch (e) {
-                    //Error
-                    console.error(e);
-                }
-
-            })
+            message.channel.send(embed)
 
 
         } else {
 
 
-            let searchedCommand = args[0];
+            let searchQuery = args[0];
 
-            const command = this.client.commands.get(searchedCommand.toLowerCase()) || this.client.commands.get(this.client.aliases.get(searchedCommand.toLowerCase()));
+            const result = this.client.categories.get(searchQuery.toLowerCase()) || this.client.commands.get(searchQuery.toLowerCase()) || this.client.commands.get(this.client.aliases.get(searchQuery.toLowerCase()));
 
+            if (!result) message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 15000}).catch(() => null));
 
-            if (command) {
-
-                let embed = new MessageEmbed()
-                    .setColor("#FFD700")
-                    .setTitle(this.client.utils.capitalise(command.name));
+            if (result instanceof Command) {
 
 
-                let description = `${command.description}`
+                if (result) {
 
-                if (command.aliases.length > 0) {
-                    embed.addField(`\n\n**Alternative Namen:**`, `${command.name}, ${command.aliases.join(", ")}`)
-                }
+                    let embed = new MessageEmbed()
+                        .setColor("#FFD700")
+                        .setTitle(this.client.utils.capitalise(result.name));
 
 
-                embed.addField(`**Nutzung:**`, `${this.client.prefix}${args[0]} ${command.argsDef.length > 0 ? " " + command.argsDef.join(" ") : ""}`)
+                    let description = `${result.description}`
 
-                let subcommands = [];
-                if (command.children.size > 0) {
-
-                    for await (const SubCommand of command.children) {
-                        subcommands.push(`${this.client.prefix}${args[0]} ${SubCommand[1].name}${SubCommand[1].argsDef ? " " + SubCommand[1].argsDef.join(" ") : ""}`);
-
+                    if (result.aliases.length > 0) {
+                        embed.addField(`\n\n**Alternative Namen:**`, `${result.name}, ${result.aliases.join(", ")}`)
                     }
 
 
+                    embed.addField(`**Nutzung:**`, `${this.client.prefix}${args[0]} ${result.argsDef.length > 0 ? " " + result.argsDef.join(" ") : ""}`)
+
+                    let subcommands = [];
+                    if (result.children.size > 0) {
+
+                        for await (const SubCommand of result.children) {
+                            subcommands.push(`${this.client.prefix}${args[0]} ${SubCommand[1].name}${SubCommand[1].argsDef ? " " + SubCommand[1].argsDef.join(" ") : ""}`);
+
+                        }
+
+
+                    }
+
+                    embed.addField(`Unterbefehle: `, subcommands.join("\n") || `Dieser Befehl besitzt keine Unterbefehle.`)
+
+                    if (result.additionalinfo.length > 0) {
+
+                        embed.setFooter(`Achtung: ` + result.additionalinfo);
+                    }
+
+                    embed.setDescription(description)
+
+
+                    message.channel.send(embed).then(m => m.delete({timeout: 15000}).catch(() => null));
+
                 }
 
-                embed.addField(`Unterbefehle: `, subcommands.join("\n") || `Dieser Befehl besitzt keine Unterbefehle.`)
-
-                if (command.additionalinfo.length > 0) {
-
-                    embed.setFooter(`Achtung: ` + command.additionalinfo);
-                }
-
-                embed.setDescription(description)
-
-
-                message.channel.send(embed).then(m => m.delete({timeout: 15000}).catch(() => null));
 
             } else {
-                message.channel.send(`Dieser Befehl konnte nicht gefunden werden!`).then(m => m.delete({timeout: 15000}).catch(() => null));
-            }
+                //Category searched
 
+                let embed = new MessageEmbed()
+                    .setTitle(`${result.emoji} ${this.client.utils.capitalise(result.name)}`)
+                    .setColor("#FFD700")
+                    .setDescription(result.description);
+
+
+                let accessibleCommands = [];
+
+                this.client.commands.map(x => {
+
+                    if (message.member.hasPermission(x.userPerms)) {
+                        if (x.category !== result.name) return; //TODO
+
+                        if (!x.ownerOnly) {
+                            return accessibleCommands.push(x);
+                        } else {
+                            if (!this.client.utils.checkOwner(message.author)) return;
+                            return accessibleCommands.push(x);
+                        }
+                    }
+
+                })
+
+
+                if (!accessibleCommands.length > 0) {
+
+                    embed.addField("Fehler!", "Es gibt keine Befehle für diese Kategorie!")
+
+
+                }
+
+                for await (let command of accessibleCommands) {
+                    let name = `${this.client.prefix}${command.name}`;
+
+                    embed.addField(name, `${command.description}`);
+
+                }
+
+
+                message.channel.send({embed: embed}).then(m => {
+                    try {
+                        m.delete({timeout: (20000)})
+                    } catch (e) {
+                        //Error
+                        console.error(e);
+                    }
+
+                })
+
+
+            }
         }
 
         try {

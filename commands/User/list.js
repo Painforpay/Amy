@@ -9,7 +9,7 @@ module.exports = class extends Command {
 
             description: 'Zeigt jede Person an die Besagte Rolle hat.',
             aliases: ["lu"],
-            category: 'roles',
+            category: 'User',
             guildOnly: true,
             minArgs: 1,
             argsDef: ['<rollenname>'],
