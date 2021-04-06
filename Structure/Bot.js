@@ -47,6 +47,8 @@ module.exports = class Bot extends Client {
 
         this.PVoices = new Collection(); //List of Current Private Channels
 
+        this.spamCollection = new Collection();
+
         this.raidMode = false;
 
         this.disabledCommands = [];
@@ -62,6 +64,8 @@ module.exports = class Bot extends Client {
         this.xpMessages = 1;    //XP pro Nachricht
 
         this.xpVoice = 2;   //XP pro Minute
+
+        this.messagesPerSecond = 3; //Nachrichten erlaubt pro Sekunde
 
         this.VoiceUsers = new Collection();
 

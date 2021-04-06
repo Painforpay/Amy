@@ -30,9 +30,9 @@ module.exports = class extends Command {
         });
         if (!user) return;
         let member = message.guild.member(user);
-        if (message.member.id === user.id) return message.channel.send(`Du kannst dich nicht selbst muten!`)
+        if (message.member.id === user.id && !this.client.dev) return message.channel.send(`Du kannst dich nicht selbst muten!`)
 
-        if (member && !this.client.utils.comparePerms(message.member, member)) {
+        if (member && !this.client.utils.comparePerms(message.member, member) && message.guild.ownerID != message.member.id) {
             return message.channel.send(`Du kannst diesen Nutzer nicht muten!`)
         }
 
@@ -43,7 +43,6 @@ module.exports = class extends Command {
         await args.shift();
 
         let time = parseInt(args[0]) || 1;
-        await user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`)
 
 
         //ARMED

@@ -225,12 +225,31 @@ module.exports = class Util {
 
     }
 
-    async muteMember(member, time, mod) {
-        let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
+    async logToGeneral(messageString) {
+        let general = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919").channels.cache.get(this.client.dev ? "800110138027409501" : "793944435809189921");
+
         try {
+            general.send(messageString);
+
+        } catch (e) {
+            console.log(e);
+        }
+
+    }
+
+    async muteMember(member, time, mod) {
+        if (member.voice) {
+            member.voice.kick();
+        }
+        let internerModlog = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919").channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
+        try {
+
+
             member.roles.add(this.client.dev ? "828709057103003678" : "828708084674199632");
             internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted!`)
+            let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`)
 
+            m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
         } catch (e) {
             console.error(e);
         }
@@ -238,7 +257,9 @@ module.exports = class Util {
         setTimeout(async () => {
             try {
                 member.roles.remove(this.client.dev ? "828709057103003678" : "828708084674199632");
-                internerModlog.send(`🙉 ${member.user.tag} [${member.user.id}] wurde entmuted!`)
+                internerModlog.send(`🙉 ${member.user.tag} [${member.user.id}] wurde Automatisch entmuted!`)
+                let m = await member.user.send(`Du wurdest im Wohnzimmer automatisch entmuted.`);
+                m.delete({timeout: (time * 60000) * 3}).catch(() => null)
 
             } catch (e) {
                 null;

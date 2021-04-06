@@ -44,6 +44,14 @@ module.exports = class extends Event {
         }//*/
 
 
+        //Selfbot detection
+        if (message.embeds.length > 0) {
+            message.delete().catch(() => null);
+            this.client.utils.log(`[SelfBot Detected] Der Nutzer ${message.member} hat ein Embed gepostet obwohl er dies nicht ohne ein Selfbotting kann. Er wurde deswegen für 24h gemuted. Bitte in Diskurs treten!\n<@&798293308937863219>`)
+            await this.client.utils.muteMember(message.member, 1440, message.guild.me)
+        }
+
+
         if (message.content.match(mentionRegex)) message.channel.send(`Mein prefix ist \`${this.client.prefix}\`.`);
 
         const prefix = message.content.match(mentionRegexPrefix) ?
@@ -63,6 +71,23 @@ module.exports = class extends Event {
 
             await this.client.utils.colorgiver(message);
 
+        }
+
+        if (this.client.spamCollection.has(message.member.id)) {
+            if (this.client.spamCollection.get(message.member.id) > 2) {
+                message.channel.send(`Bitte Spam nicht!`)
+                message.delete();
+                if (this.client.spamCollection.get(message.member.id) > 6) {
+                    this.client.utils.muteMember(message.member, 2, message.guild.me);
+                }
+            }
+            let currentCount = this.client.spamCollection.get(message.member.id) ? this.client.spamCollection.get(message.member.id) : 0;
+
+            this.client.spamCollection.set(message.member.id, currentCount + 1)
+
+        } else {
+
+            this.client.spamCollection.set(message.member.id, 1)
         }
 
 

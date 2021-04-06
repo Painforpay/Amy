@@ -137,9 +137,20 @@ module.exports = class extends Event {
         await (await this.client.channels.fetch(client.dev ? "800110137820971040" : "796119563803689050", true)).messages.fetch(client.dev ? "800111566459764737" : "796203324410953808", true);
 
 
-
         let botlogs = await this.client.channels.fetch(client.dev ? "803530075571224627" : "803530018369830922", true);
         console.log(colors.green("Done caching Messages / Channels."));
+
+        setInterval(async () => {
+
+            this.client.spamCollection.forEach((v, k) => {
+                if (v > 0) {
+                    this.client.spamCollection.delete(k)
+                } else {
+                    let newV = v - 1
+                    this.client.spamCollection.set(k, newV)
+                }
+            })
+        }, 1000 / this.client.messagesPerSecond)
 
 
         schedule.scheduleJob('0 0 * * *', () => {
