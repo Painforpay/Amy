@@ -42,7 +42,7 @@ module.exports = class extends Event {
         }, 1000);
 
         //Cache Reactionroles and Messages
-        console.log("Caching reactionroles...")
+        console.log(colors.gray("Caching reactionroles..."))
 
 
         //Get all Messages in #steckbriefrollen
@@ -82,7 +82,7 @@ module.exports = class extends Event {
 
         }
         if (this.client.VoiceUsers.size > 0) {
-            console.log(`Found ${this.client.VoiceUsers.size} User${this.client.VoiceUsers.size > 1 ? "s" : ""} in Voice Channels`);
+            console.log(colors.yellow(`Found ${this.client.VoiceUsers.size} User${this.client.VoiceUsers.size > 1 ? "s" : ""} in Voice Channels`));
         }
 
 
@@ -113,16 +113,23 @@ module.exports = class extends Event {
 
         }
 
-        //React to the messages
-        /*this.client.con.query(`SELECT * FROM rroles;`, function(err, result) {
-            if(err) throw err;
 
-            result.forEach(r => {
-               await steckbriefrollen.messages.fetch(r.messageid).then(m => m.react(r.emoji));
-
+        //Unmute all Members currently muted as there is no unmute Timeout Anymore
+        {   //brackets so the muterole variable is available out of scope
+            let muterole = guild.roles.cache.get(this.client.dev ? "828709057103003678" : "828708084674199632")
+            let muteMembersSize = muterole.members.size
+            muterole.members.forEach(m => {
+                try {
+                    m.roles.remove(this.client.dev ? "828709057103003678" : "828708084674199632");
+                } catch (e) {
+                    console.error(e);
+                }
             })
+            if (muteMembersSize > 0) {
+                console.log(colors.yellow(`Removed the Muted Role from ${muteMembersSize} Member${muteMembersSize > 1 ? "s" : ""}`))
+            }
 
-        }); // */
+        }
 
 
         let teammemberembed = await (await this.client.channels.fetch(client.dev ? "800110138924466191" : "795804770178039808", true)).messages.fetch(client.dev ? "802569631238717490" : "795806452039811073", true);
@@ -130,9 +137,10 @@ module.exports = class extends Event {
         await (await this.client.channels.fetch(client.dev ? "800110137820971040" : "796119563803689050", true)).messages.fetch(client.dev ? "800111566459764737" : "796203324410953808", true);
 
 
+
         let botlogs = await this.client.channels.fetch(client.dev ? "803530075571224627" : "803530018369830922", true);
         console.log(colors.green("Done caching Messages / Channels."));
-        (!this.client.dev ? botlogs.send(`[${this.client.utils.getDateTime()}] Status: Back Online!`) : null);
+
 
         schedule.scheduleJob('0 0 * * *', () => {
             //Increment daily for all
@@ -297,7 +305,7 @@ module.exports = class extends Event {
                         await member.roles.add(client.dev ? "815864639279202365" : "813853716691025960");
                         let embed = new MessageEmbed()
                             .setTitle("Birthday Reminder!")
-                            .setDescription(`Herzlichen Glückwunsch zum Geburtstag, ${user}`)
+                            .setDescription(`Herzlichen Glückwunsch zum Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
                             .setTimestamp();
                         general.send(`${user}`).then(m => m.delete({timeout: 1000}));
                         general.send({embed: embed});
@@ -388,6 +396,8 @@ module.exports = class extends Event {
             }
         }, 10000)
 
+        !this.client.dev ? botlogs.send(`[${this.client.utils.getDateTime()}] Status: Back Online!`) : null;
+        console.log(colors.green(`Bot fully ready and Operational`))
 
     }
 
