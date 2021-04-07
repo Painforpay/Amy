@@ -35,7 +35,7 @@ module.exports = class Bot extends Client {
 
         this.owners = options.owners;
 
-        this.maxChanSize = 4;
+        this.maxChanSize = 4;  //Maximale größe von UserChanneln
 
         this.con = new MySQL(options.host, options.username, options.password).createConnection();
 
@@ -49,11 +49,11 @@ module.exports = class Bot extends Client {
 
         this.spamCollection = new Collection();
 
-        this.raidMode = false;
+        this.raidMode = false;  //Automatisch vom Bot verwaltet - Wenn wahr wird jeder neue User welcher joined gekickt
 
         this.disabledCommands = [];
 
-        this.conceptDevelopment = false;
+        this.conceptDevelopment = false; //Wenn wahr: Nur User mit der Konzeptentwicklungsrolle können in Diskussionen mitreden
 
         this.deletedAudits = new Collection();
 
@@ -71,7 +71,9 @@ module.exports = class Bot extends Client {
 
         this.picCooldown = new Collection();
 
-        this.currentMaxLevel = 6;
+        this.currentMaxLevel = 6; //Gegenwärtig höchste Levelrolle. Plus eins und dann Mal 10 zu nehmen. 6 = Level 70
+
+        this.savePChannelNames = true; //Autosave the Channel Name if it gets updated.
     }
 
     validate(options) {

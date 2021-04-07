@@ -162,8 +162,6 @@ module.exports = class Util {
                 const command = new File(this.client, name.toLowerCase());
                 if (!(command instanceof Command)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von Command.`);
                 this.client.commands.set(command.name, command);
-
-
                 if (command.aliases.length) {
                     for (const alias of command.aliases) {
                         this.client.aliases.set(alias, command.name);
@@ -671,10 +669,16 @@ module.exports = class Util {
                 // Der Bot kann den User nicht moven
             }
 
+
         } else {
-            let name = `${newState.member.nickname != null ? newState.member.nickname : newState.member.user.username}s Sprachkanal`;
+
+            let UserData = await this.client.utils.getUserData(newState.member.id);
+
+
+            let name = UserData.pChannelName == null ? `${newState.member.nickname != null ? newState.member.nickname : newState.member.user.username}s Sprachkanal` : UserData.pChannelName;
             if (name.length > 32) {
                 name = 'Neuer Privater Sprachkanal'
+
             }
             let chan = await newState.channel.guild.channels.create(name, {
                 type: "voice",

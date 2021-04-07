@@ -16,6 +16,9 @@ module.exports = class extends Event {
             if (newChannel.userLimit > this.client.maxChanSize || newChannel.userLimit == 0) {
                 await newChannel.setUserLimit(this.client.maxChanSize);
             }
+            if (newChannel.name != oldChannel.name && this.client.savePChannelNames) {
+                this.client.con.query(`UPDATE \`users\` SET \`pChannelName\` = '${newChannel.name}' WHERE \`users\`.\`id\` = '${this.client.PVoices.get(newChannel.id).userid}';`)
+            }
         }
 
 
