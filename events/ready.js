@@ -152,6 +152,22 @@ module.exports = class extends Event {
             })
         }, 1000 / this.client.messagesPerSecond)
 
+        setInterval(async () => {
+            if (this.client.fullMutes.size > 0 && this.client.fullMuteAFK) {
+                this.client.fullMutes.forEach((v, k) => {
+                    if ((Date.parse(new Date()) - v.timestamp) > (this.client.fullMuteAFKTime * 60) * 1000) {
+
+                        if (v.member.voice.channelID == v.member.guild.afkChannelID) {
+                            v.member.voice.setChannel(v.member.guild.afkChannelID);
+                        }
+
+
+                    }
+                })
+            }
+
+        }, 60000)
+
 
         schedule.scheduleJob('0 0 * * *', () => {
             //Increment daily for all

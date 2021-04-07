@@ -11,7 +11,32 @@ module.exports = class extends Event {
     }
 
     async run(oldState, newState) {
+
         let voicecontext = oldState.member.guild.roles.cache.get(this.client.dev ? "800110137553453112" : "795075741955653652")
+
+        if (!oldState.selfDeaf && newState.selfDeaf) {
+            //User selfdeafened
+
+            if (!this.client.fullMutes.has(newState.member.id)) {
+
+                this.client.fullMutes.set(newState.member.id, {
+                    member: newState.member,
+                    timestamp: Date.parse(new Date())
+                });
+
+            }
+        } else if (oldState.selfDeaf && !newState.selfDeaf) {
+
+            if (this.client.fullMutes.has(newState.member.id)) {
+
+                this.client.fullMutes.delete(newState.member.id);
+
+            }
+
+
+        }
+
+
         if (newState.channel && !oldState.channel) {
             //User Joined a Channel
 

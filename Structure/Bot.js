@@ -45,6 +45,8 @@ module.exports = class Bot extends Client {
 
         this.raidCounter = 0;
 
+        this.fullMutes = new Collection(); //List of Fullmute Members
+
         this.PVoices = new Collection(); //List of Current Private Channels
 
         this.spamCollection = new Collection();
@@ -74,6 +76,10 @@ module.exports = class Bot extends Client {
         this.currentMaxLevel = 6; //Gegenwärtig höchste Levelrolle. Plus eins und dann Mal 10 zu nehmen. 6 = Level 70
 
         this.savePChannelNames = true; //Autosave the Channel Name if it gets updated.
+
+        this.fullMuteAFK = true; //Wenn Wahr werden User nach einer Speziellen Zeit im FullMute in den AFK gemoved
+
+        this.fullMuteAFKTime = 5; //Zeit in minuten nach denen ein User im fullmute in den Afk gemoved wird.
     }
 
     validate(options) {

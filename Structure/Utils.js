@@ -896,18 +896,8 @@ module.exports = class Util {
 
     async colorgiver(message) {
         try {
-            if (isNaN(message.content) || message.content > 18 || message.content < 1) {
-                message.channel.send("Bitte nur eine Nummer kleinergleich 18 angeben!").then(m => {
-                    try {
-                        m.delete({timeout: 3000})
-                    } catch (e) {
-                        //Error
-                        console.error(e);
-                    }
-                });
-
-            } else if (!message.content) {
-                message.channel.send("Bitte nur eine Nummer kleinergleich 18 angeben!").then(m => {
+            if (isNaN(message.content) || message.content > 18 || message.content < 1 || !message.content) {
+                message.channel.send("Bitte eine Nummer im Bereich 1 bis 18 angeben!").then(m => {
                     try {
                         m.delete({timeout: 3000})
                     } catch (e) {
@@ -918,8 +908,6 @@ module.exports = class Util {
 
             } else {
                 try {
-
-
 
 
                     let role = message.guild.roles.cache.find(role => role.name === colors[(message.content) - 1].name);
