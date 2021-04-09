@@ -9,7 +9,7 @@ module.exports = class extends Command {
     constructor(...args) {
         super(...args, {
             description: `${json[1]}`,
-            category: 'Gestures',
+            category: 'gesten',
             guildOnly: true,
             minArgs: 1,
             argsDef: ['<ping>'],

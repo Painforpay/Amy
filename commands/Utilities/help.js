@@ -21,14 +21,14 @@ module.exports = class extends Command {
             let embed = new MessageEmbed()
                 .setColor("#FFD700")
                 .setTitle(`:question: Hilfe`)
-                .setDescription(`Hier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!`);
+                .setDescription(`**Der Hilfebefehl befindet sich im BETA Test**\nHier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!\n**Alternativ** kannst du mit \`${this.client.prefix}${this.name} <befehl>\` mehr Informationen zu einem Befehl erhalten.`);
 
             for await (let category of this.client.categories) {
                 console.log(category)
                 embed.addField(`${category[1].emoji} ${this.client.utils.capitalise(category[1].name)}`, `**${category[1].description}**`)
             }
 
-            embed.setFooter(`Beispiel: !help ${this.client.categories.first().name}`);
+            embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name}`);
 
             message.channel.send(embed)
 
@@ -40,7 +40,7 @@ module.exports = class extends Command {
 
             const result = this.client.categories.get(searchQuery.toLowerCase()) || this.client.commands.get(searchQuery.toLowerCase()) || this.client.commands.get(this.client.aliases.get(searchQuery.toLowerCase()));
 
-            if (!result) message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 15000}).catch(() => null));
+            if (!result) return message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 15000}).catch(() => null));
 
             if (result instanceof Command) {
 
@@ -54,8 +54,10 @@ module.exports = class extends Command {
 
                     let description = `${result.description}`
 
+                    embed.addField(`**Kategorie:**`, `${this.client.utils.capitalise(result.category)}`)
+
                     if (result.aliases.length > 0) {
-                        embed.addField(`\n\n**Alternative Namen:**`, `${result.name}, ${result.aliases.join(", ")}`)
+                        embed.addField(`**Alternative Namen:**`, `${result.name}, ${result.aliases.join(", ")}`)
                     }
 
 
@@ -116,7 +118,7 @@ module.exports = class extends Command {
 
                 if (!accessibleCommands.length > 0) {
 
-                    embed.addField("Fehler!", "Es gibt keine Befehle für diese Kategorie!")
+                    embed.addField("Fehler!", "Es gibt keine Befehle für diese Kategorie bzw. du kannst keine von ihnen Nutzen!")
 
 
                 }
