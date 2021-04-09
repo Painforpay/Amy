@@ -24,7 +24,6 @@ module.exports = class extends Command {
                 .setDescription(`**Der Hilfebefehl befindet sich im BETA Test**\nHier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!\n**Alternativ** kannst du mit \`${this.client.prefix}${this.name} <befehl>\` mehr Informationen zu einem Befehl erhalten.`);
 
             for await (let category of this.client.categories) {
-                console.log(category)
                 embed.addField(`${category[1].emoji} ${this.client.utils.capitalise(category[1].name)}`, `**${category[1].description}**`)
             }
 
