@@ -35,7 +35,7 @@ module.exports = class Bot extends Client {
 
         this.owners = options.owners;
 
-        this.maxChanSize = 4;  //Maximale größe von UserChanneln
+        this.maxChanSize = 4;  //Maximale Größe von UserChanneln
 
         this.con = new MySQL(options.host, options.username, options.password).createConnection();
 
@@ -53,11 +53,15 @@ module.exports = class Bot extends Client {
 
         this.raidMode = false;  //Automatisch vom Bot verwaltet - Wenn wahr wird jeder neue User welcher joined gekickt
 
-        this.disabledCommands = [];
+        this.disabledCommands = ["search-yt", "yt-search", "yt"];
 
         this.conceptDevelopment = false; //Wenn wahr: Nur User mit der Konzeptentwicklungsrolle können in Diskussionen mitreden
 
         this.deletedAudits = new Collection();
+
+        this.ChatHookChan = "830202084569382972";
+
+        this.hookEndPoint = "830202064784457778";
 
         this.lounges = [];
 

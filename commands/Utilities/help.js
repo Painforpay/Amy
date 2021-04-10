@@ -78,6 +78,7 @@ module.exports = class extends Command {
                     if (result.additionalinfo.length > 0) {
 
                         embed.setFooter(`Achtung: ` + result.additionalinfo);
+
                     }
 
                     embed.setDescription(description)

@@ -19,6 +19,8 @@ module.exports = class extends Event {
         }
 
 
+
+
         const mentionRegex = RegExp(`^<@!?${this.client.user.id}>$`);
         const mentionRegexPrefix = RegExp(`^<@!?${this.client.user.id}> `);
 
@@ -42,6 +44,31 @@ module.exports = class extends Event {
 
             return; //await this.client.utils.DeeptalkSender(message);
         }//*/
+
+        if(this.client.ChatHookChan != "") {
+            if(message.channel.id === this.client.ChatHookChan) {
+
+
+                let hookEndPointChan = await this.client.channels.fetch(this.client.hookEndPoint);
+
+                hookEndPointChan.send(`${this.client.utils.getDateTime()}\n**${message.author.tag}:**\n${message.content}`);
+
+
+            }
+        }
+
+        if(this.client.hookEndPoint != "") {
+            if(message.channel.id === this.client.hookEndPoint) {
+
+
+                let ChatHookChan = await this.client.channels.fetch(this.client.ChatHookChan);
+
+                ChatHookChan.send(`${message.content}`);
+
+
+            }
+        }
+
 
 
         //Selfbot detection

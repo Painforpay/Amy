@@ -908,23 +908,25 @@ module.exports = class Util {
 
             } else {
                 try {
+                    let colors = ["794575425975877641", "794575395033710622", "794575441355603968", "794575390822891530", "794575442539577395", "794575472901226516", "794575427132719144", "794575427132719144", "794575387405058078", "794575436289671169", "794575456875577364", "794575415204773898", "794575406723760129", "794575447081091072", "794575460902240276", "794575399895957514", "794575400692219914", "794575472037331034", "794575421610000394"]
+
+                    let role = message.guild.roles.cache.find(role => role.id === colors[(message.content) - 1]);
 
 
-                    let role = message.guild.roles.cache.find(role => role.name === colors[(message.content) - 1].name);
-
-                    console.log(`[${this.getDateTime()}] Trying to add "${role.name}" to "${message.member.user.tag}"`);
+                   // console.log(`[${this.getDateTime()}] Trying to add "${role}" to "${message.member.user.tag}"`);
 
                     colors.forEach(color => {
 
-                        if (message.member.roles.cache.find(role => role.name === color.name)) {
+                        if (message.member.roles.cache.find(role => role.id === color)) {
 
-                            message.member.roles.remove(message.member.roles.cache.find(role => role.name === color.name));
+                            console.log(message.member.roles.cache.find(role => role.id === color));
+                            //message.member.roles.remove(message.member.roles.cache.find(role => role.id === color));
                         }
 
                     })
 
-                    await message.member.roles.add(role);
-
+                    //await message.member.roles.add(role);
+                    console.log(role);
 
                 } catch (e) {
                     //Error
