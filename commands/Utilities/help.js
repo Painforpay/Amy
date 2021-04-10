@@ -15,6 +15,13 @@ module.exports = class extends Command {
 
     async run(message, args) {
 
+        try {
+            message.delete()
+        } catch (e) {
+            //Error
+            console.error(e);
+        }
+
         if (!args.length) {
 
 
@@ -29,7 +36,9 @@ module.exports = class extends Command {
 
             embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name}`);
 
-            message.channel.send(embed)
+            message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(err => null);
+
+
 
 
         } else {
@@ -39,7 +48,7 @@ module.exports = class extends Command {
 
             const result = this.client.categories.get(searchQuery.toLowerCase()) || this.client.commands.get(searchQuery.toLowerCase()) || this.client.commands.get(this.client.aliases.get(searchQuery.toLowerCase()));
 
-            if (!result) return message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 15000}).catch(() => null));
+            if (!result) return message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 30000}).catch(() => null));
 
             if (result instanceof Command) {
 
@@ -84,7 +93,7 @@ module.exports = class extends Command {
                     embed.setDescription(description)
 
 
-                    message.channel.send(embed).then(m => m.delete({timeout: 15000}).catch(() => null));
+                    message.channel.send(embed).then(m => m.delete({timeout: 30000}).catch(() => null));
 
                 }
 
@@ -133,7 +142,7 @@ module.exports = class extends Command {
 
                 message.channel.send({embed: embed}).then(m => {
                     try {
-                        m.delete({timeout: (20000)})
+                        m.delete({timeout: (30000)})
                     } catch (e) {
                         //Error
                         console.error(e);
@@ -145,12 +154,7 @@ module.exports = class extends Command {
             }
         }
 
-        try {
-            message.delete({timeout: 15000})
-        } catch (e) {
-            //Error
-            console.error(e);
-        }
+
 
     }
 }
