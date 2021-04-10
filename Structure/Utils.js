@@ -925,8 +925,7 @@ module.exports = class Util {
 
                     })
 
-                    //await message.member.roles.add(role);
-                    console.log(role);
+
 
                 } catch (e) {
                     //Error

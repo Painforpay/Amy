@@ -61,12 +61,18 @@ module.exports = class extends Event {
             if (err) return console.error(err);
 
 
-            result.forEach(r => {
+            result.forEach(async r => {
 
                 if (r.emoji === reaction.emoji.name) {
 
-                    member.roles.add(r.roleid);
-                    member.roles.add(r.categoryid);
+                    try {
+                        await member.roles.add(r.roleid);
+                        if(!member.roles.cache.has(r.categoryid)) {
+                            await member.roles.add(r.categoryid);
+                        }
+                    } catch (e) {
+                        console.error(`\nError while adding Reactionrole\nRoleID: ${r.roleid}\nCategoryID: ${r.categoryid}\n${e.stack}`)
+                    }
                 }
 
             });
