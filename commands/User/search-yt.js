@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+
 const Command = require("../../Structure/Command");
 const fetch = require("node-fetch");
 
@@ -29,21 +29,20 @@ module.exports = class extends Command {
 
         }).then(res => {
 
-            res.json().then(body => {
-                console.log(body);
-                if(body.items.length == 0) return message.channel.send("Es wurde kein Ergebnis gefunden!")
+            res.json().then(async body => {
 
+                if (body.items.length === 0) return message.channel.send("Es wurde kein Ergebnis gefunden!")
 
+                let datetime = Date.parse(new Date(body.items[0].snippet.publishedAt))
+
+                let formattedDate = await this.client.utils.getDateTime(datetime);
                 let vidID = body.items[0].id.videoId;
-                if(vidID == undefined) return message.channel.send("Fehler bei der Suche! Bitte anderen Suchbegriff nutzen!")
-                return message.channel.send(`https://www.youtube.com/watch?v=${vidID}`)
+                if (vidID === undefined) return message.channel.send("Fehler bei der Suche! Bitte anderen Suchbegriff nutzen!")
+                return message.channel.send(`Suchergebnis:\n[${formattedDate}]\n${body.items[0].snippet.title} von ${body.items[0].snippet.channelTitle}\nhttps://www.youtube.com/watch?v=${vidID}`)
             })
 
 
         })
-
-
-
 
 
     }

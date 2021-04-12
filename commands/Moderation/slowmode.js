@@ -10,7 +10,7 @@ module.exports = class extends Command {
             description: 'Aktiviert den Slowmode in einem Channel für bestimmte Zeit',
             category: 'Utilities',
             aliases: ["sm", "slow"],
-            argsDef: [`<Zeit in Sekunden>`,`<Sekunden pro Nachricht>`],
+            argsDef: [`<Zeit in Sekunden>`, `<Sekunden pro Nachricht>`],
             userPerms: ['MANAGE_CHANNELS'],
             guildOnly: true,
             minArgs: 0
@@ -22,8 +22,7 @@ module.exports = class extends Command {
         message.delete();
 
 
-
-        if(isNaN(args[0])) return message.channel.send("Bitte gib eine Zahl als Parameter an!").then(m => {
+        if (isNaN(args[0])) return message.channel.send("Bitte gib eine Zahl als Parameter an!").then(m => {
             try {
                 m.delete({timeout: 5000})
             } catch (e) {
@@ -34,7 +33,7 @@ module.exports = class extends Command {
 
 
         let channel = message.channel;
-        if(test.get(channel.id)) return message.channel.send("Dieser Channel befindet sich bereits im Slowmode! Gesetzt für "+ test.get(channel.id) + " Sekunden").then(m => {
+        if (test.get(channel.id)) return message.channel.send("Dieser Channel befindet sich bereits im Slowmode! Gesetzt für " + test.get(channel.id) + " Sekunden").then(m => {
             try {
                 m.delete({timeout: 5000})
             } catch (e) {
@@ -46,10 +45,10 @@ module.exports = class extends Command {
         let time = (Math.abs(args[0]));
         let limit = (Math.abs((args[1] ? args[1] : 5)));
         let original = channel.rateLimitPerUser || 0;
-        if(time > 120 || time <= 0) time = 120;
-        if(limit > 30) {
+        if (time > 120 || time <= 0) time = 120;
+        if (limit > 30) {
             limit = 30;
-        } else if(limit <= 0) {
+        } else if (limit <= 0) {
             limit = 2;
         }
         await channel.setRateLimitPerUser(limit, `Executed by ${message.author.tag} for ${time} Seconds`);
@@ -76,8 +75,6 @@ module.exports = class extends Command {
             this.client.utils.log(`Slowmode in ${channel} deaktiviert`)
 
         }, time * 1000)
-
-
 
 
     }

@@ -19,11 +19,23 @@ module.exports = class Bot extends Client {
 
         this.dev = options.dev;
 
-        this.datetimeformat = {  year: 'numeric', month: '2-digit', day: '2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: 'CET' }
+        this.datetimeformat = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: 'CET'
+        }
 
         this.categories = new Collection();
 
         this.verbose = options.verbose;
+
+        this.options = options;
+
+        this.setAfkUsers = new Collection(); //Collection aus Usern die AFK gesetzt sind.
 
         this.evals = new Collection();
 
@@ -53,15 +65,11 @@ module.exports = class Bot extends Client {
 
         this.raidMode = false;  //Automatisch vom Bot verwaltet - Wenn wahr wird jeder neue User welcher joined gekickt
 
-        this.disabledCommands = ["search-yt", "yt-search", "yt"];
+        this.disabledCommands = [];
 
         this.conceptDevelopment = false; //Wenn wahr: Nur User mit der Konzeptentwicklungsrolle können in Diskussionen mitreden
 
         this.deletedAudits = new Collection();
-
-        this.ChatHookChan = "830202084569382972";
-
-        this.hookEndPoint = "830202064784457778";
 
         this.lounges = [];
 

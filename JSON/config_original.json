@@ -10,5 +10,7 @@
   "defaultPerms": "CONNECT",
   "host": "",
   "username": "",
-  "password": ""
+  "password": "",
+  "neutrinoapiuid": "",
+  "neutrinoapiakey": ""
 }

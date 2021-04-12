@@ -36,9 +36,7 @@ module.exports = class extends Command {
 
             embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name}`);
 
-            message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(err => null);
-
-
+            message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(() => null);
 
 
         } else {
@@ -153,7 +151,6 @@ module.exports = class extends Command {
 
             }
         }
-
 
 
     }

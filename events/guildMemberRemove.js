@@ -24,7 +24,7 @@ module.exports = class extends Event {
         try {
             const logChannel = member.guild.channels.cache.find(channel => channel.id === "796000304873209866");
             logChannel.send(`${member.user.tag} hat den Server verlassen.`);
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }

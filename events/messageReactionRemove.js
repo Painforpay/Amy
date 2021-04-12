@@ -30,8 +30,7 @@ module.exports = class extends Event {
             if (err) throw err;
 
 
-
-            if(member) {
+            if (member) {
                 result.forEach(async r => {
 
                     if (r.emoji === reaction.emoji.name) {
@@ -45,7 +44,6 @@ module.exports = class extends Event {
 
                 })
             }
-
 
 
         });

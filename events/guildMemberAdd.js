@@ -36,7 +36,7 @@ module.exports = class extends Event {
 
             } else {
                 // A real basic message with the information we need.
-            
+
                 //Trying to get the inviter by finding the code that has been deleted:
                 let msg;
                 ei.forEach(async ei => {
@@ -66,10 +66,9 @@ module.exports = class extends Event {
             return member.kick();
         } else {
 
-            if((Date.parse(new Date()) - member.user.createdTimestamp) < 259200000) {
+            if ((Date.parse(new Date()) - member.user.createdTimestamp) < 259200000) {
 
-                let vor = Date.parse(new Date()) - member.user.createdTimestamp;
-
+                //let vor = Date.parse(new Date()) - member.user.createdTimestamp;
 
 
                 logChannel.send(`Achtung: Der Account von ${member} ist ziemlich jung. Erstellt am: ${await this.client.utils.getDateTime(member.user.createdTimestamp)}`);

@@ -26,8 +26,6 @@ module.exports = class extends Event {
         ].join('\n'));
 
 
-
-
         let charlie = await this.client.users.fetch("795406184177860628");
         //${this.client.prefix}help | ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} usern zu!
         setInterval(async () => this.client.user.setActivity(`${(charlie.presence.status === "online") ? `v2 BETATEST` : "wo Charlie hin ist :("}`, {type: 'WATCHING'}), 15000);
@@ -131,6 +129,23 @@ module.exports = class extends Event {
 
         }
 
+        //Remove AFK Role from every Member that has it
+        {   //brackets so the muterole variable is available out of scope
+            let Afkrole = guild.roles.cache.get(this.client.dev ? "831069345860943904" : "831069006759854150")
+            let AfkMembersSize = Afkrole.members.size
+            Afkrole.members.forEach(m => {
+                try {
+                    m.roles.remove(this.client.dev ? "831069345860943904" : "831069006759854150");
+                } catch (e) {
+                    console.error(e);
+                }
+            })
+            if (AfkMembersSize > 0) {
+                console.log(colors.yellow(`Removed the AFK Role from ${AfkMembersSize} Member${AfkMembersSize > 1 ? "s" : ""}`))
+            }
+
+        }
+
 
         let teammemberembed = await (await this.client.channels.fetch(client.dev ? "800110138924466191" : "795804770178039808", true)).messages.fetch(client.dev ? "802569631238717490" : "795806452039811073", true);
         await (await this.client.channels.fetch(client.dev ? "800110137820971042" : "794175100118499379")).messages.fetch();
@@ -155,9 +170,9 @@ module.exports = class extends Event {
         setInterval(async () => {
             if (this.client.fullMutes.size > 0 && this.client.fullMuteAFK) {
                 this.client.fullMutes.forEach((v, k) => {
-                    if ((Date.parse(new Date()) - v.timestamp) > (this.client.fullMuteAFKTime * 60) * 1000) {
+                    if ((Date.parse(new Date()) - v.timestamp) > ((this.client.fullMuteAFKTime * 60) * 1000)) {
 
-                        if (v.member.voice.channelID == v.member.guild.afkChannelID) {
+                        if (v.member.voice.channelID !== v.member.guild.afkChannelID) {
                             v.member.voice.setChannel(v.member.guild.afkChannelID);
                         }
 
@@ -184,7 +199,6 @@ module.exports = class extends Event {
                         let xp = r.xp;
 
 
-
                         if (xp === 0) return;
                         let days = r.inactive - 30;
 
@@ -208,13 +222,13 @@ module.exports = class extends Event {
                         //Tryblock #1
                         try {
                             let member = await client.utils.getGuildMember(r.id);
-                            if(member.user.bot) return;
+                            if (member.user.bot) return;
                             let inactive = 0;
                             if (days >= 14) {
                                 inactive = 1;
                             }
 
-                            if(currentlevel === leveluserhastoget) return;
+                            if (currentlevel === leveluserhastoget) return;
                             let roletogive = await member.guild.roles.fetch((await client.utils.checkLevelRole(leveluserhastoget)))
 
 
@@ -244,7 +258,7 @@ module.exports = class extends Event {
                             console.error(colors.red(e));
                             console.log(colors.red(`--- End of Error ---\n`));
 
-                            if(e.httpStatus === "404") {
+                            if (e.httpStatus === "404") {
                                 client.con.query(`DELETE FROM users WHERE id = ${r.id};`, function (err) {
                                     if (err) throw err;
                                     console.log(`[MySQL] Successfully Deleted Entry for User with ID '${r.id}' in users`);

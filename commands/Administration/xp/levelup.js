@@ -30,24 +30,23 @@ module.exports = class extends SubCommand {
 
         let UserData = await this.client.utils.getUserData(member.id);
 
-                let xp = UserData.xp;
-                let levelup = value;
-                let currentLevel = await client.utils.getLevelforXp(xp);
-                let nextLevel = currentLevel+levelup
-                let nextLevelXP = await client.utils.getLevelXp(nextLevel);
+        let xp = UserData.xp;
+        let levelup = value;
+        let currentLevel = await client.utils.getLevelforXp(xp);
+        let nextLevel = currentLevel + levelup
+        let nextLevelXP = await client.utils.getLevelXp(nextLevel);
 
-                let required = nextLevelXP - xp;
+        let required = nextLevelXP - xp;
 
-                await client.utils.xpadd(member, required, false);
+        await client.utils.xpadd(member, required, false);
 
-                client.utils.log(`${message.author} hat das Level von \`${member.user.tag}\` um \`${levelup}\` erhöht! [${currentLevel} -> ${nextLevel}]`);
+        client.utils.log(`${message.author} hat das Level von \`${member.user.tag}\` um \`${levelup}\` erhöht! [${currentLevel} -> ${nextLevel}]`);
 
 
         message.channel.send(`Level für \`${member.user.tag}\` wurde um \`${value}\` erhöht!`).then(m => {
-            m.delete({timeout: 15000}).catch( err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
         })
-        message.delete({timeout: 15000}).catch( err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
-
+        message.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
 
 
     }

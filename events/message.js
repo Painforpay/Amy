@@ -1,5 +1,6 @@
 const Event = require('../Structure/Event');
 let compliments = ['https://tenor.com/view/thank-you-so-much-hearts-pink-than-yyou-thanks-thank-you-gif-12086415', 'https://tenor.com/view/cute-bear-thank-you-thanks-gif-14105969', 'https://tenor.com/view/thank-you-alice-in-wonderland-thanks-gif-9790628', 'https://tenor.com/view/jonah-hill-yay-african-child-screaming-shouting-gif-7212866', 'https://tenor.com/view/cute-comfort-massage-gif-15134902', 'https://tenor.com/view/peach-cat-hug-hug-up-love-mochi-mochi-peach-cat-gif-16334628', 'https://tenor.com/view/hug-virtual-hug-hug-sent-gif-5026057']
+const {Collection} = require('discord.js')
 
 module.exports = class extends Event {
 
@@ -17,8 +18,6 @@ module.exports = class extends Event {
                 return;
             }
         }
-
-
 
 
         const mentionRegex = RegExp(`^<@!?${this.client.user.id}>$`);
@@ -43,39 +42,44 @@ module.exports = class extends Event {
             }
 
             return; //await this.client.utils.DeeptalkSender(message);
-        }//*/
-
-        if(this.client.ChatHookChan != "") {
-            if(message.channel.id === this.client.ChatHookChan) {
-
-
-                let hookEndPointChan = await this.client.channels.fetch(this.client.hookEndPoint);
-
-                hookEndPointChan.send(`${this.client.utils.getDateTime()}\n**${message.author.tag}:**\n${message.content}`);
-
-
-            }
-        }
-
-        if(this.client.hookEndPoint != "") {
-            if(message.channel.id === this.client.hookEndPoint) {
-
-
-                let ChatHookChan = await this.client.channels.fetch(this.client.ChatHookChan);
-
-                ChatHookChan.send(`${message.content}`);
-
-
-            }
         }
 
 
 
-        //Selfbot detection
-        if (message.embeds.length > 0) {
-            message.delete().catch(() => null);
-            this.client.utils.log(`[SelfBot Detected] Der Nutzer ${message.member} hat ein Embed gepostet obwohl er dies nicht ohne ein Selfbotting kann. Er wurde deswegen für 24h gemuted. Bitte in Diskurs treten!\n<@&798293308937863219>`)
-            await this.client.utils.muteMember(message.member, 1440, message.guild.me)
+        if (this.client.setAfkUsers.has(message.member.id)) {
+            this.client.setAfkUsers.delete(message.member.id);
+            if (message.member.roles.cache.has(this.client.dev ? "831069345860943904" : "831069006759854150")) {
+                await message.member.roles.remove(this.client.dev ? "831069345860943904" : "831069006759854150");
+            }
+            message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`)
+        }
+
+        if (message.mentions.members.size > 0) {
+            let list = new Collection();
+            message.mentions.members.forEach(m => {
+                if (this.client.setAfkUsers.has(m.user.id)) {
+                    let userinfo = this.client.setAfkUsers.get(m.user.id);
+                    list.set(m.user.id, {
+                        member: m,
+                        reason: userinfo.reason
+                    });
+                }
+            })
+
+            if (list.size > 0) {
+                let message1 = `Gepingte User sind AFK:\n`;
+                let list2 = [];
+                list.forEach(u => {
+
+                    list2.push(`${u.member.nickname ? u.member.nickname : u.member.user.tag}: **${u.reason}**`);
+                })
+                message.channel.send(message1 + list2.join("\n")).catch(() => null);
+            }
+        }
+
+        //MasspingProtection
+        if (message.mentions.members.size > 8) {
+            return this.client.utils.muteMember(message.member, 60, this.client.user, "Masspinging");
         }
 
 
@@ -177,7 +181,7 @@ module.exports = class extends Event {
                         console.error(e);
                     }
                 }
-                break;
+                    break;
             }
 
             if (message.content.toLowerCase().match(/.*(script\n*.*kiddie).*/g) && message.channel.name !== "ideen") {

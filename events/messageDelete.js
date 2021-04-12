@@ -8,9 +8,9 @@ module.exports = class extends Event {
 
     async run(message) {
 
-        if(this.client.evals.has(message.id)) {
+        if (this.client.evals.has(message.id)) {
 
-            if(message.channel) {
+            if (message.channel) {
                 const messageembed = await (this.client.channels.cache.get(message.channel.id)).messages.fetch((this.client.evals.get(message.id)));
                 messageembed.delete().catch(() => null);
             }

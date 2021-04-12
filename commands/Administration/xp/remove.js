@@ -32,19 +32,19 @@ module.exports = class extends SubCommand {
 
         let currentXP = UserData.xp;
         let toMuch = false;
-        if(value > currentXP) {
+        if (value > currentXP) {
             toMuch = true;
             valueToTake = currentXP;
 
         }
 
-        client.con.query(`UPDATE users SET \`xp\` = \`xp\` - \`${valueToTake}\` WHERE id = ${member.id};`,function (err) {
-            if(err) {
+        client.con.query(`UPDATE users SET \`xp\` = \`xp\` - \`${valueToTake}\` WHERE id = ${member.id};`, function (err) {
+            if (err) {
                 client.utils.log(e.stack);
                 return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
             }
 
-            message.channel.send(`${toMuch ? `${member.user.tag} hat weniger als ${value} Erfahrung! Ich entferne daher ${valueToTake} Erfahrung und somit alles!\n\n`: ""}Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${valueToTake}\` verringert!`).then(m => {
+            message.channel.send(`${toMuch ? `${member.user.tag} hat weniger als ${value} Erfahrung! Ich entferne daher ${valueToTake} Erfahrung und somit alles!\n\n` : ""}Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${valueToTake}\` verringert!`).then(m => {
                 m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
             })
 

@@ -22,7 +22,7 @@ module.exports = class extends Command {
         if (command && command.parent === this.name) {
             let cutArgs = args.slice(1);
             if (command.minArgs && cutArgs < command.minArgs) {
-                message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Angegeben: ${args.length}, Benötigt: ${command.minArgs+1}\nNutzung: \`${this.client.prefix}${this.name} ${command.name} ${command.argsDef.join(" ")}\``).then(m => {
+                message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Angegeben: ${args.length}, Benötigt: ${command.minArgs + 1}\nNutzung: \`${this.client.prefix}${this.name} ${command.name} ${command.argsDef.join(" ")}\``).then(m => {
                     m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                 });
                 return message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));

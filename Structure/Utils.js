@@ -4,10 +4,10 @@ const glob = promisify(require('glob'));
 const Command = require('./Command.js');
 const SubCommand = require('./SubCommand.js');
 const Event = require('./Event.js');
-const { MessageEmbed, Collection, MessageAttachment } = require('discord.js');
-const { inspect } = require('util');
-const { Type } = require('@anishshobith/deeptype')
-const colors = require("../JSON/colors.json");
+const {MessageEmbed, Collection, MessageAttachment} = require('discord.js');
+const {inspect} = require('util');
+const {Type} = require('@anishshobith/deeptype')
+const fetch = require('node-fetch')
 
 
 module.exports = class Util {
@@ -88,7 +88,7 @@ module.exports = class Util {
     }
 
     clean(text) {
-        if(typeof text === 'string') {
+        if (typeof text === 'string') {
             text = text
                 .replace(/`/g, `${String.fromCharCode(8203)}`)
                 .replace(/@/g, `@${String.fromCharCode(8203)}`)
@@ -98,7 +98,7 @@ module.exports = class Util {
         return text;
     }
 
-    trimString (str) {
+    trimString(str) {
         return ((str.length > 1024) ? `${str.slice(0, 1024 - 7)}...\n\`\`\`` : str);
     }
 
@@ -128,7 +128,7 @@ module.exports = class Util {
         return new Promise((resolve, reject) => {
 
             client.con.query(`SELECT * FROM users WHERE id = ${id}`, function (err, result) {
-                if(err) reject(err.name);
+                if (err) reject(err.name);
 
                 if (result[0]) {
                     resolve(result[0]);
@@ -235,7 +235,7 @@ module.exports = class Util {
 
     }
 
-    async muteMember(member, time, mod) {
+    async muteMember(member, time, mod, reason) {
         if (member.voice) {
             member.voice.kick();
         }
@@ -244,8 +244,8 @@ module.exports = class Util {
 
 
             member.roles.add(this.client.dev ? "828709057103003678" : "828708084674199632");
-            internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted!`)
-            let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`)
+            internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted!`)
+            let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`)
 
             m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
         } catch (e) {
@@ -332,7 +332,7 @@ module.exports = class Util {
 
             const start = process.hrtime();
             evaled = eval(code);
-            if(evaled instanceof Promise) {
+            if (evaled instanceof Promise) {
                 evaled = await evaled;
             }
             const stop = process.hrtime(start);
@@ -340,7 +340,7 @@ module.exports = class Util {
                 `📥 **Input:**`, `\`\`\`js\n${code}\n\`\`\``,
                 `📤 **Output:**`, `\`\`\`js\n${this.clean(inspect(evaled, {depth: 0}))}\n\`\`\``,
                 `🔎 **Typ:**`, `\`\`\`ts\n${new Type(evaled).is}\n\`\`\``,
-                `⏲️ Bearbeitungszeit: ${(((stop[0]*1e9)+stop[1]))/1e6}ms`
+                `⏲️ Bearbeitungszeit: ${(((stop[0] * 1e9) + stop[1])) / 1e6}ms`
             ]
 
             let embed = new MessageEmbed()
@@ -353,11 +353,11 @@ module.exports = class Util {
                 .setTimestamp();
 
 
-            if(embed.fields[0].value.length <= 256 && embed.fields[1].value.length <= 256 && embed.length <= 6000) {
+            if (embed.fields[0].value.length <= 256 && embed.fields[1].value.length <= 256 && embed.length <= 6000) {
 
                 return embed;
 
-            } else  {
+            } else {
                 let res = response.join('\n');
                 res = res
                     .replace("📥 **Input:**", "Input:")
@@ -379,12 +379,12 @@ module.exports = class Util {
                 .setTimestamp();
 
 
-            if(errorEmbed.fields[0].value.length <= 256 && errorEmbed.fields[1].value.length <= 256 && errorEmbed.length <= 6000) {
+            if (errorEmbed.fields[0].value.length <= 256 && errorEmbed.fields[1].value.length <= 256 && errorEmbed.length <= 6000) {
 
                 return errorEmbed;
 
 
-            } else  {
+            } else {
 
                 let response = [
                     `Input:`, `${code}\n\nCleaned: ${code}\n\n`,
@@ -400,7 +400,6 @@ module.exports = class Util {
         }
 
     }
-
 
 
     async createTicket(reaction, user) {
@@ -431,7 +430,7 @@ module.exports = class Util {
         supportchan.send(`${user}; <@&${senior.id}>; <@${mod.id}>`).then(m => {
             try {
                 m.delete({timeout: 300});
-            } catch(e) {
+            } catch (e) {
                 //Error
                 console.error(e);
             }
@@ -589,7 +588,7 @@ module.exports = class Util {
                 let userday = b.day;
                 let user = client.users.cache.get(b.id);
 
-                usermonth = months[b.month-1]
+                usermonth = months[b.month - 1]
 
 
                 if (embed.fields.find(f => f.name === usermonth)) {
@@ -626,7 +625,7 @@ module.exports = class Util {
         //let levels = [0, 2, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 
-        if(level >= 2 && level < 10) {
+        if (level >= 2 && level < 10) {
             return this.client.dev ? '824240839139655691' : '824242651321991218';
         } else {
             let levelIDs = ['803039995342225429', '795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543', '810590641745821727', '810590795836686356', '810590814710530098'];
@@ -645,15 +644,14 @@ module.exports = class Util {
         }
 
 
-
     }
 
     async getRolestoRemove() {
 
         if (this.client.dev) {
-            return ['800110137544146962', '824240839139655691','800110137544146961', '800110137544146960', '800110137544146959', '800110137544146958', '800110137544146957', '800110137544146956', '800110137544146955'];
+            return ['800110137544146962', '824240839139655691', '800110137544146961', '800110137544146960', '800110137544146959', '800110137544146958', '800110137544146957', '800110137544146956', '800110137544146955'];
         } else {
-            return ['803039995342225429', '824242651321991218','795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543'];
+            return ['803039995342225429', '824242651321991218', '795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543'];
 
         }
 
@@ -735,6 +733,29 @@ module.exports = class Util {
 
     }
 
+    async profanityFilter(string) {
+
+        let data = {
+            "user-id": this.client.options.neutrinoapiuid,
+            "api-key": this.client.options.neutrinoapiakey,
+            "content": string,
+            "catalog": "obscene"
+        }
+
+
+        return fetch('https://neutrinoapi.net/bad-word-filter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(data)
+        }).then(res => res.json().then(body => {
+
+            return body;
+
+        }));
+    }
+
 
     async xpadd(member, amount, giveboost = true) {
         let unwashed = amount;
@@ -759,7 +780,6 @@ module.exports = class Util {
 
                 let nextlevel = await client.utils.getLevelXp(leveluserhastoget + 1);
                 if (client.verbose) {
-
                     console.log(`Current Level: ${currentlevel}`);
                     console.log(`Old Xp: ${result[0].xp}`);
                     console.log(`Amount to add: ${amount}`);
@@ -892,8 +912,6 @@ module.exports = class Util {
     }
 
 
-
-
     async colorgiver(message) {
         try {
             if (isNaN(message.content) || message.content > 18 || message.content < 1 || !message.content) {
@@ -908,23 +926,24 @@ module.exports = class Util {
 
             } else {
                 try {
+                    //let colorsDev = ["800110137649135629", "800110137649135628", "800110137649135627"]
                     let colors = ["794575425975877641", "794575395033710622", "794575441355603968", "794575390822891530", "794575442539577395", "794575472901226516", "794575427132719144", "794575427132719144", "794575387405058078", "794575436289671169", "794575456875577364", "794575415204773898", "794575406723760129", "794575447081091072", "794575460902240276", "794575399895957514", "794575400692219914", "794575472037331034", "794575421610000394"]
 
                     let role = message.guild.roles.cache.find(role => role.id === colors[(message.content) - 1]);
 
 
-                   // console.log(`[${this.getDateTime()}] Trying to add "${role}" to "${message.member.user.tag}"`);
+                    console.log(`[${this.getDateTime()}] Trying to add "${role.name}" to "${message.member.user.tag} [${message.member.user.id}]"`);
 
                     colors.forEach(color => {
 
                         if (message.member.roles.cache.find(role => role.id === color)) {
 
-                            console.log(message.member.roles.cache.find(role => role.id === color));
-                            //message.member.roles.remove(message.member.roles.cache.find(role => role.id === color));
+
+                            message.member.roles.remove(message.member.roles.cache.find(role => role.id === color));
                         }
 
                     })
-
+                    message.member.roles.add(role).catch(() => null);
 
 
                 } catch (e) {
@@ -1010,7 +1029,7 @@ module.exports = class Util {
         reaction.message.channel.send(`Channel wurde archiviert!`);
         await reaction.users.fetch();
         reaction.users.cache.forEach(user => {
-            setTimeout(function() {
+            setTimeout(function () {
                 reaction.users.remove(user);
             }, 2000);
 
@@ -1027,8 +1046,6 @@ module.exports = class Util {
         }
         return i - 1;
     }
-
-
 
 
     async setBirthday(message, day, month) {

@@ -47,11 +47,11 @@ module.exports = class extends Event {
 
             // await this.client.utils.createLounge();
 
-            if(newState.channel.members.size == 2) {
+            if (newState.channel.members.size == 2) {
 
                 let member = newState.channel.members.filter(member => member.id !== newState.member.id);
 
-                if(!this.client.VoiceUsers.has(member.map(x => x)[0].id)) {
+                if (!this.client.VoiceUsers.has(member.map(x => x)[0].id)) {
                     this.client.VoiceUsers.set(member.map(x => x)[0].id, {
                         user: member.map(x => x)[0].id,
                         time: Date.parse(new Date())
@@ -59,7 +59,6 @@ module.exports = class extends Event {
                 }
 
             }
-
 
 
             await newState.member.roles.add(voicecontext.id);
@@ -78,7 +77,7 @@ module.exports = class extends Event {
             //give User XP
             await this.client.utils.VoiceUserDisconnectXP(oldState);
 
-            if(oldState.channel.members.size == 1) {
+            if (oldState.channel.members.size == 1) {
 
                 let member = oldState.channel.members.filter(member => member.id !== oldState.member.id);
 
@@ -87,6 +86,11 @@ module.exports = class extends Event {
 
             }
 
+            if (this.client.fullMutes.has(oldState.member.id)) {
+
+                this.client.fullMutes.delete(oldState.member.id);
+
+            }
 
             if (oldState.channel.members.size < 1) await this.client.utils.deletePVoice(oldState.channel);
 

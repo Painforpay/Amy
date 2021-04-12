@@ -67,7 +67,7 @@ module.exports = class extends Event {
 
                     try {
                         await member.roles.add(r.roleid);
-                        if(!member.roles.cache.has(r.categoryid)) {
+                        if (!member.roles.cache.has(r.categoryid)) {
                             await member.roles.add(r.categoryid);
                         }
                     } catch (e) {

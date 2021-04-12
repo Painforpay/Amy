@@ -32,13 +32,13 @@ module.exports = class extends Command {
         if (!member) {
             return message.channel.send("User nicht gefunden");
         }
-        if(message.member.id === member.id) return message.channel.send(`Du kannst dich nicht selbst kicken!`)
+        if (message.member.id === member.id) return message.channel.send(`Du kannst dich nicht selbst kicken!`)
 
-        if(!this.client.utils.comparePerms(message.member, member)) {
+        if (!this.client.utils.comparePerms(message.member, member)) {
             return message.channel.send(`Du kannst diesen Nutzer nicht kicken!`)
         }
 
-        if(!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
+        if (!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
             return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
         }
 
@@ -52,9 +52,8 @@ module.exports = class extends Command {
         await member.kick(reason);
 
 
-
-        let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195": "795773658916061264");
-        let Modlog = message.guild.channels.cache.get(this.client.dev ? "800110139155546203": "795773686064873542");
+        let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
+        let Modlog = message.guild.channels.cache.get(this.client.dev ? "800110139155546203" : "795773686064873542");
 
         let userData = await this.client.utils.getUserData(user.id);
 

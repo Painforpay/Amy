@@ -32,7 +32,6 @@ module.exports = class extends Command {
             });
 
 
-
         } catch (e) {
             //Error
             this.client.utils.log(`Es gab einen Fehler beim Cachen der Nachricht! ID: ${args[0]}${e.httpStatus === 404 ? "\nNachricht konnte nicht gefunden werden. (404 Not Found)" : e.httpStatus}`).then(m => {
@@ -45,9 +44,6 @@ module.exports = class extends Command {
             });
 
         }
-
-
-
 
 
     }
