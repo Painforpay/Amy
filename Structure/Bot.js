@@ -33,7 +33,7 @@ module.exports = class Bot extends Client {
 
         this.verbose = options.verbose;
 
-        this.options = options;
+        this.neutrinoapi = [options.neutrinoapiuid, options.neutrinoapikey]
 
         this.setAfkUsers = new Collection(); //Collection aus Usern die AFK gesetzt sind.
 

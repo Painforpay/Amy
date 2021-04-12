@@ -736,8 +736,8 @@ module.exports = class Util {
     async profanityFilter(string) {
 
         let data = {
-            "user-id": this.client.options.neutrinoapiuid,
-            "api-key": this.client.options.neutrinoapiakey,
+            "user-id": this.client.options.neutrinoapi[0],
+            "api-key": this.client.options.neutrinoapi[1],
             "content": string,
             "catalog": "obscene"
         }
