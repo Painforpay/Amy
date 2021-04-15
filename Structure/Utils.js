@@ -892,7 +892,7 @@ module.exports = class Util {
             botlogs.send(message);
         } catch (e) {
             //Error
-            console.error(e);
+            console.error(`Logging to Serverlogs failed:\n${e.stack}`);
         }
 
 
@@ -943,7 +943,7 @@ module.exports = class Util {
                         }
 
                     })
-                    message.member.roles.add(role).catch(() => null);
+                    message.member.roles.add(role).catch(err => this.client.utils.log(`Error while giving ${member} the ${role.name} Role:\n${err.stack}`));
 
 
                 } catch (e) {

@@ -12,7 +12,7 @@ module.exports = class extends Event {
     async run(reaction, user) {
 
         if (user.bot) return;
-
+        const client = this.client;
         // When we receive a reaction we check if the reaction is partial or not
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -37,7 +37,7 @@ module.exports = class extends Event {
                         try {
                             await member.roles.remove(r.roleid);
                         } catch (e) {
-                            console.error(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
+                            client.utils.log(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
                         }
 
                     }

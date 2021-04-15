@@ -11,7 +11,7 @@ module.exports = class extends Event {
     async run(reaction, user) {
 
         if (user.bot) return;
-
+        const client = this.client;
         // When we receive a reaction we check if the reaction is partial or not
         if (reaction.partial) {
             // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -71,7 +71,7 @@ module.exports = class extends Event {
                             await member.roles.add(r.categoryid);
                         }
                     } catch (e) {
-                        console.error(`\nError while adding Reactionrole\nRoleID: ${r.roleid}\nCategoryID: ${r.categoryid}\n${e.stack}`)
+                        client.utils.log(`\nError while adding Reactionrole\nRoleID: ${r.roleid}\nCategoryID: ${r.categoryid}\n${e.stack}`)
                     }
                 }
 

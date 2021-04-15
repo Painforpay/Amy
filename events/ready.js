@@ -27,8 +27,23 @@ module.exports = class extends Event {
 
 
         let charlie = await this.client.users.fetch("795406184177860628");
-        //${this.client.prefix}help | ${this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} usern zu!
-        setInterval(async () => this.client.user.setActivity(`${(charlie.presence.status === "online") ? `v2 BETATEST` : "wo Charlie hin ist :("}`, {type: 'WATCHING'}), 15000);
+        //${this.client.prefix}help
+        setInterval(async () => {
+            let memberCount = this.client.guilds.cache.reduce((a, b) => a + b.memberCount, 0);
+
+            if(client.dev) return this.client.user.setActivity(`DevMode`, {type: "LISTENING"});
+
+            if(!client.isBeta) {
+                if(charlie.presence.status === "online") {
+                    this.client.user.setActivity(`auf ${memberCount} Nutzer`, {type: "LISTENING"});
+                } else {
+                    this.client.user.setActivity(`wo Charlie hin ist :(`, {type: "WATCHING"});
+                }
+            } else {
+                this.client.user.setActivity(`Betatest für v${client.version}`, {type: "WATCHING"});
+            }
+
+        }, 15000);
 
         let client = this.client;
 
