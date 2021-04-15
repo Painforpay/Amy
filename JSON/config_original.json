@@ -1,9 +1,11 @@
 {
   "token": "",
   "tokendev": "",
+  "isBeta": true,
   "dev": true,
-  "verbose": true,
+  "verbose": false,
   "prefix": "!",
+  "version": "4.0",
   "owners": [
     ""
   ],
