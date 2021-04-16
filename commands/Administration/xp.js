@@ -12,6 +12,7 @@ module.exports = class extends Command {
             ownerOnly: false,
             nsfw: false,
             aliases: ["xpManage", "exp"],
+            argsDef: ["<put/levelup/add/remove>"],
             minArgs: 1
         });
     }

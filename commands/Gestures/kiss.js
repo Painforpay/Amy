@@ -21,14 +21,14 @@ module.exports = class extends Command {
     async run(message, args) {
 
 
-        let target = message.mentions.users.first() || message.guild.members.cache.find(u => u.user.username === args[0] || u.nickname === args[0]);
+        let target = message.mentions.users.first() || message.guild.members.cache.find(u => u.user.username.toLowerCase() === args[0].toLowerCase() || u.nickname.toLowerCase() === args[0].toLowerCase());
 
         if (target) {
             //if(target.bot) return;
             let embed = new MessageEmbed()
                 .setTitle(`${json[0][0]}!`)
                 .setColor(`#FFD700`)
-                .setDescription(`${message.author} ${json[0][1]} ${target == message.author ? "sich Selbst" : target}! ${await this.client.utils.getRandom(json[3])}`)
+                .setDescription(`${message.author} ${json[0][1]} ${target === message.author ? "sich Selbst" : target}! ${await this.client.utils.getRandom(json[3])}`)
                 .setImage(await this.client.utils.getRandom(json[2]))
             message.channel.send(embed)
         } else {

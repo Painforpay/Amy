@@ -9,7 +9,8 @@ module.exports = class extends Command {
             aliases: ["lvl", "l"],
             description: 'Zeigt dir Informationen zu deinem Level an!',
             category: 'user',
-            guildOnly: true
+            guildOnly: true,
+            cooldown: 60
         });
     }
 

@@ -13,6 +13,7 @@ module.exports = class extends Command {
             guildOnly: true,
             minArgs: 1,
             argsDef: ['<rollenname>'],
+            cooldown: 60,
             additionalinfo: "Es kann darf keine Rolle gepingt werden - Der exakte Name reicht."
         });
     }

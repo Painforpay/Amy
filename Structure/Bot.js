@@ -96,6 +96,8 @@ module.exports = class Bot extends Client {
         this.fullMuteAFK = true; //Wenn Wahr werden User nach einer Speziellen Zeit im FullMute in den AFK gemoved
 
         this.fullMuteAFKTime = 5; //Zeit in minuten nach denen ein User im fullmute in den Afk gemoved wird.
+
+        this.picCooldownSecs = 10;
     }
 
     validate(options) {

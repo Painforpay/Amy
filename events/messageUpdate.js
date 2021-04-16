@@ -48,11 +48,11 @@ module.exports = class extends Event {
             if (command) {
 
 
-                if (command.ownerOnly && !this.client.utils.checkOwner(message.author)) {
+                if (command.ownerOnly && !this.client.utils.checkOwner(newMessage.author)) {
 
                     //User is not allowed to use this command, we don't want to do anything as it is not needed
 
-                    return message.delete().catch(() => null);
+                    return;
                 } else {
 
                     if (cmd.toLowerCase() != "eval") return;

@@ -51,7 +51,7 @@ module.exports = class extends Event {
             if (message.member.roles.cache.has(this.client.dev ? "831069345860943904" : "831069006759854150")) {
                 await message.member.roles.remove(this.client.dev ? "831069345860943904" : "831069006759854150");
             }
-            message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`)
+            message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`).then(m => m.delete({timeout: 10000}).catch(() => null))
         }
 
         if (message.mentions.members.size > 0) {
@@ -106,7 +106,7 @@ module.exports = class extends Event {
 
         if (this.client.spamCollection.has(message.member.id)) {
             if (this.client.spamCollection.get(message.member.id) > 2) {
-                message.channel.send(`Bitte Spam nicht!`)
+                message.channel.send(`Bitte Spamme nicht!`)
                 message.delete();
                 if (this.client.spamCollection.get(message.member.id) > 6) {
                     this.client.utils.muteMember(message.member, 2, message.guild.me);
@@ -126,9 +126,9 @@ module.exports = class extends Event {
             if (message.attachments.size || message.content.includes("cdn.discordapp.com/attachments/")) {
                 if (this.client.picCooldown.has(message.author.id)) {
 
-                    // let timespentmills = Date.parse(new Date()) - this.client.picCooldown.get(message.author.id);
+                     let timespentmills = Date.parse(new Date()) - this.client.picCooldown.get(message.author.id);
 
-                    //message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(10-timespentmills/1000)} Sekunden!`);
+                    message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(-timespentmills/1000)} Sekunden!`).then(m => m.delete({timeout: 5000}).catch(() => null))
                     try {
                         message.delete()
                     } catch (e) {
@@ -141,7 +141,7 @@ module.exports = class extends Event {
                     setTimeout(() => {
                         // Removes the User from the set after a minute
                         this.client.picCooldown.delete(message.author.id);
-                    }, 10000);
+                    }, this.client.picCooldownSecs * 1000);
 
 
                 }
@@ -241,7 +241,10 @@ module.exports = class extends Event {
                     // Check if the Command has a specified minimal Number of Args and then check if the message contains the right amount
                     if (command.minArgs && args.length < command.minArgs) {
                         message.delete().catch(() => null);
-                        return message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Abgegeben: ${args.length}, Benötigt: ${command.minArgs}`).then(m => m.delete({timeout: 60000}).catch(() => null));
+                        return message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Angegeben: ${args.length}, Benötigt: ${command.minArgs}\nNutzung: \`${this.client.prefix}${command.name} ${command.argsDef.join(" ")}\``).then(m => {
+                            m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        });
+
                     }
 
                     //Check if the Message was sent to a Guild - Always true
@@ -272,14 +275,18 @@ module.exports = class extends Event {
 
                     }
 
-                    if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) && !message.member.hasPermission("ADMINISTRATOR")) {
+                    if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) ) {//&& !message.member.hasPermission("ADMINISTRATOR")) {
                         message.delete();
-                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf diesem Befehl!`).then(m => m.delete({timeout: 60000}).catch(() => null));
+
+                        let timespentmills = Date.parse(new Date().toString()) - command.cooldownPeople.get(message.author.id);
+
+
+                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf dem \`${command.name}\` Befehl! Bitte warte noch \`${Math.floor(-timespentmills/1000)}\` Sekunden!`).then(m => m.delete({timeout: 5000}).catch(() => null));
 
 
                     }
                     if (command.cooldown > 0) {
-                        command.cooldownPeople.set(message.author.id, command.cooldown);
+                        command.cooldownPeople.set(message.author.id, Date.parse(new Date().toString())+command.cooldown);
 
                         setTimeout(async () => {
                             command.cooldownPeople.delete(message.author.id);

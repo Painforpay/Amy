@@ -206,9 +206,11 @@ module.exports = class Util {
 
         let embed = new MessageEmbed()
             .setTitle(`Oh, oh!`)
-            .setTimestamp();
+            .setColor("#FFD700")
+            .setFooter(`Gebe ${this.client.prefix}help ${cmdFile.name} ein um weitere Informationen zu erhalten!`);
 
-        let desc = `Leider gibt es keinen \`${args}\` Unterbefehl für den \`${this.capitalise(cmdFile.name)}\` Befehl!`;
+
+        let desc = `Leider gibt es keinen \`${args}\` Unterbefehl für den \`${cmdFile.name}\` Befehl!`;
 
         if (cmdFile.children.size > 0) {
             desc += `\nMögliche Unterbefehle sind:`
@@ -741,7 +743,6 @@ module.exports = class Util {
             "content": string,
             "catalog": "obscene"
         }
-
 
         return fetch('https://neutrinoapi.net/bad-word-filter', {
             method: 'POST',
