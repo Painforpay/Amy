@@ -18,6 +18,7 @@ module.exports = class extends Event {
         //Log Bot Stats
 
 
+
         console.log([
             `[${this.client.utils.getDateTime()}]`,
             `Logged in as ${this.client.user.tag}`,

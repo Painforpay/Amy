@@ -8,6 +8,7 @@ const {MessageEmbed, Collection, MessageAttachment} = require('discord.js');
 const {inspect} = require('util');
 const {Type} = require('@anishshobith/deeptype')
 const fetch = require('node-fetch')
+const ms = require("ms");
 
 
 module.exports = class Util {
@@ -121,6 +122,16 @@ module.exports = class Util {
         await message.react("🔺");
         await message.react("🔻");
 
+    }
+
+    async duration(ms) {
+        const sec = Math.floor((ms / 1000) % 60).toString()
+        const min = Math.floor((ms / (1000 * 60)) % 60).toString()
+        const hrs = Math.floor((ms / (1000 * 60 * 60)) % 60).toString()
+        const days = Math.floor((ms / (1000 * 60 * 60 * 24)) % 60).toString()
+        const months = Math.floor((ms / (1000 * 60 * 60 * 24 * 30)) % 60).toString()
+        const years = Math.floor((ms / (1000 * 60 * 60 * 24 * 365.25)) % 60).toString()
+        return `${years > 0 ? years.padStart(1, '0')+ `Jahr${years > 1 ? "e": ""} `: ""}${days > 0 ? days.padStart(1, '0')+` Tag${days > 1 ? "e": ""} `: ""}${hrs > 0 ? hrs.padStart(2, '0')+` Stunde${hrs > 1 ? "n": ""} `: ""}${min > 0 ? min.padStart(2, '0')+` Minute${min > 1 ? "n": ""} `: ""}${sec > 0 ? sec.padStart(2, '0')+` Sekunde${sec > 1 ? "n": ""}`: ""}`
     }
 
     async getUserData(id) {

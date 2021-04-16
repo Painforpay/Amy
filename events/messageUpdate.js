@@ -66,7 +66,7 @@ module.exports = class extends Event {
                         if (response instanceof MessageEmbed) {
 
                             if (message.attachments.map(x => x)[0]) {
-                                await message.delete();
+                                await message.delete().catch(() => null);
                                 let evalresponse = await message.channel.send(response);
                                 this.client.evals.set(newMessage.id, evalresponse.id);
                             } else {

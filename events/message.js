@@ -276,12 +276,12 @@ module.exports = class extends Event {
                     }
 
                     if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) ) {//&& !message.member.hasPermission("ADMINISTRATOR")) {
-                        message.delete();
+                        message.delete().catch(() => null);
 
                         let timespentmills = Date.parse(new Date().toString()) - command.cooldownPeople.get(message.author.id);
 
-
-                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf dem \`${command.name}\` Befehl! Bitte warte noch \`${Math.floor(-timespentmills/1000)}\` Sekunden!`).then(m => m.delete({timeout: 5000}).catch(() => null));
+                        let duration = await this.client.utils.duration(-timespentmills)
+                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf dem \`${command.name}\` Befehl! Bitte warte noch \`${duration}\`!`).then(m => m.delete({timeout: 5000}).catch(() => null));
 
 
                     }

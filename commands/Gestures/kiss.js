@@ -21,7 +21,7 @@ module.exports = class extends Command {
     async run(message, args) {
 
 
-        let target = message.mentions.users.first() || message.guild.members.cache.find(u => u.user.username.toLowerCase() === args[0].toLowerCase() || u.nickname.toLowerCase() === args[0].toLowerCase());
+        let target = message.mentions.users.first() || message.guild.members.cache.find(u => u.user.username === args[0] || u.nickname === args[0]);
 
         if (target) {
             //if(target.bot) return;

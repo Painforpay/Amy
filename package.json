@@ -21,6 +21,7 @@
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "glob": "^7.1.6",
+    "ms": "^2.0.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
