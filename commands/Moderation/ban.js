@@ -42,7 +42,7 @@ module.exports = class extends Command {
         await args.shift();
 
         let reason = args.join(" ") || '[Kein Grund angegeben]'
-        await user.send(`Du wurdest vom Wohnzimmer gebannt. \nGrund: \`${reason}\`\nBans sind permanent. Sollte ein Missverständnis vorliegen, melde dich bitte bei einem Owner! ${this.client.owners.join(" ")}`)
+        await user.send(`Du wurdest vom Wohnzimmer gebannt. \nGrund: \`${reason}\`\nBans sind permanent. Sollte ein Missverständnis vorliegen, melde dich bitte bei einem Owner! ${this.client.owners.join(" ")}`).catch(() => null);
 
         //ARMED
         await message.guild.members.ban(user.id, {reason: reason, days: 7});

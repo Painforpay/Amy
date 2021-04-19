@@ -44,6 +44,20 @@ module.exports = class extends Event {
             return; //await this.client.utils.DeeptalkSender(message);
         }
 
+        if(message.author.id === "302050872383242240") {
+
+            if(message.embeds) {
+                if(message.embeds[0].description.search(/Bump done/)) {
+                    setTimeout(async () => {
+
+                            message.channel.send(`Serverbumping ist wieder verfügbar! Nutze \`!d bump\` um uns zu unterstützen!`)
+
+                    }, 7200000)
+                }
+
+            }
+
+        }
 
 
         if (this.client.setAfkUsers.has(message.member.id)) {
@@ -109,7 +123,7 @@ module.exports = class extends Event {
                 message.channel.send(`Bitte Spamme nicht!`)
                 message.delete();
                 if (this.client.spamCollection.get(message.member.id) > 6) {
-                    this.client.utils.muteMember(message.member, 2, message.guild.me);
+                    await this.client.utils.muteMember(message.member, 2, message.guild.me);
                 }
             }
             let currentCount = this.client.spamCollection.get(message.member.id) ? this.client.spamCollection.get(message.member.id) : 0;

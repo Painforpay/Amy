@@ -57,11 +57,9 @@ module.exports = class extends Event {
         });
 
         if (this.client.raidMode) {
-            try {
-                await member.send("Sorry, die Raid Protection ist aktiv. Bitte versuche es später nochmal!")
-            } catch (e) {
-                // Der Bot kann dem User keine DMs schicken!
-            }
+
+                await member.send("Sorry, die Raid Protection ist aktiv. Bitte versuche es später nochmal!").catch(() => null);
+
 
             return member.kick();
         } else {

@@ -749,8 +749,8 @@ module.exports = class Util {
     async profanityFilter(string) {
 
         let data = {
-            "user-id": this.client.options.neutrinoapi[0],
-            "api-key": this.client.options.neutrinoapi[1],
+            "user-id": this.client.neutrinoapi[0],
+            "api-key": this.client.neutrinoapi[1],
             "content": string,
             "catalog": "obscene"
         }
@@ -792,14 +792,14 @@ module.exports = class Util {
 
                 let nextlevel = await client.utils.getLevelXp(leveluserhastoget + 1);
                 if (client.verbose) {
-                    console.log(`Current Level: ${currentlevel}`);
-                    console.log(`Old Xp: ${result[0].xp}`);
-                    console.log(`Amount to add: ${amount}`);
-                    console.log(`New Xp: ${result[0].xp + amount}`);
-                    console.log(`Level to Give: ${leveluserhastoget}\n`);
+                    console.log(`Current Level: ${currentlevel}
+                                 Old Xp: ${result[0].xp}
+                                 Amount to add: ${amount}
+                                 New Xp: ${result[0].xp + amount}
+                                 Level to Give: ${leveluserhastoget}\n`);
                 }
 
-                //*/
+
 
                 let togive = result[0].xp + amount;
 

@@ -46,7 +46,7 @@ module.exports = class extends Command {
 
         let reason = args.join(" ") || '[Kein Grund angegeben]'
 
-        await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``)
+        await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
 
         //ARMED
         await member.kick(reason);
