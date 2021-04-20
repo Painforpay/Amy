@@ -64,11 +64,8 @@ module.exports = class extends Event {
             return member.kick();
         } else {
 
-            if ((Date.parse(new Date()) - member.user.createdTimestamp) < 259200000) {
-
+            if ((Date.parse(new Date()) - member.user.createdTimestamp) < 604800000) {
                 //let vor = Date.parse(new Date()) - member.user.createdTimestamp;
-
-
                 logChannel.send(`Achtung: Der Account von ${member} ist ziemlich jung. Erstellt am: ${await this.client.utils.getDateTime(member.user.createdTimestamp)}`);
             }
 
@@ -79,10 +76,8 @@ module.exports = class extends Event {
                 console.error(e);
             }
 
-
             try {
                 if (this.client.dev) {
-
                     let array = ["800110137632882778", "800110137544146962"];
                     for (const roleid of array) {
                         let role = member.guild.roles.cache.get(roleid);
