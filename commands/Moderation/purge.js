@@ -23,7 +23,7 @@ module.exports = class extends Command {
         const deleteCount = Math.abs(args[0]);
         const user = message.mentions.users.first();
 
-        if (!user && !deleteCount) return message.channel.send("Bitte gib einen User oder die anzahl der zu löschenden Nachrichten an, nach welchen gefiltert werden soll.");
+        if (!user && !deleteCount) return message.channel.send("Bitte gib einen User oder die Anzahl der zu löschenden Nachrichten an, nach welchen gefiltert werden soll.");
 
         const fetchedMessages = await message.channel.messages.fetch({limit: 100, before: message.id});
         let filteredMessages = fetchedMessages;
