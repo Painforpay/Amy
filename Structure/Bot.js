@@ -97,7 +97,9 @@ module.exports = class Bot extends Client {
 
         this.fullMuteAFKTime = 5; //Zeit in minuten nach denen ein User im fullmute in den Afk gemoved wird.
 
-        this.picCooldownSecs = 10;
+        this.picCooldownSecs = 10; //Zeit in Sekunden die man Zwischen bildern warten muss!
+
+        this.birthdayReward = 500; //Anzahl an XP die der User an seinem Geburtstag geschenkt bekommt
     }
 
     validate(options) {

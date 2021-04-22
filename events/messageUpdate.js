@@ -28,13 +28,10 @@ module.exports = class extends Event {
         if (!oldMessage.guild || newMessage.author.bot) return;
 
         if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
-            try {
-                newMessage.delete();
+
+                newMessage.catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                 newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
-            } catch (e) {
-                //Error
-                console.error(e);
-            }
+
         }
 
 
@@ -52,7 +49,6 @@ module.exports = class extends Event {
 
                     //User is not allowed to use this command, we don't want to do anything as it is not needed
 
-                    return;
                 } else {
 
                     if (cmd.toLowerCase() != "eval") return;
@@ -66,7 +62,7 @@ module.exports = class extends Event {
                         if (response instanceof MessageEmbed) {
 
                             if (message.attachments.map(x => x)[0]) {
-                                await message.delete().catch(() => null);
+                                await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                                 let evalresponse = await message.channel.send(response);
                                 this.client.evals.set(newMessage.id, evalresponse.id);
                             } else {
@@ -75,7 +71,7 @@ module.exports = class extends Event {
 
 
                         } else if (response instanceof MessageAttachment) {
-                            await message.delete();
+                            await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                             let evalresponse = await message.channel.send(response);
                             this.client.evals.set(newMessage.id, evalresponse.id);
                         }

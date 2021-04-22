@@ -364,9 +364,9 @@ module.exports = class extends Event {
                             .setTitle("Birthday Reminder!")
                             .setDescription(`Herzlichen Glückwunsch zum Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
                             .setTimestamp();
-                        general.send(`${user}`).then(m => m.delete({timeout: 1000}));
+                        general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
                         general.send({embed: embed});
-                        await client.utils.xpadd(member, 500);
+                        await client.utils.xpadd(member, this.client.birthdayReward);
 
                     });
 

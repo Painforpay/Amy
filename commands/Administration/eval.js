@@ -44,11 +44,11 @@ module.exports = class extends Command {
         if (response instanceof MessageEmbed) {
 
             evalresponse = await message.channel.send(response)
-            m.delete().catch(() => null)
+            m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
         } else if (response instanceof MessageAttachment) {
 
             evalresponse = await message.channel.send(response);
-            m.delete().catch(() => null)
+            m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
         }
         this.client.evals.set(message.id, evalresponse.id);
 

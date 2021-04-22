@@ -8,7 +8,7 @@ module.exports = class extends SubCommand {
             description: 'Erhöht die XP für einen Nutzer',
             category: 'users',
             guildOnly: true,
-            parent: __dirname.substring(require('path').resolve(__dirname, '..').length+1),
+            parent: __dirname.split(require('path').sep).pop(),
             minArgs: 2,
             argsDef: ["<User>", "<Menge>"]
         });

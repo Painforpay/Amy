@@ -20,7 +20,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete();
+        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
 
         let embed = new Discord.MessageEmbed()
@@ -51,11 +51,9 @@ module.exports = class extends Command {
 
 
         await message.channel.send({embed: embed}).then(m => {
-            try {
-                m.delete({timeout: 15000});
-            } catch (e) {
 
-            }
+                m.delete({timeout: 15000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+
         });
 
     }

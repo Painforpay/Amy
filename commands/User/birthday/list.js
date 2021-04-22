@@ -9,7 +9,7 @@ module.exports = class extends SubCommand {
             description: 'Zeigt alle Geburtstage an, welche zur Zeit eingetragen sind!',
             category: 'users',
             guildOnly: true,
-            parent: __dirname.substring(require('path').resolve(__dirname, '..').length+1)
+            parent: __dirname.split(require('path').sep).pop()
         });
     }
 

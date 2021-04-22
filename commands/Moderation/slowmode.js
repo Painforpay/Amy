@@ -19,27 +19,21 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete();
+        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
 
         if (isNaN(args[0])) return message.channel.send("Bitte gib eine Zahl als Parameter an!").then(m => {
-            try {
-                m.delete({timeout: 5000})
-            } catch (e) {
-                //Error
-                console.error(e);
-            }
+
+                m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+
         });
 
 
         let channel = message.channel;
         if (test.get(channel.id)) return message.channel.send("Dieser Channel befindet sich bereits im Slowmode! Gesetzt für " + test.get(channel.id) + " Sekunden").then(m => {
-            try {
-                m.delete({timeout: 5000})
-            } catch (e) {
-                //Error
-                console.error(e);
-            }
+
+                m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+
         });
 
         let time = (Math.abs(args[0]));
@@ -61,12 +55,9 @@ module.exports = class extends Command {
         }, 10000);
 
         message.channel.send(`Der Channel wurde für ${time} Sekunden in den Slowmode versetzt! ${args[1] ? (`(${limit} Sekunden pro Nachricht)`) : ""}`).then(m => {
-            try {
-                m.delete({timeout: 15000})
-            } catch (e) {
-                //Error
-                console.error(e);
-            }
+
+                m.delete({timeout: 15000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+
         })
 
         setTimeout(() => {
