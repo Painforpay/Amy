@@ -9,7 +9,7 @@ module.exports = class extends SubCommand {
             description: 'Setzt den Geburtstag eines Users',
             category: 'users',
             guildOnly: true,
-            parent: 'birthday',
+            parent: __dirname.substring(require('path').resolve(__dirname, '..').length+1),
             minArgs: 1,
             argsDef: ["<TT.MM>"]
         });

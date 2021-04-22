@@ -16,7 +16,7 @@ module.exports = class extends Command {
 
     async run(message, args) {
         let subCommand = args[0];
-        const command = this.client.subCommands.get(subCommand.toLowerCase());
+        const command = this.client.subCommands.get(`${this.name}_${subCommand.toLowerCase()}`);
 
 
         if (command && command.parent === this.name) {
@@ -29,8 +29,10 @@ module.exports = class extends Command {
 
             }
             command.run(message, cutArgs);
+            return message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
         } else {
-            return message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))
+            message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))
+            return message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
         }
 
     }

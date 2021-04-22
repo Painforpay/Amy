@@ -192,7 +192,7 @@ module.exports = class Util {
                 if (!this.isClass(File)) throw new TypeError(`Der Befehl ${name} exportiert keine Klasse.`);
                 const command = new File(this.client, name.toLowerCase());
                 if (!(command instanceof SubCommand)) throw new TypeError(`Der Befehl ${name} ist keine Instanz von SubCommand.`);
-                this.client.subCommands.set(command.name, command);
+                this.client.subCommands.set(command.parent ? `${command.parent}_${command.name}` : command.name, command);
             }
         });
     }
@@ -320,13 +320,13 @@ module.exports = class Util {
         if (message.member.hasPermission('MANAGE_CHANNELS')) {
 
             //Set the Description and set a Image
-            embed.setDescription(`The Title (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease enable NSFW-Mode on this Channel to use it!`)
+            embed.setDescription(`The Content (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease enable NSFW-Mode on this Channel to use it!`)
 
                 .setImage(`https://cdn.discordapp.com/attachments/821157975246241822/821158154447355964/ChannelNSFWEnable.gif`)
         } else {
 
             //Set the Description and set a Image
-            embed.setDescription(`The Title (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease use it in a NSFW Channel!`)
+            embed.setDescription(`The Content (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease use it in a NSFW Channel!`)
         }
 
         //return the embed

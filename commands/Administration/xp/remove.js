@@ -8,7 +8,7 @@ module.exports = class extends SubCommand {
             description: 'Verringert die XP für einen Nutzer',
             category: 'users',
             guildOnly: true,
-            parent: 'xp',
+            parent: __dirname.substring(require('path').resolve(__dirname, '..').length+1),
             minArgs: 2,
             argsDef: ["<User>", "<Menge>"]
         });
@@ -27,6 +27,12 @@ module.exports = class extends SubCommand {
         if (!user) return;
         let member = message.guild.member(user);
         let value = args.pop();
+        if(isNaN(value)) {
+            return message.channel.send(`Bitte einen numerischen Wert für die Menge angeben`).then(m => {
+                m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            })
+        }
+
         let valueToTake = value;
         const UserData = this.client.utils.getUserData(member.id);
 

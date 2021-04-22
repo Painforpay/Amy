@@ -8,7 +8,7 @@ module.exports = class extends SubCommand {
             description: 'Setzt die XP für einen Nutzer',
             category: 'users',
             guildOnly: true,
-            parent: 'xp',
+            parent: __dirname.substring(require('path').resolve(__dirname, '..').length+1),
             minArgs: 2,
             argsDef: ["<User>", "<Menge>"]
         });
@@ -30,6 +30,12 @@ module.exports = class extends SubCommand {
 
         let value = args.pop();
 
+        if(isNaN(value)) {
+            return message.channel.send(`Bitte einen numerischen Wert für die Menge angeben`).then(m => {
+                m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            })
+        }
+
 
         this.client.con.query(`UPDATE users SET \`xp\` = '${value}' WHERE id = "${member.id}";`, function (err) {
             if (err) {
@@ -42,9 +48,6 @@ module.exports = class extends SubCommand {
             message.channel.send(`Erfahrungspunkte für \`${member.user.tag}\` wurden auf \`${value}\` angepasst!`).then(m => {
                 m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
             })
-
-            message.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
-
         });
     }
 

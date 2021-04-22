@@ -1,5 +1,5 @@
 const Command = require('../../Structure/Command');
-const {User, MessageEmbed} = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const commandname = __filename.split("").slice(__dirname.length + 1);
 commandname.splice(commandname.length - 3, 3)
 const json = require(`../../images-gifs/${commandname.join("")}.json`);
