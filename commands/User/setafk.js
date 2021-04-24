@@ -21,7 +21,7 @@ module.exports = class extends Command {
         message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
         let reason = args.join(" ");
 
-        reason = reason.replaceAll(/(<.*:.+:.+>)|(:.*:)/gi, "")
+        reason = reason.replace(/(<.*:.+:.+>)|(:.*:)/gi, "")
 
         let fResult = await this.client.utils.profanityFilter(reason)
 

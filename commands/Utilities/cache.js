@@ -6,7 +6,7 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            description: 'Lädt eine Nachricht in Amys Speicher',
+            description: 'Lädt eine Nachricht in Amys Cache',
             category: 'utilities',
             userPerms: ['ADMINISTRATOR'],
             guildOnly: true,
