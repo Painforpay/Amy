@@ -926,8 +926,8 @@ module.exports = class Util {
 
     async colorgiver(message) {
         try {
-            if (isNaN(message.content) || message.content > 18 || message.content < 1 || !message.content) {
-                message.channel.send("Bitte eine Nummer im Bereich 1 bis 18 angeben!").then(m => {
+            if ( isNaN(message.content) || message.content > 19 || message.content < 1 || !message.content ) {
+                message.channel.send("Bitte eine Nummer im Bereich 1 bis 19 angeben!").then(m => {
                     try {
                         m.delete({timeout: 3000})
                     } catch (e) {
@@ -939,7 +939,7 @@ module.exports = class Util {
             } else {
                 try {
                     //let colorsDev = ["800110137649135629", "800110137649135628", "800110137649135627"]
-                    let colors = ["794575425975877641", "794575395033710622", "794575441355603968", "794575390822891530", "794575442539577395", "794575472901226516", "794575427132719144", "794575387405058078", "794575436289671169", "794575456875577364", "794575415204773898", "794575406723760129", "794575447081091072", "794575460902240276", "794575399895957514", "794575400692219914", "794575472037331034", "794575421610000394"]
+                    let colors = ["794575425975877641", "794575395033710622", "794575441355603968", "794575390822891530", "794575442539577395", "794575472901226516", "794575427132719144", "794575387405058078", "794575436289671169", "794575456875577364", "794575415204773898", "794575406723760129", "794575447081091072", "794575460902240276", "794575399895957514", "794575400692219914", "794575472037331034", "794575421610000394", "834828722308644894"]
                     let role = message.guild.roles.cache.find(role => role.id === colors[(message.content) - 1]);
 
 
@@ -948,8 +948,6 @@ module.exports = class Util {
                     colors.forEach(color => {
 
                         if (message.member.roles.cache.find(role => role.id === color)) {
-
-
                             message.member.roles.remove(message.member.roles.cache.find(role => role.id === color));
                         }
 
