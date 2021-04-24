@@ -84,7 +84,7 @@ module.exports = class extends Event {
 
                     list2.push(`${u.member.nickname ? u.member.nickname : u.member.user.tag}: **${u.reason}**`);
                 })
-                message.channel.send(message1 + list2.join("\n")).then(m => m.delete({timeout: 120000}).catch(() => null));
+                message.channel.send(message1 + list2.join("\n")).then(m => m.delete({timeout: 60000}).catch(() => null));
             }
         }
 
