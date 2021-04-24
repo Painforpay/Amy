@@ -19,14 +19,12 @@ module.exports = class extends Command {
 
         let dms = this.client.channels.cache.filter( c => c.type === "dm");
         let amount = 0;
-        await dms.forEach(dm => {
-
-            dm.messages.fetch();
+        for await (const dm of dms) {
+            await dm.messages.fetch();
             let own = dm.messages.filter(dm => dm.author === this.client.user);
 
             amount += own.size;
-
-        })
+        }
 
         console.log(amount);
 
