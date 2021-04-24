@@ -78,13 +78,13 @@ module.exports = class extends Event {
             })
 
             if (list.size > 0) {
-                let message1 = `Gepingte User sind AFK:\n`;
+                let message1 = `${message.author}\nGepingte User sind AFK:\n`;
                 let list2 = [];
                 list.forEach(u => {
 
                     list2.push(`${u.member.nickname ? u.member.nickname : u.member.user.tag}: **${u.reason}**`);
                 })
-                message.channel.send(message1 + list2.join("\n")).catch(() => null);
+                message.channel.send(message1 + list2.join("\n")).then(m => m.delete({timeout: 120000}).catch(() => null));
             }
         }
 
