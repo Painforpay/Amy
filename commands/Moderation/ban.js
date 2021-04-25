@@ -29,8 +29,15 @@ module.exports = class extends Command {
         });
         if (!user) return;
         let member = message.guild.member(user);
+
+        await args.shift();
+
+        let reason = args.join(" ") || '[Kein Grund angegeben]'
+
         if (message.member.id === user.id) return message.channel.send(`Du kannst dich nicht selbst bannen!`)
+
         let userData = {xp: "Unbekannt"};
+
         if(member) {
             userData = await this.client.utils.getUserData(user.id);
             if (member && !this.client.utils.comparePerms(message.member, member)) {
@@ -40,18 +47,17 @@ module.exports = class extends Command {
             if (!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
                 return message.channel.send(`Ich kann diesen Nutzer nicht bannen!`)
             }
+            await user.send(`Du wurdest vom Wohnzimmer gebannt. \nGrund: \`${reason}\`\nBans sind permanent. Sollte ein Missverständnis vorliegen, melde dich bitte bei einem Owner! ${this.client.owners.join(" ")}`).catch(() => null);
+
         }
 
-        await args.shift();
 
-        let reason = args.join(" ") || '[Kein Grund angegeben]'
-        await user.send(`Du wurdest vom Wohnzimmer gebannt. \nGrund: \`${reason}\`\nBans sind permanent. Sollte ein Missverständnis vorliegen, melde dich bitte bei einem Owner! ${this.client.owners.join(" ")}`).catch(() => null);
 
         //ARMED
         await message.guild.members.ban(user.id, {reason: reason, days: 7});
 
-        let internerModlog = message.guild.channels.resolve(this.client.dev ? "800110138924466195" : "795773658916061264");
-        let Modlog = message.guild.channels.resolve(this.client.dev ? "800110139155546203" : "795773686064873542");
+        let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
+        let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
 
 
         internerModlog.send(`:octagonal_sign: ${user.tag} [${user.id}] wurde von ${message.member} wegen \`${reason}\` gebannt!  XP: ${userData.xp}`)
