@@ -30,8 +30,9 @@ module.exports = class extends Command {
         if (!user) return;
         let member = message.guild.member(user);
         if (message.member.id === user.id) return message.channel.send(`Du kannst dich nicht selbst bannen!`)
-
+        let userData = {xp: "Unbekannt"};
         if(member) {
+            userData = await this.client.utils.getUserData(user.id);
             if (member && !this.client.utils.comparePerms(message.member, member)) {
                 return message.channel.send(`Du kannst diesen Nutzer nicht bannen!`)
             }
@@ -51,11 +52,11 @@ module.exports = class extends Command {
 
         let internerModlog = message.guild.channels.resolve(this.client.dev ? "800110138924466195" : "795773658916061264");
         let Modlog = message.guild.channels.resolve(this.client.dev ? "800110139155546203" : "795773686064873542");
-        let userData = await this.client.utils.getUserData(user.id);
+
 
         internerModlog.send(`:octagonal_sign: ${user.tag} [${user.id}] wurde von ${message.member} wegen \`${reason}\` gebannt!  XP: ${userData.xp}`)
         Modlog.send(`:octagonal_sign: ${user.tag} [${user.id}] gebannt!`)
-
+        console.log("test")
     }
 
 
