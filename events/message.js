@@ -181,7 +181,7 @@ module.exports = class extends Event {
 
                 case "voice-kontext": {
 
-                        message.delete({timeout: 3600000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        message.delete({timeout: 3600000}).catch(() => null);
 
                 }
                     break;
