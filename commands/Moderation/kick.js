@@ -20,6 +20,7 @@ module.exports = class extends Command {
 
     async run(message, args) {
 
+        message.delete();
         let BanmemberID = message.mentions.members.first() || args[0];
 
         let user = await this.client.users.fetch(BanmemberID.id ? BanmemberID.id : BanmemberID).catch(err => {
@@ -29,33 +30,37 @@ module.exports = class extends Command {
         });
         if (!user) return;
         let member = message.guild.member(user);
-        if (!member) {
-            return message.channel.send("User nicht gefunden");
-        }
-        if (message.member.id === member.id) return message.channel.send(`Du kannst dich nicht selbst kicken!`)
-
-        if (!this.client.utils.comparePerms(message.member, member)) {
-            return message.channel.send(`Du kannst diesen Nutzer nicht kicken!`)
-        }
-
-        if (!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
-            return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
-        }
 
         await args.shift();
 
         let reason = args.join(" ") || '[Kein Grund angegeben]'
+        if (!member) {
+            return message.channel.send("User nicht gefunden");
+        }
+        if (message.member.id === user.id) return message.channel.send(`Du kannst dich nicht selbst kicken!`)
 
-        await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
+        let userData = {xp: "Unbekannt"};
+
+        if(member) {
+            userData = await this.client.utils.getUserData(user.id);
+            if (!this.client.utils.comparePerms(message.member, member)) {
+                return message.channel.send(`Du kannst diesen Nutzer nicht kicken!`)
+            }
+
+            if (!this.client.utils.comparePerms(message.guild.member(this.client.user), member)) {
+                return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
+            }
+            await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
+
+        }
+
+
 
         //ARMED
         await member.kick(reason);
 
-
-        let internerModlog = message.guild.channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
-        let Modlog = message.guild.channels.cache.get(this.client.dev ? "800110139155546203" : "795773686064873542");
-
-        let userData = await this.client.utils.getUserData(user.id);
+        let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
+        let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
 
 
         internerModlog.send(`🥾 ${member.user.tag} [${user.id}] wurde von ${message.author} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);

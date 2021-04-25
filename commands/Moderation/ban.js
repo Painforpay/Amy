@@ -19,7 +19,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-
+        message.delete();
         let BanmemberID = message.mentions.members.first() || args[0];
 
         let user = await this.client.users.fetch(BanmemberID.id ? BanmemberID.id : BanmemberID).catch(err => {
