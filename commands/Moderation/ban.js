@@ -56,7 +56,7 @@ module.exports = class extends Command {
 
         internerModlog.send(`:octagonal_sign: ${user.tag} [${user.id}] wurde von ${message.member} wegen \`${reason}\` gebannt!  XP: ${userData.xp}`)
         Modlog.send(`:octagonal_sign: ${user.tag} [${user.id}] gebannt!`)
-        console.log("test")
+
     }
 
 
