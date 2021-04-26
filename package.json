@@ -13,6 +13,7 @@
     "@anishshobith/deeptype": "^1.1.0",
     "@datafire/neutrinoapi": "^6.0.0",
     "@discordjs/collection": "^0.1.6",
+    "@top-gg/sdk": "^3.1.1",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
     "common-tags": "^1.8.0",

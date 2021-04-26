@@ -1,4 +1,5 @@
 ﻿const express = require('express');
+const topgg = require('@top-gg/sdk')
 const bodyParser = require('body-parser');
 const colors = require('colors/safe');
 const app = express();
@@ -20,7 +21,7 @@ module.exports = class RESTApi {
         app.post('/xp', async (req, res) => {
             const body = req.body;
 
-            return;
+            if(!this.client.enableAPIXP) return;
 
             let ref;
             switch (body.auth) {
@@ -57,11 +58,24 @@ module.exports = class RESTApi {
 
         });
 
+        const webhook = new topgg.Webhook(this.client.topggtoken)
+        app.post('/dblwebhook', webhook.listener(async vote => {
+
+            if(vote.type !== "upvote") return;
+            this.client.channels.fetch(this.client.dev ? "836203865929023518": "823910154449846292").then(c => {
+
+                c.send(`<@${vote.user}> hat erfolgreich für unseren Server gevoted und ${this.client.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
+
+            })
+            await this.addUserXP(vote.user, this.client.voteReward, "Voting")
+        }))
+
 
         app.listen(port, () => console.log(colors.green(`App listening on Port ${port}!`)))
 
 
     }
+
 
     async addUserXP(id, xp, ref) {
         await this.client.utils.xpadd((await this.client.utils.getGuildMember(id)), xp)

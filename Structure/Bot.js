@@ -51,6 +51,8 @@ module.exports = class Bot extends Client {
 
         this.owners = options.owners;
 
+        this.topggtoken = options.topggAuth;
+
         this.maxChanSize = 4;  //Maximale Größe von UserChanneln
 
         this.con = new MySQL(options.host, options.username, options.password).createConnection();
@@ -100,6 +102,11 @@ module.exports = class Bot extends Client {
         this.picCooldownSecs = 10; //Zeit in Sekunden die man Zwischen bildern warten muss!
 
         this.birthdayReward = 500; //Anzahl an XP die der User an seinem Geburtstag geschenkt bekommt
+
+        this.voteReward = 50; //Anzahl xp welche man für topgg Votes bekommt!
+
+        this.enableAPIXP = false; //Wenn wahr, werden API Anfragen für XP angenommen!
+
     }
 
     validate(options) {
