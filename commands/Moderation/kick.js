@@ -51,7 +51,6 @@ module.exports = class extends Command {
                 return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
             }
             await user.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
-
         }
 
 

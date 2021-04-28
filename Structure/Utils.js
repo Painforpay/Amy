@@ -521,7 +521,7 @@ module.exports = class Util {
     async getGuildMember(id) {
 
         let guild;
-        guild = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919");
+        guild = this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
 
         let member;
         member = await guild.members.cache.find(m => m.id === id);
@@ -684,7 +684,6 @@ module.exports = class Util {
         } else {
 
             let UserData = await this.client.utils.getUserData(newState.member.id);
-
 
             let name = UserData.pChannelName == null ? `${newState.member.nickname != null ? newState.member.nickname : newState.member.user.username}s Sprachkanal` : UserData.pChannelName;
             if (name.length > 32) {

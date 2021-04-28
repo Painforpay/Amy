@@ -107,6 +107,8 @@ module.exports = class Bot extends Client {
 
         this.enableAPIXP = false; //Wenn wahr, werden API Anfragen für XP angenommen!
 
+        this.allowFullChannelJoin = false; //Wenn wahr, dürfen User mit Move rechten einem vollem Channel joinen!
+
     }
 
     validate(options) {

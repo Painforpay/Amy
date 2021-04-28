@@ -35,7 +35,7 @@ module.exports = class extends Command {
         if (!deletedMessages) return message.channel.send("Ein Fehler ist aufgetreten, bitte versuche es nochmal!");
 
         const deletedCount = deletedMessages.size;
-        message.channel.send(`${deletedCount} Nachricht${deletedCount === 1 ? "" : "en"} wurden gelöscht.`).then(m => m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
+        message.channel.send(`${deletedCount} Nachricht${deletedCount === 1 ? "" : "en"} wurden gelöscht.`).then(m => m.delete({timeout: 5000}).catch(() => null));
 
 
     }
