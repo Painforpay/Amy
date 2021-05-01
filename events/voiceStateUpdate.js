@@ -67,9 +67,10 @@ module.exports = class extends Event {
 
 
             if(this.client.allowFullChannelJoin) return;
-            if(newState.channel.userLimit == 0) return;
-            if(newState.channel.userLimit < newState.channel.members.size){
+
+            if(newState.full){
                 if(newState.member.user.bot) return;
+                if(newState.channel.members.has("252128902418268161") || newState.channel.members.has("235088799074484224")) return;
                 newState.kick(`Tried to join a full Channel!`);
                 newState.member.user.send(`Du darfst keinen vollen Channeln beitreten!`).then(m => m.delete({timeout:20000}))
             }
@@ -124,9 +125,10 @@ module.exports = class extends Event {
             if (newState.channel.id == (this.client.dev ? "804744090637959178" : "804684722763595777")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
 
             if(this.client.allowFullChannelJoin) return;
-            if(newState.channel.userLimit == 0) return;
-            if(newState.channel.userLimit < newState.channel.members.size){
+
+            if(newState.full){
                 if(newState.member.user.bot) return;
+                if(newState.channel.members.has("252128902418268161") || newState.channel.members.has("235088799074484224")) return;
                 newState.setChannel(oldState.channel, `Tried joining a full Channel`);
                 newState.member.user.send(`Du darfst keinen vollen Channeln beitreten!`).then(m => m.delete({timeout:20000}))
             }
