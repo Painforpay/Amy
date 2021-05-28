@@ -67,7 +67,7 @@ module.exports = class Bot extends Client {
 
         this.PVoices = new Collection(); //List of Current Private Channels
 
-        this.spamCollection = new Collection();
+        this.antispam = new Collection();
 
         this.raidMode = false;  //Automatisch vom Bot verwaltet - Wenn wahr wird jeder neue User welcher joined gekickt
 
@@ -108,6 +108,8 @@ module.exports = class Bot extends Client {
         this.enableAPIXP = false; //Wenn wahr, werden API Anfragen für XP angenommen!
 
         this.allowFullChannelJoin = false; //Wenn wahr, dürfen User mit Move rechten einem vollem Channel joinen!
+
+        this.spamMuteTime = 2; //Zeit in Minuten für welche man gemuted wird, wenn man spammt!
 
     }
 

@@ -171,17 +171,16 @@ module.exports = class extends Event {
         let botlogs = await this.client.channels.fetch(client.dev ? "803530075571224627" : "803530018369830922", true);
         console.log(colors.green("Done caching Messages / Channels."));
 
-        setInterval(async () => {
+        setInterval(() => {
 
-            this.client.spamCollection.forEach((v, k) => {
-                if (v > 0) {
-                    this.client.spamCollection.delete(k)
-                } else {
-                    let newV = v - 1
-                    this.client.spamCollection.set(k, newV)
-                }
+            this.client.antispam.forEach((v, k) => {
+
+                let newMessageCount = v.messageCount - 1 <= 0 ? 0 : v.messageCount - 1;
+
+                this.client.antispam.set(k, {GuildMember: v.GuildMember, messageCount: newMessageCount});
             })
-        }, 1000 / this.client.messagesPerSecond)
+
+        }, 1000)
 
         setInterval(async () => {
             if (this.client.fullMutes.size > 0 && this.client.fullMuteAFK) {

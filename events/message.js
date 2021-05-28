@@ -99,11 +99,36 @@ module.exports = class extends Event {
         const prefix = message.content.match(mentionRegexPrefix) ?
             message.content.match(mentionRegexPrefix)[0] : this.client.prefix;
 
-        if (message.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
+        if (message.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g) && !message.member.hasPermission("MANAGE_MESSAGES")) {
 
                 message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                 message.channel.send(`${message.member}, du darfst keine Invites posten!`);
 
+                if((Date.parse(new Date()) - message.member.joinedTimestamp) < 604800000) {
+                    let userData = {xp: "Unbekannt"};
+                    let reason = "Senden von Invitelinks"
+                    if(message.member) {
+                        userData = await this.client.utils.getUserData(message.author.id);
+
+                        if (!this.client.utils.comparePerms(message.guild.member(this.client.user), message.member)) {
+                            return message.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
+                        }
+                        await message.author.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
+                    }
+
+
+
+                    //ARMED
+                    await message.member.kick(reason);
+
+                    let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
+                    let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
+
+
+                    internerModlog.send(`🥾 ${message.author.tag} [${message.author.id}] wurde von ${this.client.user.username} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
+                    Modlog.send(`🥾 ${message.author.tag} [${message.author.id}] wurde gekickt!`);
+                    return;
+                }
         }
 
         if (message.channel.id === (this.client.dev ? "800110137820971047" : "797833037022363659")) {
@@ -112,21 +137,31 @@ module.exports = class extends Event {
 
         }
 
-        if (this.client.spamCollection.has(message.member.id)) {
-            if (this.client.spamCollection.get(message.member.id) > 2) {
-                message.channel.send(`Bitte Spamme nicht!`)
-                message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                if (this.client.spamCollection.get(message.member.id) > 6) {
-                    await this.client.utils.muteMember(message.member, 2, message.guild.me);
-                }
-            }
-            let currentCount = this.client.spamCollection.get(message.member.id) ? this.client.spamCollection.get(message.member.id) : 0;
+        //Spamprotection
+        if(this.client.antispam.has(message.author.id) && message.channel.parentID !== "835863892014006282") {
 
-            this.client.spamCollection.set(message.member.id, currentCount + 1)
+            let messageCount = this.client.antispam.get(message.author.id).messageCount;
+
+            let newMessageCount = messageCount + 1;
+
+            if(messageCount >= 3) {
+
+
+
+
+                    await this.client.utils.muteMember(message.member, this.client.spamMuteTime, this.client.user, "Spamming in " + message.channel.name);
+                    await message.channel.send(`${message.author}\nHör auf zu Spammen! Du kannst für ${this.client.spamMuteTime} Minuten keine Nachrichten mehr senden!`)
+
+                message.delete();
+                this.client.antispam.set(message.author.id, { GuildMember: message.member, messageCount: this.client.spamMuteTime*60});
+            }
+
+            this.client.antispam.set(message.author.id, { GuildMember: message.member, messageCount: newMessageCount});
 
         } else {
 
-            this.client.spamCollection.set(message.member.id, 1)
+            this.client.antispam.set(message.author.id, { GuildMember: message.member, messageCount: 1});
+
         }
 
 
@@ -200,6 +235,9 @@ module.exports = class extends Event {
         } else {
 
             if (message.guild && !this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
+
+                if(message.channel.id === "823910154449846292") return;
+
                 await message.channel.send("Befehle sind hier deaktviert!").then(m => {
 
                         message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
