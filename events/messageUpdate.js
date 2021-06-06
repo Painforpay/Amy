@@ -29,7 +29,7 @@ module.exports = class extends Event {
 
         if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g) && !newMessage.member.hasPermission("MANAGE_MESSAGES")) {
 
-            message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            newMessage.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
             newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
 
             if((Date.parse(new Date()) - newMessage.member.joinedTimestamp) < 604800000) {
@@ -41,7 +41,7 @@ module.exports = class extends Event {
                     if (!this.client.utils.comparePerms(newMessage.guild.member(this.client.user), newMessage.member)) {
                         return newMessage.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
                     }
-                    await message.author.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
+                    await newMessage.author.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
                 }
 
 

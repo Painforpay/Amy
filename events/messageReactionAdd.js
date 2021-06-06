@@ -75,6 +75,7 @@ module.exports = class extends Event {
                 //create Message
 
                 let embed = new MessageEmbed()
+                    .setColor("#ffd700")
                     .setAuthor(`${reaction.message.author.tag}`, reaction.message.author.displayAvatarURL({dynamic: true}));
 
                 if(reaction.message.content.length > 0) {
