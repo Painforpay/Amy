@@ -699,7 +699,7 @@ module.exports = class Util {
             });
 
             try {
-                newState.member.send(`Dein Sprachkanal wurde erstellt und steht bereit!`).then(m => m.delete({timeout: 6000}));
+                newState.member.send(`Dein Sprachkanal wurde erstellt und steht bereit!`).then(m => m.delete({timeout: 300000}));
             } catch (e) {
                 // Der Bot kann dem User keine DMs schicken!
             }

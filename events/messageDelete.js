@@ -17,6 +17,12 @@ module.exports = class extends Event {
             return this.client.evals.delete(message.id);
         }
 
+        if(this.client.starredMessages.has(message.id)) {
+
+            let starredMessage = await this.client.starredMessages.get(message.id);
+            starredMessage.delete();
+        }
+
 
         if (message.partial || !message.guild || message.author.bot || message.system || ignorelist.find(ch => ch === message.channel.name) || message.content.startsWith(this.client.prefix)) return;
 

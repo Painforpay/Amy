@@ -1,5 +1,5 @@
 const Event = require('../Structure/Event');
-
+const { MessageEmbed } = require('discord.js');
 module.exports = class extends Event {
 
     constructor(...args) {
@@ -54,6 +54,44 @@ module.exports = class extends Event {
             if (reaction.emoji.name === "❌" && !member.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936")) {
                 await reaction.users.remove(user);
             }
+        }
+
+        if(reaction.message.reactions.cache.has("⭐")) {
+            if(reaction.message.reactions.cache.get("⭐").count < this.client.starBoardMinReactions) return;
+            let starboard = await this.client.channels.fetch(this.client.dev ? "850824322523332619" : "850824438991683584")
+
+            await reaction.message.fetch();
+            let description = `\n\n[Link](https://discord.com/channels/${reaction.message.guild.id}/${reaction.message.channel.id}/${reaction.message.id})`;
+
+            if(this.client.starredMessages.has(reaction.message.id)) {
+
+                let starboardMsg = await this.client.starredMessages.get(reaction.message.id)
+
+                let embed = starboardMsg.embeds[0];
+
+                starboardMsg.edit(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`, embed)
+
+            } else {
+                //create Message
+
+                let embed = new MessageEmbed()
+                    .setAuthor(`${reaction.message.author.tag}`, reaction.message.author.displayAvatarURL({dynamic: true}));
+
+                if(reaction.message.content.length > 0) {
+                    description = `${reaction.message.content}` + description;
+                }
+                embed.setDescription(description);
+
+                if(reaction.message.attachments.size > 0) {
+                    embed.setImage(reaction.message.attachments.firstKey().proxyURL);
+                }
+
+                let starboardMsg = starboard.send(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`,embed)
+
+                this.client.starredMessages.set(reaction.message.id, starboardMsg);
+
+            }
+
         }
 
 

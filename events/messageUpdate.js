@@ -27,11 +27,36 @@ module.exports = class extends Event {
 
         if (!oldMessage.guild || newMessage.author.bot) return;
 
-        if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g)) {
+        if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g) && !newMessage.member.hasPermission("MANAGE_MESSAGES")) {
 
-                newMessage.catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
+            message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
 
+            if((Date.parse(new Date()) - newMessage.member.joinedTimestamp) < 604800000) {
+                let userData = {xp: "Unbekannt"};
+                let reason = "Senden von Invitelinks"
+                if(newMessage.member) {
+                    userData = await this.client.utils.getUserData(newMessage.author.id);
+
+                    if (!this.client.utils.comparePerms(newMessage.guild.member(this.client.user), newMessage.member)) {
+                        return newMessage.channel.send(`Ich kann diesen Nutzer nicht kicken!`)
+                    }
+                    await message.author.send(`Du wurdest vom Wohnzimmer gekickt. Grund: \`${reason}\``).catch(() => null);
+                }
+
+
+
+                //ARMED
+                await newMessage.member.kick(reason);
+
+                let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
+                let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
+
+
+                internerModlog.send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde von ${this.client.user.username} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
+                Modlog.send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde gekickt!`);
+                return;
+            }
         }
 
 
@@ -58,21 +83,21 @@ module.exports = class extends Event {
                     let response = await this.client.utils.evaluate(newMessage, args.join(' '));
 
 
-                    if (message) {
+                    if (newMessage) {
                         if (response instanceof MessageEmbed) {
 
-                            if (message.attachments.map(x => x)[0]) {
+                            if (newMessage.attachments.map(x => x)[0]) {
                                 await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                                let evalresponse = await message.channel.send(response);
+                                let evalresponse = await newMessage.channel.send(response);
                                 this.client.evals.set(newMessage.id, evalresponse.id);
                             } else {
-                                await message.edit(response);
+                                await newMessage.edit(response);
                             }
 
 
                         } else if (response instanceof MessageAttachment) {
                             await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                            let evalresponse = await message.channel.send(response);
+                            let evalresponse = await newMessage.channel.send(response);
                             this.client.evals.set(newMessage.id, evalresponse.id);
                         }
                     }

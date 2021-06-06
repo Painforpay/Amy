@@ -91,6 +91,8 @@ module.exports = class Bot extends Client {
 
         this.picCooldown = new Collection();
 
+        this.starredMessages = new Collection();
+
         this.currentMaxLevel = 6; //Gegenwärtig höchste Levelrolle. Plus eins und dann Mal 10 zu nehmen. 6 = Level 70
 
         this.savePChannelNames = true; //Autosave the Channel Name if it gets updated.
@@ -110,6 +112,8 @@ module.exports = class Bot extends Client {
         this.allowFullChannelJoin = false; //Wenn wahr, dürfen User mit Move rechten einem vollem Channel joinen!
 
         this.spamMuteTime = 2; //Zeit in Minuten für welche man gemuted wird, wenn man spammt!
+
+        this.starBoardMinReactions = 5; //Mindestmenge an Reaktionen damit eine Nachricht zum Starboard hinzugefügt wird!
 
     }
 
