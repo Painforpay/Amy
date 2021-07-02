@@ -99,6 +99,23 @@ module.exports = class extends Event {
             console.log(colors.yellow(`Found ${this.client.VoiceUsers.size} User${this.client.VoiceUsers.size > 1 ? "s" : ""} in Voice Channels`));
         }
 
+        //Fetch StarboardMessages
+        let starboardChannel = await this.client.channels.fetch(client.dev ? "850824322523332619" : "850824438991683584", true, true);
+        starboardChannel.messages.fetch().then(messages => {
+            messages.forEach(message => {
+                if(message.mentions.channels) {
+                    if(message.embeds.length === 1) {
+                        if(!message.embeds[0].footer) return;
+                        this.client.starredMessages.set(message.embeds[0].footer.text.substr(14, 100), message);
+
+                    }
+                }
+
+            })
+
+        })
+
+
 
         if (this.client.verbose) {
 
@@ -236,7 +253,7 @@ module.exports = class extends Event {
 
                         //Tryblock #1
                         try {
-                            let member = await client.utils.getGuildMember(r.id);
+                            let member = await guild.member(r.id);
                             if (member.user.bot) return;
                             let inactive = 0;
                             if (days >= 14) {
@@ -361,6 +378,7 @@ module.exports = class extends Event {
                         await member.roles.add(client.dev ? "815864639279202365" : "813853716691025960");
                         let embed = new MessageEmbed()
                             .setTitle("Birthday Reminder!")
+                            .setColor("#ffd900")
                             .setDescription(`Herzlichen Glückwunsch zum Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
                             .setTimestamp();
                         general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));

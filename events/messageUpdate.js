@@ -91,7 +91,7 @@ module.exports = class extends Event {
                                 let evalresponse = await newMessage.channel.send(response);
                                 this.client.evals.set(newMessage.id, evalresponse.id);
                             } else {
-                                await newMessage.edit(response);
+                                await message.edit(response);
                             }
 
 

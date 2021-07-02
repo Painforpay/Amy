@@ -26,6 +26,7 @@
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
+    "os-utils": "^0.0.14",
     "path": "^0.12.7",
     "util": "^0.12.3"
   }

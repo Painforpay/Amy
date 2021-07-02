@@ -9,6 +9,7 @@ module.exports = class extends Command {
             description: 'Verwaltet deinen Geburtstag',
             category: 'user',
             minArgs: 1,
+            cooldown: 300
 
         });
     }

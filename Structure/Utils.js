@@ -258,7 +258,7 @@ module.exports = class Util {
 
             member.roles.add(this.client.dev ? "828709057103003678" : "828708084674199632");
             internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted!`)
-            let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`)
+            let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`).catch(() => null)
 
             m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
         } catch (e) {
@@ -521,10 +521,10 @@ module.exports = class Util {
     async getGuildMember(id) {
 
         let guild;
-        guild = this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
+        guild = await this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
 
         let member;
-        member = await guild.members.cache.find(m => m.id === id);
+        member = await guild.member(id);
 
         return member;
 

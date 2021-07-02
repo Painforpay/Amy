@@ -9,7 +9,8 @@ module.exports = class Bot extends Client {
     constructor(options = {}) {
         super({
             disableMentions: 'everyone',
-            partials: ["REACTION", "MESSAGE"]
+            partials: ["REACTION", "MESSAGE"],
+            restRequestTimeout: 60000
         });
         this.validate(options);
 
@@ -114,6 +115,8 @@ module.exports = class Bot extends Client {
         this.spamMuteTime = 2; //Zeit in Minuten für welche man gemuted wird, wenn man spammt!
 
         this.starBoardMinReactions = 5; //Mindestmenge an Reaktionen damit eine Nachricht zum Starboard hinzugefügt wird!
+
+        this.pageSize = 15; //Anzahl an einträgen pro Seite in PageEmbeds
 
     }
 

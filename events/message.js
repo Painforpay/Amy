@@ -106,7 +106,7 @@ module.exports = class extends Event {
 
                 if((Date.parse(new Date()) - message.member.joinedTimestamp) < 604800000) {
                     let userData = {xp: "Unbekannt"};
-                    let reason = "Senden von Invitelinks"
+                    let reason = "Senden von einem Invitelink"
                     if(message.member) {
                         userData = await this.client.utils.getUserData(message.author.id);
 
@@ -144,7 +144,7 @@ module.exports = class extends Event {
 
             let newMessageCount = messageCount + 1;
 
-            if(messageCount >= 3) {
+            if(messageCount >= this.client.messagesPerSecond) {
 
 
 
@@ -166,7 +166,7 @@ module.exports = class extends Event {
 
 
         if (message.channel.id === (this.client.dev ? "800110138027409501" : "793944435809189921") && !message.member.permissions.has("MANAGE_MESSAGES")) {
-            if (message.attachments.size || message.content.includes("cdn.discordapp.com/attachments/")) {
+            if (message.attachments.size || message.content.includes("cdn.discordapp.com/attachments/") || message.content.includes("tenor.com")) {
                 if (this.client.picCooldown.has(message.author.id)) {
 
                      let timespentmills = Date.parse(new Date()) - this.client.picCooldown.get(message.author.id);
@@ -203,7 +203,7 @@ module.exports = class extends Event {
                     id: user.id,
                     allow: "VIEW_CHANNEL"
                 }, {id: mod.id, allow: "VIEW_CHANNEL"}])
-                message.channel.send(`${user}, dein Ticket wurde neu eröffnet von ${message.member}!`);
+                message.channel.send(`${user}, dein Ticket wurde erneut geöffnet von ${message.member}!`);
 
             }
 
@@ -219,7 +219,8 @@ module.exports = class extends Event {
                         message.delete({timeout: 3600000}).catch(() => null);
 
                 }
-                    break;
+                break;
+
             }
 
             if (message.content.toLowerCase().match(/.*(script\n*.*kiddie).*/g) && message.channel.name !== "ideen") {
@@ -310,7 +311,7 @@ module.exports = class extends Event {
 
                     }
 
-                    if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) ) {//&& !message.member.hasPermission("ADMINISTRATOR")) {
+                    if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) && !message.member.hasPermission("ADMINISTRATOR")) {
                         message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
                         let timespentmills = Date.parse(new Date().toString()) - command.cooldownPeople.get(message.author.id);

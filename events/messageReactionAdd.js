@@ -28,6 +28,7 @@ module.exports = class extends Event {
 
         //Check if reaction happened in #support
         let member = reaction.message.guild.members.cache.get(user.id);
+        await member.fetch();
         if (reaction.message.channel.id === (this.client.dev ? "800110137820971040" : "796119563803689050")) {
 
             await this.client.utils.createTicket(reaction, user);
@@ -64,10 +65,11 @@ module.exports = class extends Event {
             let description = `\n\n[Link](https://discord.com/channels/${reaction.message.guild.id}/${reaction.message.channel.id}/${reaction.message.id})`;
 
             if(this.client.starredMessages.has(reaction.message.id)) {
-
+                //Update Message
                 let starboardMsg = await this.client.starredMessages.get(reaction.message.id)
 
                 let embed = starboardMsg.embeds[0];
+
 
                 starboardMsg.edit(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`, embed)
 
@@ -76,18 +78,23 @@ module.exports = class extends Event {
 
                 let embed = new MessageEmbed()
                     .setColor("#ffd700")
+                    .setFooter(`Reference ID: ${reaction.message.id}`)
                     .setAuthor(`${reaction.message.author.tag}`, reaction.message.author.displayAvatarURL({dynamic: true}));
 
                 if(reaction.message.content.length > 0) {
                     description = `${reaction.message.content}` + description;
                 }
                 embed.setDescription(description);
-
+                let starboardMsg;
                 if(reaction.message.attachments.size > 0) {
-                    embed.setImage(reaction.message.attachments.firstKey().proxyURL);
+                    let attachment = reaction.message.attachments.first();
+
+                    embed.setImage(attachment.proxyURL);
+
+
                 }
 
-                let starboardMsg = starboard.send(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`,embed)
+                starboardMsg = await starboard.send(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`, embed)
 
                 this.client.starredMessages.set(reaction.message.id, starboardMsg);
 
@@ -105,6 +112,7 @@ module.exports = class extends Event {
                 if (r.emoji === reaction.emoji.name) {
 
                     try {
+
                         await member.roles.add(r.roleid);
                         if (!member.roles.cache.has(r.categoryid)) {
                             await member.roles.add(r.categoryid);

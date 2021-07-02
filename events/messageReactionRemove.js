@@ -25,24 +25,23 @@ module.exports = class extends Event {
             }
         }
 
-        if(reaction.message.reactions.cache.has("⭐")) {
-
-
             let starboard = await this.client.channels.fetch(this.client.dev ? "850824322523332619" : "850824438991683584")
 
             if(reaction.message.channel === starboard) return;
-            await reaction.message.fetch();
+
 
             if(this.client.starredMessages.has(reaction.message.id)) {
 
                 let starboardMsg = await this.client.starredMessages.get(reaction.message.id)
-                if(reaction.message.reactions.cache.get("⭐").count < this.client.starBoardMinReactions) {
+                if(!reaction.message.reactions.cache.get("⭐") || reaction.message.reactions.cache.get("⭐").count < this.client.starBoardMinReactions) {
                     //delete Message
                     starboardMsg.delete();
                     this.client.starredMessages.delete(reaction.message.id);
                 } else {
                     //update Message
                     let embed = starboardMsg.embeds[0];
+
+
                     starboardMsg.edit(`${reaction.message.reactions.cache.get("⭐").count} ⭐ | ${reaction.message.channel}`, embed)
 
                 }
@@ -52,10 +51,11 @@ module.exports = class extends Event {
             }
 
 
-        }
+
 
 
         let member = reaction.message.guild.members.cache.get(user.id);
+        await member.fetch();
 
         this.client.con.query(`SELECT * FROM rroles WHERE messageid = '${reaction.message.id}'`, function (err, result) {
             if (err) throw err;

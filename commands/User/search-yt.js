@@ -38,7 +38,7 @@ module.exports = class extends Command {
                 let formattedDate = await this.client.utils.getDateTime(datetime);
                 let vidID = body.items[0].id.videoId;
                 if (vidID === undefined) return message.channel.send("Fehler bei der Suche! Bitte anderen Suchbegriff nutzen!")
-                return message.channel.send(`Suchergebnis:\n[${formattedDate}]\n${body.items[0].snippet.title} von ${body.items[0].snippet.channelTitle}\nhttps://www.youtube.com/watch?v=${vidID}`)
+                return message.channel.send(`Suchergebnis:\n[Hochladedatum: ${formattedDate}]\n${body.items[0].snippet.title} von ${body.items[0].snippet.channelTitle}\nhttps://www.youtube.com/watch?v=${vidID}`)
             })
 
 

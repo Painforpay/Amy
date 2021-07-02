@@ -25,13 +25,13 @@ module.exports = class extends Command {
             let embed = new MessageEmbed()
                 .setColor("#FFD700")
                 .setTitle(`:question: Hilfe`)
-                .setDescription(`**Der Hilfebefehl befindet sich im BETA Test**\nHier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!\n**Alternativ** kannst du mit \`${this.client.prefix}${this.name} <befehl>\` mehr Informationen zu einem Befehl erhalten.`);
+                .setDescription(`Hier findest du eine Liste aller Befehlskategorien!\nGebe \`${this.client.prefix}${this.name} <kategorie>\` ein um alle Befehle dieser Kategorie zu sehen!\n**Alternativ** kannst du mit \`${this.client.prefix}${this.name} <befehl>\` mehr Informationen zu einem Befehl erhalten.`);
 
             for await (let category of this.client.categories) {
                 embed.addField(`${category[1].emoji} ${this.client.utils.capitalise(category[1].name)}`, `**${category[1].description}**`)
             }
 
-            embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name}`);
+            embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name} ${this.client.isBeta ? `| Beta v${this.client.version}` : ""}`);
 
             message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
@@ -77,7 +77,9 @@ module.exports = class extends Command {
 
                     }
 
-                    embed.addField(`Unterbefehle: `, subcommands.join("\n") || `Dieser Befehl besitzt keine Unterbefehle.`)
+                    if(subcommands.length > 0) {
+                        embed.addField(`Unterbefehle: `, subcommands.join("\n"));
+                    }
 
                     if (result.additionalinfo.length > 0) {
 
@@ -122,7 +124,7 @@ module.exports = class extends Command {
 
                 if (!accessibleCommands.length > 0) {
 
-                    embed.addField("Fehler!", "Es gibt keine Befehle für diese Kategorie bzw. du kannst keine von ihnen Nutzen!")
+                    embed.addField("Fehler!", "Es gibt keine Befehle für diese Kategorie oder du kannst keine von ihnen nutzen!")
 
 
                 }

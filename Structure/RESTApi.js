@@ -1,5 +1,4 @@
 ﻿const express = require('express');
-const topgg = require('@top-gg/sdk')
 const bodyParser = require('body-parser');
 const colors = require('colors/safe');
 const app = express();
@@ -14,6 +13,7 @@ module.exports = class RESTApi {
     }
 
     createServer() {
+        let ClientBot = this.client;
         app.use(bodyParser.urlencoded({extended: false}));
         app.use(bodyParser.json());
 
@@ -21,14 +21,14 @@ module.exports = class RESTApi {
         app.post('/xp', async (req, res) => {
             const body = req.body;
 
-            if(!this.client.enableAPIXP) return;
+            if(!ClientBot.enableAPIXP) return;
 
             let ref;
             switch (body.auth) {
                 case "TVKpT8SZZu": {
                     ref = "Charlie [BOT]";
                 }
-                    break;
+                break;
                 default: {
                     res.status(401)
 
@@ -46,7 +46,7 @@ module.exports = class RESTApi {
             res.status(200);
 
             let amount = Math.abs(body.xp);
-            amount = (await this.client.utils.getGuildMember(body.id)).roles.cache.find(r => r.name === "Unterstützer") ? amount * 1.02 : amount;
+            amount = (await ClientBot.utils.getGuildMember(body.id)).roles.cache.find(r => r.name === "Unterstützer") ? amount * 1.02 : amount;
 
 
             return res.json({
@@ -58,17 +58,31 @@ module.exports = class RESTApi {
 
         });
 
-        const webhook = new topgg.Webhook(this.client.topggtoken)
-        app.post('/dblwebhook', webhook.listener(async vote => {
 
-            if(vote.type !== "upvote") return;
-            this.client.channels.fetch(this.client.dev ? "836203865929023518": "823910154449846292").then(c => {
 
-                c.send(`<@${vote.user}> hat erfolgreich für unseren Server gevoted und ${this.client.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
+        let ThisClass = this;
+
+        app.post('/dblwebhook', async function (req, res) {
+
+            if(req.headers.authorization !== ClientBot.topggtoken) return;
+            let vote = req.body;
+
+            if(ClientBot.dev) {
+                console.log(vote)
+            } else {
+                if(vote.type !== "upvote") return;
+            }
+
+            ClientBot.channels.fetch(ClientBot.dev ? "836203865929023518": "823910154449846292").then(c => {
+
+                c.send(`<@${vote.user}> hat erfolgreich für unseren Server gevoted und ${ClientBot.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
 
             })
-            await this.addUserXP(vote.user, this.client.voteReward, "Voting")
-        }))
+            await ThisClass.addUserXP(vote.user, ClientBot.voteReward, "Voting")
+
+            res.sendStatus(200);
+            res.end();
+        });
 
 
         app.listen(port, () => console.log(colors.green(`App listening on Port ${port}!`)))

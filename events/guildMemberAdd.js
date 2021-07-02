@@ -97,9 +97,12 @@ module.exports = class extends Event {
             }
 
             this.client.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
-                if (err) console.log(colors.red(err.message));
+                if (err) {
+                    console.log(colors.red(err.message));
+                } else {
+                    console.log(`[${client.utils.getDateTime()}] [MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
+                }
 
-                console.log(`[${client.utils.getDateTime()}] [MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
 
             });
         }

@@ -30,7 +30,7 @@ module.exports = class extends Command {
         } catch (error) {
             console.error(error);
             message.channel.send(`Es gab einen Fehler beim neueinlesen von \`${command.name}\`:\n\`${error.message}\``);
-        }*/
+        }//*/
 
     }
 
