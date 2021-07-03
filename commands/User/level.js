@@ -10,18 +10,36 @@ module.exports = class extends Command {
             description: 'Zeigt dir Informationen zu deinem Level an!',
             category: 'user',
             guildOnly: true,
-            cooldown: 60
+            cooldown: 60,
+            argsDef: ["<userping>"]
         });
     }
 
 
-    async run(message) {
-
+    async run(message, args) {
+        message.delete();
+        let member = message.member;
 
         let client = this.client;
-        let result = await this.client.utils.getUserData(message.author.id);
+        if(args.length > 0) {
+            let UserID = message.mentions.members.first() || args[0];
 
-        if (result) {
+            let user = await this.client.users.fetch(UserID.id ? UserID.id : UserID).catch(err => {
+                return message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
+            });
+            if (user) {
+                member = await message.guild.member(user);
+            }
+        }
+
+
+
+
+        let result = await this.client.utils.getUserData(member.id);
+
+
+
+        if (result && !member.user.bot) {
             let currentLevel = await client.utils.getLevelforXp(result.xp)
             let nextLevelValue = currentLevel + 1;
             let currentLevelMinXP = await client.utils.getLevelXp(currentLevel);
@@ -55,17 +73,28 @@ module.exports = class extends Command {
             let placement = await client.utils.getPlacementforUser(message.author.id, currentXP)
 
             let embed = new Discord.MessageEmbed()
-                .setTitle(`**Level ${currentLevel}**`)
+                .setTitle(`Level ${currentLevel} [${Math.floor(progress)}%]`)
                 .setColor("#FFD700")
                 .setTimestamp()
-                .addField("Du hast", `✨ **${(Math.round(currentXP * 100) / 100).toFixed(0)} Erfahrungspunkte**`)
-                .addField(`Dir fehlen`, `**${(Math.round(remainingXP * 100) / 100).toFixed(0)} Erfahrungspunkte** für das nächste Level!`)
-                .addField(`Dein Levelfortschritt liegt bei`, `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀**${Math.floor(progress)}%**\n${currentLevelMinXP}${progressbar}${nextLevelMinXP}\n`)
-                .setAuthor(message.author.tag);
+                .setDescription(`
+                ${currentXP > 0 ? `🏁 ${result.id === message.member.id ? `Du belegst` : `${member.nickname || member.user.username} belegt`} den **${placement}.** Platz aller User`: ""}
+                
+                ✨ **${(Math.round(currentXP * 100) / 100).toFixed(0)} Erfahrungspunkte**
+                
+                Es fehlen:
+                **${(Math.round(remainingXP * 100) / 100).toFixed(0)} Erfahrungspunkte** für das nächste Level! 
+                
+               
+                ${currentLevelMinXP}${progressbar}${nextLevelMinXP}
+                `)
+                .setAuthor(member.nickname || member.user.username);
 
             //set Placement if User has more than 0 xp
-            currentXP > 0 ? embed.setDescription(`🏁 Du belegst den **${placement}.** Platz aller User`) : null;
+            //currentXP > 0 ? embed.setDescription(`🏁 ${result.id == message.member.id ? `Du belegst`: `${member.nickname || member.user.username} belegt`} den **${placement}.** Platz aller User`) : null;
 
+            if(result.id !== message.member.id) {
+                embed.setFooter(`Abgefragt von ${message.member.nickname || member.user.username}`, message.member.user.displayAvatarURL)
+            }
 
             message.channel.send({embed: embed}).then(m => {
 
@@ -74,10 +103,10 @@ module.exports = class extends Command {
 
             })
 
-                message.delete().catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
-
-
-
+        } else {
+            message.channel.send(`Keine Nutzerdaten für ${member.nickname || member.user.username} gefunden!`).then(m => {
+                m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            })
         }
 
 

@@ -9,7 +9,7 @@ module.exports = class extends Command {
 
             description: 'Zeigt jede Person an die Besagte Rolle hat.',
             aliases: ["lu"],
-            category: 'User',
+            category: 'user',
             guildOnly: true,
             minArgs: 1,
             argsDef: ['<rollenname>'],
@@ -48,10 +48,10 @@ module.exports = class extends Command {
             await message.react('⬅️')
             await message.react('➡️')
             const collector = message.createReactionCollector(
-                // only collect left and right arrow reactions from the message author
+
                 reaction => ['⬅️', '➡️'].includes(reaction.emoji.name),
-                // time out after a minute
-                {time: 5000}
+
+                {time: 500000}
             )
             let index = 0
 

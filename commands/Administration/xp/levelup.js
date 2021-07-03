@@ -38,7 +38,7 @@ module.exports = class extends SubCommand {
         let xp = UserData.xp;
         let levelup = value;
         let currentLevel = await client.utils.getLevelforXp(xp);
-        let nextLevel = currentLevel + levelup
+        let nextLevel = parseInt(currentLevel) + parseInt(levelup)
         let nextLevelXP = await client.utils.getLevelXp(nextLevel);
 
         let required = nextLevelXP - xp;

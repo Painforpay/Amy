@@ -116,7 +116,13 @@ module.exports = class Bot extends Client {
 
         this.starBoardMinReactions = 5; //Mindestmenge an Reaktionen damit eine Nachricht zum Starboard hinzugefügt wird!
 
-        this.pageSize = 15; //Anzahl an einträgen pro Seite in PageEmbeds
+        this.pageSize = 5; //Anzahl an einträgen pro Seite in PageEmbeds
+
+        this.awards = new Collection();
+
+        this.msgAck = new Collection();
+
+        this.vcAck = new Collection();
 
     }
 
@@ -146,6 +152,7 @@ module.exports = class Bot extends Client {
         this.owners = await this.utils.getOwners(this.owners);
         new RESTApi(this).createServer();
 
+        await this.utils.loadAwards();
         await this.utils.loadCategories();
         await this.utils.loadSubCommands();
         await this.utils.loadCommands();

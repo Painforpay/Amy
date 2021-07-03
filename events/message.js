@@ -209,6 +209,28 @@ module.exports = class extends Event {
 
 
             await this.client.utils.xpadd(message.member, this.client.xpMessages);
+
+            if(this.client.msgAck.has(message.member.id)) {
+
+                let { today, weekly, monthly } = this.client.msgAck.get(message.member.id);
+
+
+                this.client.msgAck.set(message.member.id, {
+                    today: today + 1,
+                    weekly: weekly + 1,
+                    monthly: monthly + 1
+                })
+
+            } else {
+                this.client.msgAck.set(message.member.id, {
+                    today: 1,
+                    weekly: 1,
+                    monthly: 1
+                })
+            }
+
+            this.client.utils.addUserMessages(message.member.id, 1);
+
             switch (message.channel.name) {
                 case "ideen": {
                     return message.client.utils.reactvoting(message);

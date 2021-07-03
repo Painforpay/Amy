@@ -395,6 +395,50 @@ module.exports = class extends Event {
         });
 
 
+        //Acktivityresets
+
+        //Daily
+        schedule.scheduleJob('0 0 * * *', () => {
+
+            this.client.vcAck.forEach((v, k) => {
+                v.today = 0
+            })
+
+            this.client.msgAck.forEach((v, k) => {
+                v.today = 0
+            })
+
+        });
+
+        //Weekly
+        schedule.scheduleJob('0 0 1,7,15,30 * *', () => {
+
+            this.client.vcAck.forEach((v, k) => {
+                v.weekly = 0
+            })
+
+            this.client.msgAck.forEach((v, k) => {
+                v.weekly = 0
+            })
+
+        });
+
+        //Monthly
+        schedule.scheduleJob('0 0 1 * *', () => {
+
+            this.client.vcAck.forEach((v, k) => {
+                v.monthly = 0
+            })
+
+            this.client.msgAck.forEach((v, k) => {
+                v.monthly = 0
+            })
+
+        });
+
+
+
+
         /*schedule.scheduleJob('1 18 * * *', async () => {
             let freegameschan = await client.channels.fetch(this.client.dev ? "800110899565690900" : "797531759159803944");
 

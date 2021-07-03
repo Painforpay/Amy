@@ -151,6 +151,23 @@ module.exports = class Util {
 
     }
 
+    async loadAwards() {
+        let client = this.client;
+        client.con.query(`SELECT * FROM awards ORDER BY \`id\` ASC;`, function (err, results) {
+
+            results.forEach(result => {
+                client.awards.set(result.id, {
+                    type: result.type,
+                    name: result.name,
+                    requirements: result.requirements
+                })
+            });
+
+
+        })
+
+    }
+
     async loadCategories() {
         let test = require("../JSON/categories.json");
 
@@ -543,6 +560,25 @@ module.exports = class Util {
                 let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
 
                 await this.client.utils.xpadd(oldState.member, amount);
+                await this.addUserMinutes(oldState.member.id, ((timespentmills / 1000) / 60));
+                if(this.client.vcAck.has(oldState.member.id)) {
+
+                    let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
+
+
+                    this.client.vcAck.set(oldState.member.id, {
+                        today: today + ((timespentmills / 1000) / 60),
+                        weekly: weekly + ((timespentmills / 1000) / 60),
+                        monthly: monthly + ((timespentmills / 1000) / 60)
+                    })
+
+                } else {
+                    this.client.vcAck.set(oldState.member.id, {
+                        today: ((timespentmills / 1000) / 60),
+                        weekly: ((timespentmills / 1000) / 60),
+                        monthly: ((timespentmills / 1000) / 60)
+                    })
+                }
             }
             this.client.VoiceUsers.delete(oldState.member.id);
             this.client.VoiceUsers.set(oldState.member.id, {
@@ -565,8 +601,29 @@ module.exports = class Util {
                 let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
 
                 await this.client.utils.xpadd(oldState.member, amount);
+                await this.addUserMinutes(oldState.member.id, ((timespentmills / 1000) / 60));
+                if(this.client.vcAck.has(oldState.member.id)) {
+
+                    let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
+
+
+                    this.client.vcAck.set(oldState.member.id, {
+                        today: today + ((timespentmills / 1000) / 60),
+                        weekly: weekly + ((timespentmills / 1000) / 60),
+                        monthly: monthly + ((timespentmills / 1000) / 60)
+                    })
+
+                } else {
+                    this.client.vcAck.set(oldState.member.id, {
+                        today: ((timespentmills / 1000) / 60),
+                        weekly: ((timespentmills / 1000) / 60),
+                        monthly: ((timespentmills / 1000) / 60)
+                    })
+                }
             }
             this.client.VoiceUsers.delete(oldState.member.id);
+
+
 
 
         }
@@ -1082,6 +1139,46 @@ module.exports = class Util {
         })
 
 
+    }
+
+    async getUserAwards(userid) {
+        let client = this.client;
+        return [`Dieses Feature befindet sich im Aufbau!`];
+
+        return new Promise((resolve) => {
+            let awards = [];
+            client.con.query(`SELECT * FROM userawards WHERE userID = \"${userid}\";`, async function (err, results) {
+
+                if (results) {
+
+
+                    await results.forEach(r => {
+                        let awardData = client.awards.get(r.awardID);
+                        if(awardData.type.includes("total")) {
+                            awards.push(`${awardData.name}`)
+                        } else {
+                            awards.push(`${r.amount}x ${awardData.name}`)
+                        }
+                    })
+                    resolve(awards);
+                }
+            });
+        });
+
+
+
+    }
+
+    addUserMessages(userID, amount) {
+        this.client.con.query(`UPDATE \`users\` SET \`totalMessagesSent\` = \`totalMessagesSent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
+            if (err) throw err;
+        });
+    }
+
+    addUserMinutes(userID, amount) {
+        this.client.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
+            if (err) throw err;
+        });
     }
 
 }

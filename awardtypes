@@ -1,0 +1,4 @@
+messages_sent_renewable  = Nachrichten gesendet, kommt alle x Nachrichten  // Beispiel 12x 100 Nachrichten gesendet
+messages_sent_total = Stufenabhängig / x Nachrichten gesendet, wird hinzugefügt // Beispiel 100 Nachrichten gesendet , 500 Nachrichten gesendet, 1000 Nachrichten gesendet
+voice_minutes_renewable = Minuten im Voice verbracht, kommt alle x Minuten  // Beispiel 12x 120 Minuten im Voice
+voice_mintues_total = Minuten im Voice verbracht, insgesamt // Beispiel 120 Minuten im Voice , 500 Minuten im Voice, 1000 Minuten im Voice
