@@ -395,7 +395,7 @@ module.exports = class extends Event {
         });
 
 
-        //Acktivityresets
+        //Activityresets
 
         //Daily
         schedule.scheduleJob('0 0 * * *', () => {

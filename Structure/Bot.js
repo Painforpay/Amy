@@ -150,7 +150,7 @@ module.exports = class Bot extends Client {
     async start(token = this.token) {
 
         this.owners = await this.utils.getOwners(this.owners);
-        new RESTApi(this).createServer();
+        //new RESTApi(this).createServer();
 
         await this.utils.loadAwards();
         await this.utils.loadCategories();

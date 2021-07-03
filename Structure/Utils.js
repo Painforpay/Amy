@@ -560,7 +560,7 @@ module.exports = class Util {
                 let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
 
                 await this.client.utils.xpadd(oldState.member, amount);
-                await this.addUserMinutes(oldState.member.id, ((timespentmills / 1000) / 60));
+                await this.addUserMinutes(oldState.member.id, parseInt((timespentmills / 1000) / 60));
                 if(this.client.vcAck.has(oldState.member.id)) {
 
                     let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
@@ -601,7 +601,7 @@ module.exports = class Util {
                 let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
 
                 await this.client.utils.xpadd(oldState.member, amount);
-                await this.addUserMinutes(oldState.member.id, ((timespentmills / 1000) / 60));
+                await this.addUserMinutes(oldState.member.id, parseInt((timespentmills / 1000) / 60));
                 if(this.client.vcAck.has(oldState.member.id)) {
 
                     let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
@@ -622,9 +622,6 @@ module.exports = class Util {
                 }
             }
             this.client.VoiceUsers.delete(oldState.member.id);
-
-
-
 
         }
     }
