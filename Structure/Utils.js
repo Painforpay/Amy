@@ -405,7 +405,7 @@ module.exports = class Util {
                 .setTitle(`Fehler!`)
                 .setColor("#CD322F")
                 .addField(`📥 **Input:**`, `\`\`\`js\n${code}\n\nCleaned: ${code}\`\`\``)
-                .addField(`📤 **Output:**`, `${this.client.utils.trimString(`\`\`\`js\n${e.stack}\n\`\`\``)}`)
+                .addField(`📤 **Output:**`, `${this.client.utils.trimString(`\`\`\`js\n${e.stack}\n\`\`\``, 1024)}`)
                 .setTimestamp();
 
 
@@ -790,7 +790,7 @@ module.exports = class Util {
         let client = this.client;
         return new Promise((resolve) => {
 
-            client.con.query(`SELECT xp FROM users WHERE xp >= ${xp};`, function (err, results) {
+            client.con.query(`SELECT * FROM users WHERE xp >= ${xp-1};`, function (err, results) {
                 if (results) {
                     resolve(results.length);
                 }
@@ -1174,6 +1174,12 @@ module.exports = class Util {
 
     addUserMinutes(userID, amount) {
         this.client.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
+            if (err) throw err;
+        });
+    }
+
+    async setBiography(userID, biography) {
+        this.client.con.query(`UPDATE \`users\` SET \`userBio\` = \"${biography}\" WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
     }

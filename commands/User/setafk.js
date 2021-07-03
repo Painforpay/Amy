@@ -26,7 +26,7 @@ module.exports = class extends Command {
         let fResult = await this.client.utils.profanityFilter(reason)
 
         if (fResult["is-bad"]) {
-            message.member.send(`Liste der Wörter:\n**${fResult["bad-words-list"].join(`, `)}**`).catch(() => null);
+
             message.channel.send(`Dieser Grund enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
             return;
         }

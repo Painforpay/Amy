@@ -133,7 +133,7 @@ module.exports = class extends Command {
                 ${currentLevelMinXP}${progressbar}${nextLevelMinXP}
                 
                 ✍ **Biographie** ✍
-                ${result.userBio ? `${result.userBio}`: "Keine Bio verfügbar!"}
+                \`${result.userBio ? `${result.userBio}`: "Keine Bio verfügbar!"}\`
                 
                 💸 **Guthaben** 💸
                 ${result.balance ? result.balance : 0} 🪙
