@@ -143,9 +143,9 @@ module.exports = class extends Command {
                 `)
                 .addField("Aktivität", `
                 *VoiceChat:*
-                Heute: **${vcAck.today}** *Minuten*
-                Diese Woche: **${vcAck.weekly}** *Minuten*
-                Diesen Monat: **${vcAck.monthly}** *Minuten*
+                Heute: ${this.timeConvert(Math.floor(vcAck.today))}
+                Diese Woche: ${this.timeConvert(Math.floor(vcAck.weekly))}
+                Diesen Monat: ${this.timeConvert(Math.floor(vcAck.monthly))}
                 
                 *Nachrichten:*
                 Heute: **${msgAck.today}**
@@ -172,4 +172,20 @@ module.exports = class extends Command {
 
 
     }
+
+    timeConvert(n) {
+        let num = n;
+        let hours = (num / 60);
+        let rhours = Math.floor(hours);
+        let minutes = (hours - rhours) * 60;
+        let rminutes = Math.round(minutes);
+
+        let returnvalue = "**";
+
+        if(rhours > 0) {
+            returnvalue += rhours + `** *Stunde${rhours === 1 ? "" : "n"}* und **`;
+        }
+        return returnvalue + rminutes + `** *Minute${rminutes === 1 ? "" : "n"}*.`;
+    }
+
 };

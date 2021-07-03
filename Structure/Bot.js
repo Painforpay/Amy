@@ -102,7 +102,7 @@ module.exports = class Bot extends Client {
 
         this.fullMuteAFKTime = 5; //Zeit in minuten nach denen ein User im fullmute in den Afk gemoved wird.
 
-        this.picCooldownSecs = 10; //Zeit in Sekunden die man Zwischen bildern warten muss!
+        this.picCooldownSecs = 60; //Zeit in Sekunden die man Zwischen bildern warten muss!
 
         this.birthdayReward = 500; //Anzahl an XP die der User an seinem Geburtstag geschenkt bekommt
 
@@ -116,7 +116,7 @@ module.exports = class Bot extends Client {
 
         this.starBoardMinReactions = 5; //Mindestmenge an Reaktionen damit eine Nachricht zum Starboard hinzugefügt wird!
 
-        this.pageSize = 5; //Anzahl an einträgen pro Seite in PageEmbeds
+        this.pageSize = 15; //Anzahl an einträgen pro Seite in PageEmbeds
 
         this.awards = new Collection();
 

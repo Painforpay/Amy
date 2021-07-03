@@ -173,15 +173,15 @@ module.exports = class extends Event {
 
                     message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(-timespentmills/1000)} Sekunden!`).then(m => m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
 
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
                 } else {
-
-                    this.client.picCooldown.set(message.author.id, Date.parse(new Date().toString()));
+                    let timeout = this.client.picCooldownSecs * (message.attachments.size == 0 ? 1 : message.attachments.size) * 1000
+                    this.client.picCooldown.set(message.author.id, Date.parse(new Date().toString()) + timeout);
                     setTimeout(() => {
                         // Removes the User from the set after a certain amount of minutes
                         this.client.picCooldown.delete(message.author.id);
-                    }, this.client.picCooldownSecs * message.attachments.size * 1000);
+                    }, (timeout));
 
 
                 }
