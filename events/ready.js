@@ -89,7 +89,7 @@ module.exports = class extends Event {
             } else {
                 for (const [memberID, member] of channel.members) {
 
-                    this.client.VoiceUsers.set(member.id, {user: member.id, time: Date.parse(new Date().toString())});
+                    this.client.VoiceUsers.set(member.id, {user: member.id, time: Date.parse(new Date())});
                 }
             }
 

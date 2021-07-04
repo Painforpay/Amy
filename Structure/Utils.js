@@ -551,7 +551,10 @@ module.exports = class Util {
     async VoiceUserChannelChangeXP(oldState) {
         if (oldState.channel.id === oldState.channel.guild.afkChannelID) {
             this.client.VoiceUsers.delete(oldState.member.id);
-            this.client.VoiceUsers.set(oldState.member.id, Date.parse(new Date()));
+            this.client.VoiceUsers.set(oldState.member.id, {
+                user: oldState.member.id,
+                time: Date.parse(new Date())
+            });
         } else if (this.client.VoiceUsers.has(oldState.member.id)) {
 
             let timespentmills = Date.parse(new Date()) - this.client.VoiceUsers.get(oldState.member.id).time;
@@ -592,7 +595,10 @@ module.exports = class Util {
     async VoiceUserDisconnectXP(oldState, override = false) {
         if (oldState.channel.id === oldState.channel.guild.afkChannelID) {
             this.client.VoiceUsers.delete(oldState.member.id);
-            this.client.VoiceUsers.set(oldState.member.id, Date.parse(new Date()));
+            this.client.VoiceUsers.set(oldState.member.id, {
+                user: oldState.member.id,
+                time: Date.parse(new Date())
+            });
         } else if (this.client.VoiceUsers.has(oldState.member.id)) {
 
             let timespentmills = Date.parse(new Date()) - this.client.VoiceUsers.get(oldState.member.id).time;
@@ -1173,6 +1179,10 @@ module.exports = class Util {
     }
 
     addUserMinutes(userID, amount) {
+        if (!amount) return;
+        amount = parseInt(amount);
+        amount = Math.abs(amount);
+        if (isNaN(amount)) return;
         this.client.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
