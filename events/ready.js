@@ -411,7 +411,7 @@ module.exports = class extends Event {
         });
 
         //Weekly
-        schedule.scheduleJob('0 0 1,7,15,30 * *', () => {
+        schedule.scheduleJob('0 0 * * 1', () => {
 
             this.client.vcAck.forEach((v, k) => {
                 v.weekly = 0
