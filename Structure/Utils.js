@@ -611,7 +611,7 @@ module.exports = class Util {
             if (err) throw err;
             for (const r of result) {
                 let user = await client.users.fetch(`${r.id}`, true, true);
-                if (message.guild.members.cache.get(user.id)) {
+                if (message.guild.members.cache.get(user.id) || client.dev) {
                     await client.users.fetch(`${user.id}`, false, false);
                     birthdaylist.set(user.id, {id: user.id, day: `${r.bday}`, month: `${r.bmonth}`, year: `${r.byear ? r.byear : ""}`});
                 }
@@ -636,19 +636,23 @@ module.exports = class Util {
 
 
                 usermonth = months[b.month - 1]
-
+                let remainingDays
                 if(useryear) {
-                    dateString = `${useryear}, ${usermonth}, ${userday}`;
+                    dateString = `${useryear}, ${b.month}, ${userday}`;
+                    remainingDays = client.utils.getRemainingDays(dateString);
+                } else {
+                    dateString = `0000, ${b.month}, ${userday}`
+                    remainingDays = client.utils.getRemainingDays(dateString);
                 }
 
                 if (embed.fields.find(f => f.name === usermonth)) {
                     let fieldcontent = embed.fields.find(f => f.name === usermonth).value;
 
-                    fieldcontent += `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}\n`;
+                    fieldcontent += `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}  *noch ${remainingDays} Tag${remainingDays == 1 ? "" : "e"}...*\n`;
 
                     embed.fields.find(f => f.name === usermonth).value = fieldcontent;
                 } else {
-                    embed.addField(usermonth, `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}\n`)
+                    embed.addField(usermonth, `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}  *noch ${remainingDays} Tag${remainingDays == 1 ? "" : "e"}...*\n`)
                 }
 
             })
@@ -1185,4 +1189,31 @@ module.exports = class Util {
         return age;
     }
 
+    getRemainingDays(dateString) {
+        let today = new Date();
+        let birthDate = new Date(dateString);
+        let m = today.getMonth() - birthDate.getMonth();
+        let isNextYear;
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+        {
+            isNextYear = false;
+        } else {
+            isNextYear = true;
+        }
+
+
+        let dateStringArr = dateString.split(",");
+        let year = today.getFullYear();
+        if(isNextYear) {
+            year += 1;
+        }
+        dateString = `${year}, ${dateStringArr[1]}, ${dateStringArr[2]}`;
+
+
+        let nextBirthday = new Date(dateString);
+        let remainingTime = nextBirthday - today;
+
+        let days = (((remainingTime / 1000) / 60) / 60) / 24;
+        return Math.floor(days+1);
+    }
 }

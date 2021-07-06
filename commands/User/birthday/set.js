@@ -67,7 +67,7 @@ module.exports = class extends SubCommand {
                 }
             }
         }
-        if(!year) return message.channel.send("Ich benötige ein Jahr, welches ich nutzen kann!").then(m => {
+        if(!year || year.length > 4 || year < 1945) return message.channel.send("Ich benötige ein Jahr, welches ich nutzen kann!").then(m => {
 
             m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
 
