@@ -68,11 +68,11 @@ module.exports = class extends Event {
 
             if(this.client.allowFullChannelJoin) return;
 
-            if(newState.full){
+            if(newState.channel.full){
                 if(newState.member.user.bot) return;
-                if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
+                //if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
                 newState.kick(`Tried to join a full Channel!`);
-                newState.member.user.send(`Du darfst keinem vollen Channeln beitreten!`).then(m => m.delete({timeout:20000}))
+                newState.member.user.send(`Du darfst keinem vollen Channel beitreten!`).then(m => m.delete({timeout:20000}))
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
@@ -126,11 +126,11 @@ module.exports = class extends Event {
 
             if(this.client.allowFullChannelJoin) return;
 
-            if(newState.full){
+            if(newState.channel.full){
                 if(newState.member.user.bot) return;
-                if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
+                //if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
                 newState.setChannel(oldState.channel, `Tried joining a full Channel`);
-                newState.member.user.send(`Du darfst keinem vollen Channeln beitreten!`).then(m => m.delete({timeout:20000}))
+                newState.member.user.send(`Du darfst keinem vollen Channel beitreten!`).then(m => m.delete({timeout:20000}))
             }
 
         }

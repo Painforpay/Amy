@@ -154,7 +154,7 @@ module.exports = class Util {
     async loadAwards() {
         let client = this.client;
         client.con.query(`SELECT * FROM awards ORDER BY \`id\` ASC;`, function (err, results) {
-
+            if(!results) return;
             results.forEach(result => {
                 client.awards.set(result.id, {
                     type: result.type,
@@ -162,17 +162,14 @@ module.exports = class Util {
                     requirements: result.requirements
                 })
             });
-
-
         })
-
     }
 
     async loadCategories() {
-        let test = require("../JSON/categories.json");
+        let categories = require("../JSON/categories.json");
 
 
-        test.forEach(i => {
+        categories.forEach(i => {
 
             this.client.categories.set(i.name, i);
         })
@@ -303,51 +300,23 @@ module.exports = class Util {
         let embed = new MessageEmbed()
             .setTimestamp()
             .setColor("#D12D42")
-            .setTitle(`🔞 NSFW-Channel Only`);
+            .setTitle(`🔞 NSFW-Channel Benötigt`);
 
 
         //Check if the member has rights to change the NSFW Option to tell him how to enable it
         if (message.member.hasPermission('MANAGE_CHANNELS')) {
 
             //Set the Description and set a Image
-            embed.setDescription(`The \`${this.capitalise(cmdFile.name)}\` command is a NSFW-tagged Command.\nPlease enable NSFW-Mode on this Channel to use it!`)
+            embed.setDescription(`Der Befehl \`${this.capitalise(cmdFile.name)}\` kann hier nicht genutzt werden!.\nBitte den Channel NSFW Status anschalten oder den Befehl in einem NSFW Channel ausführen!`)
                 .setImage(`https://cdn.discordapp.com/attachments/821157975246241822/821158154447355964/ChannelNSFWEnable.gif`)
         } else {
 
             //Set the Description and set a Image
-            embed.setDescription(`The \`${this.capitalise(cmdFile.name)}\` command is a NSFW-tagged Command.\nPlease use it in a NSFW Channel!`)
+            embed.setDescription(`Der Befehl \`${this.capitalise(cmdFile.name)}\` kann hier nicht genutzt werden!.\nBitte den Befehl in einem NSFW Channel ausführen!`)
         }
 
         //return the embed
         return embed;
-
-    }
-
-    //This creates an Embed if a Search Query for AdultContent was executed in a non NSFW Channel
-    async MediaNSFW(message, title) {
-
-        //create a base Embed
-        let embed = new MessageEmbed()
-            .setTimestamp()
-            .setColor("#D12D42")
-            .setTitle(`🔞 NSFW-Content`);
-
-
-        //Check if the member has rights to change the NSFW Option to tell him how to enable it
-        if (message.member.hasPermission('MANAGE_CHANNELS')) {
-
-            //Set the Description and set a Image
-            embed.setDescription(`The Content (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease enable NSFW-Mode on this Channel to use it!`)
-
-                .setImage(`https://cdn.discordapp.com/attachments/821157975246241822/821158154447355964/ChannelNSFWEnable.gif`)
-        } else {
-
-            //Set the Description and set a Image
-            embed.setDescription(`The Content (\`${this.capitalise(title)}\`) you were trying to access is tagged as Adult Content.\nPlease use it in a NSFW Channel!`)
-        }
-
-        //return the embed
-        message.channel.send(embed).then(m => m.delete({timeout: 60000}).catch(() => null));
 
     }
 
@@ -644,7 +613,7 @@ module.exports = class Util {
                 let user = await client.users.fetch(`${r.id}`, true, true);
                 if (message.guild.members.cache.get(user.id)) {
                     await client.users.fetch(`${user.id}`, false, false);
-                    birthdaylist.set(user.id, {id: user.id, day: `${r.bday}`, month: `${r.bmonth}`});
+                    birthdaylist.set(user.id, {id: user.id, day: `${r.bday}`, month: `${r.bmonth}`, year: `${r.byear ? r.byear : ""}`});
                 }
             }
 
@@ -660,18 +629,26 @@ module.exports = class Util {
                 let usermonth;
                 let userday = b.day;
                 let user = client.users.cache.get(b.id);
+                let useryear = b.year.length > 0 ? b.year : null;
+
+                let dateString = "";
+
+
 
                 usermonth = months[b.month - 1]
 
+                if(useryear) {
+                    dateString = `${useryear}, ${usermonth}, ${userday}`;
+                }
 
                 if (embed.fields.find(f => f.name === usermonth)) {
                     let fieldcontent = embed.fields.find(f => f.name === usermonth).value;
 
-                    fieldcontent += `${userday}.\t${user}\n`;
+                    fieldcontent += `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}\n`;
 
                     embed.fields.find(f => f.name === usermonth).value = fieldcontent;
                 } else {
-                    embed.addField(usermonth, `${userday}.\t${user}\n`)
+                    embed.addField(usermonth, `${userday}.\t${user} ${useryear ? `[${client.utils.getAge(dateString)+1}.]` : ""}\n`)
                 }
 
             })
@@ -1116,15 +1093,15 @@ module.exports = class Util {
     }
 
 
-    async setBirthday(message, day, month) {
+    async setBirthday(message, day, month, year) {
 
-        message.channel.send(`Ich versuche den ${day}.${month} als deinen Geburtstag einzutragen...`).then(m => {
-            this.client.con.query(`UPDATE \`users\` SET \`bday\` = ${day}, \`bmonth\` = ${month} WHERE \`id\` = ${message.author.id};`, function (err, result) {
+        message.channel.send(`Ich versuche den ${day}.${month}.${year} als deinen Geburtstag einzutragen...`).then(m => {
+            this.client.con.query(`UPDATE \`users\` SET \`bday\` = ${day}, \`bmonth\` = ${month}, \`byear\` = ${year} WHERE \`id\` = ${message.author.id};`, function (err, result) {
                 if (err) throw err;
 
                 if (result) {
                     // noinspection JSUnresolvedVariable
-                    console.log(`[MySQL] Successfully Updated Entry for User with ID '${message.author.id}' in users [Query: Affecting bday, bmonth]`);
+                    console.log(`[MySQL] Successfully Updated Entry for User with ID '${message.author.id}' in users [Query: Affecting bday, bmonth, byear]`);
 
                     try {
                         m.delete({timeout: 3000});
@@ -1192,6 +1169,20 @@ module.exports = class Util {
         this.client.con.query(`UPDATE \`users\` SET \`userBio\` = \"${biography}\" WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
+    }
+
+
+
+    getAge(dateString) {
+        let today = new Date();
+        let birthDate = new Date(dateString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        let m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+        {
+            age--;
+        }
+        return age;
     }
 
 }

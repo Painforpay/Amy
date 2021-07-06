@@ -373,17 +373,29 @@ module.exports = class extends Event {
                 if (results.length > 0) {
                     general.send(`<@&${client.dev ? "800110137553453109" : "796053373820207164"}>`)
                     results.forEach(async r => {
+
+
+                        let dateString = "";
+
+                        let age = ""
+                        if(r.byear != null) {
+                            dateString = `${r.byear}, ${r.bmonth - 1}, ${r.bday}`;
+                            age = ` **${(client.utils.getAge(dateString)+1)}**ten`
+                        }
+
                         let user = await client.users.cache.find(u => u.id === r.id);
                         let member = await general.guild.members.fetch(user.id);
                         await member.roles.add(client.dev ? "815864639279202365" : "813853716691025960");
                         let embed = new MessageEmbed()
                             .setTitle("Birthday Reminder!")
                             .setColor("#ffd900")
-                            .setDescription(`Herzlichen Glückwunsch zum Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
+                            .setDescription(`Herzlichen Glückwunsch zum${age} Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
+                            .setFooter(`Das Servergeschenk von ${client.birthdayReward}xp wurde dir gutgeschrieben!`)
                             .setTimestamp();
+                        general.send(embed).catch(e => console.log());
                         general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
-                        general.send({embed: embed});
-                        await client.utils.xpadd(member, this.client.birthdayReward);
+
+                        await client.utils.xpadd(member, client.birthdayReward);
 
                     });
 
