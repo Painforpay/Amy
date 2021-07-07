@@ -66,13 +66,13 @@ module.exports = class extends Event {
             if (newState.channel.id == (this.client.dev ? "804744090637959178" : "804684722763595777")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
 
 
-            if(this.client.allowFullChannelJoin) return;
 
-            if(newState.channel.full){
+
+            if((newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
                 if(newState.member.user.bot) return;
-                //if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
+                if(newState.channel.members.filter(member => !member.user.bot).size < newState.channel.userLimit) return;
                 newState.kick(`Tried to join a full Channel!`);
-                newState.member.user.send(`Du darfst keinem vollen Channel beitreten!`).then(m => m.delete({timeout:20000}))
+                newState.member.user.send(`Du kannst diesem Channel nicht betreten, da er voll ist!`).then(m => m.delete({timeout:20000}))
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
@@ -87,18 +87,12 @@ module.exports = class extends Event {
             await this.client.utils.VoiceUserDisconnectXP(oldState);
 
             if (oldState.channel.members.size == 1) {
-
                 let member = oldState.channel.members.filter(member => member.id !== oldState.member.id);
-
                 await this.client.utils.VoiceUserDisconnectXP(member.map(x => x)[0].voice, true);
-
-
             }
 
             if (this.client.fullMutes.has(oldState.member.id)) {
-
                 this.client.fullMutes.delete(oldState.member.id);
-
             }
 
             if (oldState.channel.members.size < 1) await this.client.utils.deletePVoice(oldState.channel);
@@ -124,13 +118,13 @@ module.exports = class extends Event {
             if (oldState.channel.members.size < 1) await this.client.utils.deletePVoice(oldState.channel);
             if (newState.channel.id == (this.client.dev ? "804744090637959178" : "804684722763595777")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
 
-            if(this.client.allowFullChannelJoin) return;
 
-            if(newState.channel.full){
+
+            if((newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
                 if(newState.member.user.bot) return;
-                //if(newState.channel.members.find(member => member.roles.has("794071654355304488") || member.roles.has("794155348365803560"))) return;
+                if(newState.channel.members.filter(member => !member.user.bot).size < newState.channel.userLimit) return;
                 newState.setChannel(oldState.channel, `Tried joining a full Channel`);
-                newState.member.user.send(`Du darfst keinem vollen Channel beitreten!`).then(m => m.delete({timeout:20000}))
+                newState.member.user.send(`Du kannst diesem Channel nicht betreten, da er voll ist!`).then(m => m.delete({timeout:20000}))
             }
 
         }
