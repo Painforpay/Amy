@@ -37,7 +37,8 @@ module.exports = class extends Command {
             [maxChanSize] Maximum Private Channel size: ${this.client.maxChanSize} users
             [starBoardMinReactions] Starboard Acceptance Reaction Count: ${this.client.starBoardMinReactions}   
             [fullMuteAFK] Fullmute AFK Move Status: ${this.client.fullMuteAFK ? "Active": "Inactive"}
-               
+            [allowFullChannelJoin] Allow users to join full Channels: ${this.client.allowFullChannelJoin ? "yes": "no"}
+            [savePChannelNames] Save Private Channel Names: ${this.client.savePChannelNames ? "yes" : "no"}
                
             \*\***Level System**\*\*
             [xpMessages] XP for Sending One Message: ${this.client.xpMessages} XP
