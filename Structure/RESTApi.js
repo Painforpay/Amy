@@ -46,7 +46,7 @@ module.exports = class RESTApi {
             res.status(200);
 
             let amount = Math.abs(body.xp);
-            amount = (await ClientBot.utils.getGuildMember(body.id)).roles.cache.find(r => r.name === "Unterstützer") ? amount * 1.02 : amount;
+            amount = (await ClientBot.utils.getGuildMember(body.id)).roles.cache.has(ClientBot.serverRoles.get("booster").id) ? amount * 1.02 : amount;
 
 
             return res.json({
@@ -73,7 +73,7 @@ module.exports = class RESTApi {
                 if(vote.type !== "upvote") return;
             }
 
-            ClientBot.channels.fetch(ClientBot.dev ? "836203865929023518": "823910154449846292").then(c => {
+            ClientBot.channels.fetch(ClientBot.serverChannels.get("bumpchannel")).then(c => {
 
                 c.send(`<@${vote.user}> hat erfolgreich für unseren Server gevoted und ${ClientBot.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
 
@@ -95,7 +95,7 @@ module.exports = class RESTApi {
         await this.client.utils.xpadd((await this.client.utils.getGuildMember(id)), xp)
 
         let amount = Math.abs(xp);
-        amount = (await this.client.utils.getGuildMember(id)).roles.cache.find(r => r.name === "Unterstützer") ? amount * 1.02 : amount;
+        amount = (await this.client.utils.getGuildMember(id)).roles.cache.has(this.client.serverRoles.get("booster").id) ? amount * 1.02 : amount;
 
         this.client.utils.log(`${ref ? "**" + ref + ":**" : "**Quelle Unbekannt!**"} \`${(await this.client.utils.getGuildMember(id)).user.tag}\` wurden \`${amount}\` Erfahrungspunkte über die API hinzugefügt!`)
         console.log(colors.green(`${ref ? ref + ":" : "Quelle Unbekannt!"} ${(await this.client.utils.getGuildMember(id)).user.tag} wurden ${amount} Erfahrungspunkte über die API hinzugefügt!`))

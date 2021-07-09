@@ -25,7 +25,7 @@ module.exports = class extends Event {
             }
         }
 
-            let starboard = await this.client.channels.fetch(this.client.dev ? "850824322523332619" : "850824438991683584")
+            let starboard = this.client.serverChannels.get("starboard");
 
             if(reaction.message.channel === starboard) return;
 

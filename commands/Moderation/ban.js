@@ -56,8 +56,8 @@ module.exports = class extends Command {
         //ARMED
         await message.guild.members.ban(user.id, {reason: reason, days: 7});
 
-        let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
-        let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
+        let internerModlog = this.client.serverChannels.get("internalModLog");
+        let Modlog = this.client.serverChannels.get("modlog");
 
 
         internerModlog.send(`:octagonal_sign: ${user.tag} [${user.id}] wurde von ${message.member} wegen \`${reason}\` gebannt!  XP: ${userData.xp}`)

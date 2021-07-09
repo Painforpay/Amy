@@ -13,7 +13,7 @@ module.exports = class extends Event {
         const client = this.client;
         this.client.raidCounter += 1;
 
-        const logChannel = member.guild.channels.cache.find(channel => channel.id === (this.client.dev ? "800110139155546209" : "796000304873209866"));
+        const logChannel = this.client.serverChannels.get("joinlogs");
 
         // To compare, we need to load the current invite list.
         member.guild.fetchInvites().then(guildInvites => {
@@ -30,7 +30,7 @@ module.exports = class extends Event {
                 client.invites = guildInvites;
                 const inviter = client.users.cache.get(invite.inviter.id);
                 // Get the log channel (change to your liking)
-                const logChannel = member.guild.channels.cache.find(channel => channel.id === (client.dev ? "800110139155546209" : "796000304873209866"));
+                const logChannel = this.client.serverChannels.get("joinlogs");
                 // A real basic message with the information we need.
                 logChannel.send(`${member} wurde von ${inviter} mit dem Code \`${invite.code}\` eingeladen. \`${invite.uses}\` Nutzungen seit seiner Erstellung. ${member.guild.memberCount} Mitglieder.`);
 
@@ -58,7 +58,7 @@ module.exports = class extends Event {
 
         if (this.client.raidMode) {
 
-                await member.send("Sorry, die Raid Protection ist aktiv. Bitte versuche es später nochmal!").catch(() => null);
+                await member.send("Sorry, die **Raid Protection** ist aktiv. Bitte versuche es später nochmal!").catch(() => null);
 
 
             return member.kick();
@@ -66,12 +66,12 @@ module.exports = class extends Event {
 
             if ((Date.parse(new Date()) - member.user.createdTimestamp) < 604800000) {
                 //let vor = Date.parse(new Date()) - member.user.createdTimestamp;
-                logChannel.send(`Achtung: Der Account von ${member} ist ziemlich jung. Erstellt am: ${await this.client.utils.getDateTime(member.user.createdTimestamp)}`);
+                logChannel.send(`${this.client.serverRoles.get("moderator")}\nAchtung: Der Account von ${member} ist ziemlich jung. Erstellt am: ${await this.client.utils.getDateTime(member.user.createdTimestamp)}`);
             }
 
 
             try {
-                member.guild.channels.cache.get(this.client.dev ? "800110138027409501" : "793944435809189921").send(`Willkommen ${member} auf ${member.guild.name}! Wir hoffen, dass du dich hier wohlfühlst. <@&${this.client.dev ? "800110137553453108" : "795964429228703764"}>`);
+                this.client.serverChannels.get("general").send(`Willkommen ${member} auf ${member.guild.name}! Wir hoffen, dass du dich hier wohlfühlst. ${this.client.serverRoles.get("userjoinPing")}`);
             } catch (e) {
                 console.error(e);
             }

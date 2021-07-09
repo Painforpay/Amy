@@ -35,7 +35,7 @@ module.exports = class extends Command {
 
 
 
-        let result = await this.client.utils.getUserData(member.id);
+        let result = await this.client.con.getUserData(member.id);
 
 
 
@@ -67,9 +67,9 @@ module.exports = class extends Command {
 
             progressbar += "**▏";
 
-            let placement = await client.utils.getPlacementforUser(member.id, currentXP)
+            let placement = await client.con.getPlacementforUser(member.id, currentXP)
 
-            let userAwards = await this.client.utils.getUserAwards(member.id);
+            let userAwards = await this.client.con.getUserAwards(member.id);
 
             let sonstiges = [];
 

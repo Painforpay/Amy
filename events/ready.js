@@ -48,10 +48,12 @@ module.exports = class extends Event {
 
         let client = this.client;
 
+        await this.client.utils.loadRolesAndChannels();
+
         //Fetch Invites for Invitetracking
         setInterval(async function () {
 
-            client.invites = await client.guilds.cache.get((client.dev ? "800110137544146954" : "793944435809189919")).fetchInvites();
+            client.invites = client.guild.fetchInvites();
 
         }, 1000);
 
@@ -60,17 +62,16 @@ module.exports = class extends Event {
 
 
         //Get all Messages in #steckbriefrollen
-        let steckbriefrollen = await this.client.channels.fetch(client.dev ? "800110137820971047" : "797833037022363659", true, true);
-        await steckbriefrollen.messages.fetch();
+        await this.client.serverChannels.get("reactionroles").messages.fetch();
 
 
-        const guild = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919")
+        const guild = this.client.guild;
 
         const VoiceChannels = guild.channels.cache.filter(c => c.type === 'voice');
 
         for (const [channelID, channel] of VoiceChannels) {
-            if (channel.parentID === (this.client.dev ? "804440107754192987" : "804456045481164810")) {
-                if (channel.id !== (client.dev ? "804744090637959178" : "804684722763595777")) {
+            if (channel.parentID === (this.client.serverChannels.get("userchannelCATEGORY").channelID)) {
+                if (channel !== this.client.serverChannels.get("createuserchanchannel")) {
                     let channelauthor = channel.permissionOverwrites.map(permission => permission.id)[0]
                     this.client.PVoices.set(channelauthor, {
                         channelid: channel.id,
@@ -100,8 +101,8 @@ module.exports = class extends Event {
         }
 
         //Fetch StarboardMessages
-        let starboardChannel = await this.client.channels.fetch(client.dev ? "850824322523332619" : "850824438991683584", true, true);
-        starboardChannel.messages.fetch().then(messages => {
+
+        this.client.serverChannels.get("starboard").messages.fetch().then(messages => {
             messages.forEach(message => {
                 if(message.mentions.channels) {
                     if(message.embeds.length === 1) {
@@ -147,11 +148,11 @@ module.exports = class extends Event {
 
         //Unmute all Members currently muted as there is no unmute Timeout Anymore
         {   //brackets so the muterole variable is available out of scope
-            let muterole = guild.roles.cache.get(this.client.dev ? "828709057103003678" : "828708084674199632")
+            let muterole = this.client.serverRoles.get("muted");
             let muteMembersSize = muterole.members.size
             muterole.members.forEach(m => {
                 try {
-                    m.roles.remove(this.client.dev ? "828709057103003678" : "828708084674199632");
+                    m.roles.remove(muterole);
                 } catch (e) {
                     console.error(e);
                 }
@@ -163,12 +164,12 @@ module.exports = class extends Event {
         }
 
         //Remove AFK Role from every Member that has it
-        {   //brackets so the muterole variable is available out of scope
-            let Afkrole = guild.roles.cache.get(this.client.dev ? "831069345860943904" : "831069006759854150")
-            let AfkMembersSize = Afkrole.members.size
-            Afkrole.members.forEach(m => {
+        {   //brackets so the afkrole variable is available out of scope
+            let afkrole = this.client.serverRoles.get("afk");
+            let AfkMembersSize = afkrole.members.size
+            afkrole.members.forEach(m => {
                 try {
-                    m.roles.remove(this.client.dev ? "831069345860943904" : "831069006759854150");
+                    m.roles.remove(afkrole);
                 } catch (e) {
                     console.error(e);
                 }
@@ -180,12 +181,11 @@ module.exports = class extends Event {
         }
 
 
-        let teammemberembed = await (await this.client.channels.fetch(client.dev ? "800110138924466191" : "795804770178039808", true)).messages.fetch(client.dev ? "802569631238717490" : "795806452039811073", true);
-        await (await this.client.channels.fetch(client.dev ? "800110137820971042" : "794175100118499379")).messages.fetch();
-        await (await this.client.channels.fetch(client.dev ? "800110137820971040" : "796119563803689050", true)).messages.fetch(client.dev ? "800111566459764737" : "796203324410953808", true);
+        await this.client.serverChannels.get("ideen").messages.fetch();
+        await this.client.serverChannels.get("support").messages.fetch();
 
 
-        let botlogs = await this.client.channels.fetch(client.dev ? "803530075571224627" : "803530018369830922", true);
+        let botlogs = this.client.serverChannels.get("botlogs");
         console.log(colors.green("Done caching Messages / Channels."));
 
         setInterval(() => {
@@ -249,11 +249,11 @@ module.exports = class extends Event {
                         });
 
 
-                        let guild = await client.guilds.cache.find(g => g.id === (client.dev ? "800110137544146954" : "793944435809189919"))
+
 
                         //Tryblock #1
                         try {
-                            let member = await guild.member(r.id);
+                            let member = await client.guild.member(r.id);
                             if (member.user.bot) return;
                             let inactive = 0;
                             if (days >= 14) {
@@ -309,23 +309,6 @@ module.exports = class extends Event {
         });
 
 
-        //Update Teamlist
-        schedule.scheduleJob('0 0 1 * *', () => {
-            let member = "";
-            let guild = client.guilds.cache.get(client.dev ? "800110137544146954" : "793944435809189919")
-            guild.members.cache.filter(member => member.hasPermission("KICK_MEMBERS")).forEach(m => {
-                if (m.user.bot || guild.ownerID === m.id) return;
-                member += `${m}\n`
-            })
-
-            let embed = new MessageEmbed()
-                .setTitle("💎 Unser Team 💎")
-                .setDescription(`Hier seht ihr alle Nutzer mit Moderationsrechten!\nBitte beachtet, dass ihr euch zuerst an den <#796119563803689050> wenden solltet!\n\n${member}`)
-                .setTimestamp();
-
-            teammemberembed.edit({embed: embed});
-        });
-
 
         setInterval(async function () {
 
@@ -353,17 +336,17 @@ module.exports = class extends Event {
         }, 500);//
 
         //Birthday Feature
-        let general = await this.client.channels.fetch(this.client.dev ? "800110138027409501" : "793944435809189921", true);
+        let general = this.client.serverChannels.get("general");
         schedule.scheduleJob('0 0 * * *', async () => {
             let today = new Date();
 
             //Remove Geburtstagskind Role from everyone who has it
-            let birthday_role = await general.guild.roles.fetch(this.client.dev ? "815864639279202365" : "813853716691025960", true)
+            let birthday_role = this.client.serverRoles.get("userBirthday");
 
             let members = birthday_role.members;
 
             await members.forEach(member => {
-                member.roles.remove(this.client.dev ? "815864639279202365" : "813853716691025960");
+                member.roles.remove(birthday_role);
             })
 
 
@@ -371,7 +354,7 @@ module.exports = class extends Event {
                 if (err) throw err;
 
                 if (results.length > 0) {
-                    general.send(`<@&${client.dev ? "800110137553453109" : "796053373820207164"}>`)
+                    general.send(`${client.serverRoles.get("birthdayPing")}`)
                     results.forEach(async r => {
 
 
@@ -385,7 +368,7 @@ module.exports = class extends Event {
 
                         let user = await client.users.cache.find(u => u.id === r.id);
                         let member = await general.guild.members.fetch(user.id);
-                        await member.roles.add(client.dev ? "815864639279202365" : "813853716691025960");
+                        await member.roles.add(birthday_role);
                         let embed = new MessageEmbed()
                             .setTitle("Birthday Reminder!")
                             .setColor("#ffd900")
@@ -419,6 +402,8 @@ module.exports = class extends Event {
             this.client.msgAck.forEach((v, k) => {
                 v.today = 0
             })
+
+            this.client.dailyCooldown.clear();
 
         });
 
@@ -514,10 +499,10 @@ module.exports = class extends Event {
 
 
         setInterval(async function () {
-            let categoryid = client.dev ? "804440107754192987" : "804456045481164810";
+            let categoryid = client.serverChannels.get("userchannelCATEGORY");
             const VoiceChannels = guild.channels.cache.filter(c => c.type === 'voice' && c.parentID === categoryid);
             for (const [channelID, channel] of VoiceChannels) {
-                if (channel.id === (client.dev ? "804732009426452511" : "804684722763595777")) return;
+                if (channel === client.serverChannels.get("createuserchanchannel")) return;
                 if ((Date.parse(new Date()) - channel.createdTimestamp) > 11000) {
                     if (channel.members.size === 0) {
                         await client.utils.deletePVoice(channel);

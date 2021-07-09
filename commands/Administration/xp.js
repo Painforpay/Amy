@@ -34,7 +34,7 @@ module.exports = class extends Command {
 
             }
             command.run(message, cutArgs);
-            return message.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            return message.delete({timeout: 15000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
 
         } else {
             return message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))

@@ -25,6 +25,20 @@ module.exports = class extends Event {
 
         if (message.type !== "DEFAULT") return;
         if (message.system === true) return;
+        if(message.author.id === "302050872383242240") {
+
+            if(message.embeds) {
+                if(message.embeds[0].description.search(/👍/)) {
+                    setTimeout(async () => {
+
+                        message.channel.send(`Serverbumping ist wieder verfügbar! Nutze \`!d bump\` um uns zu unterstützen!`)
+
+                    }, 7200000)
+                }
+
+            }
+
+        }
         if (message.author.bot) return;
         if (message.channel.type === "dm") {
 
@@ -41,26 +55,15 @@ module.exports = class extends Event {
             return; //await this.client.utils.DeeptalkSender(message);
         }
 
-        if(message.author.id === "302050872383242240") {
 
-            if(message.embeds) {
-                if(message.embeds[0].description.search(/Bump done/)) {
-                    setTimeout(async () => {
-
-                            message.channel.send(`Serverbumping ist wieder verfügbar! Nutze \`!d bump\` um uns zu unterstützen!`)
-
-                    }, 7200000)
-                }
-
-            }
-
-        }
 
 
         if (this.client.setAfkUsers.has(message.member.id)) {
+            let afkRole = this.client.serverRoles.get("afk")
             this.client.setAfkUsers.delete(message.member.id);
-            if (message.member.roles.cache.has(this.client.dev ? "831069345860943904" : "831069006759854150")) {
-                await message.member.roles.remove(this.client.dev ? "831069345860943904" : "831069006759854150");
+            if (message.member.roles.cache.has(afkRole.id)) {
+
+                await message.member.roles.remove(afkRole);
             }
             message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
         }
@@ -121,8 +124,8 @@ module.exports = class extends Event {
                     //ARMED
                     await message.member.kick(reason);
 
-                    let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
-                    let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
+                    let internerModlog = this.client.serverChannels.get("internalModlog");
+                    let Modlog = this.client.serverChannels.get("modlog");
 
 
                     internerModlog.send(`🥾 ${message.author.tag} [${message.author.id}] wurde von ${this.client.user.username} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
@@ -138,7 +141,7 @@ module.exports = class extends Event {
         }
 
         //Spamprotection
-        if(this.client.antispam.has(message.author.id) && message.channel.parentID !== "835863892014006282") {
+        if(this.client.antispam.has(message.author.id) && message.channel.parentID !== this.client.serverChannels.get("minigamesbotCategory")) {
 
             let messageCount = this.client.antispam.get(message.author.id).messageCount;
 
@@ -165,7 +168,7 @@ module.exports = class extends Event {
         }
 
 
-        if (message.channel.id === (this.client.dev ? "800110138027409501" : "793944435809189921") && !message.member.permissions.has("MANAGE_MESSAGES")) {
+        if (message.channel === this.client.serverChannels.get("general") && !message.member.permissions.has("MANAGE_MESSAGES")) {
             if (message.attachments.size || message.content.includes("cdn.discordapp.com/attachments/") || message.content.includes("tenor.com")) {
                 if (this.client.picCooldown.has(message.author.id)) {
 
@@ -194,10 +197,10 @@ module.exports = class extends Event {
 
         if (!message.content.startsWith(prefix || "+")) {
 
-            if (message.channel.parentID === (this.client.dev ? "800110139155546210" : "796204539911864340")) {
+            if (message.channel.parentID === this.client.serverChannels.get("supportarchiveCATEGORY").channelID) {
 
-                await message.channel.setParent(message.guild.channels.cache.get(this.client.dev ? "800110137820971039" : "796198520616517652"));
-                let mod = message.guild.roles.cache.get(this.client.dev ? "800110137632882781" : "798293308937863219")
+                await message.channel.setParent(this.client.serverChannels.get("supportCATEGORY"));
+                let mod = this.client.serverRoles.get("moderator");
                 let user = await message.guild.members.fetch(`${message.channel.topic}`, true, true);
                 await message.channel.overwritePermissions([{id: message.guild.id, deny: "VIEW_CHANNEL"}, {
                     id: user.id,
@@ -259,7 +262,7 @@ module.exports = class extends Event {
 
             if (message.guild && !this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
 
-                if(message.channel.id === "823910154449846292") return;
+                if(message.channel === this.client.serverChannels.get("bumpchannel")) return;
 
                 await message.channel.send("Befehle sind hier deaktviert!").then(m => {
 

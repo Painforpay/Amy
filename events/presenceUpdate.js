@@ -11,7 +11,7 @@ module.exports = class extends Event {
     async run(oldPresence, newPresence) {
         if (newPresence.user.bot) return;
         let client = this.client;
-        if (newPresence.member.roles.cache.find(r => r.id === (client.dev ? "800110137628557361" : "794155349665120306"))) {
+        if (newPresence.member.roles.cache.has(this.client.serverRoles.get("streamer").id)) {
 
             if (newPresence.activities.length > 0) {
 
@@ -19,18 +19,18 @@ module.exports = class extends Event {
 
                     if (!this.streamUpdated(oldPresence, newPresence) && this.isStreaming(newPresence)) {
 
-                        let streamschan = await newPresence.member.guild.channels.cache.find(c => c.id === (client.dev ? "800110138027409507" : "794685217872543774"))
-                        await streamschan.send(`${newPresence.member} hat angefangen zu Streamen! Schaut doch vorbei?\n${newPresence.activities.find(activity => activity.type === "STREAMING").url} <@&${client.dev ? "800110137553453107" : "794685489889804308"}>`)
+                        let streamschan = this.client.serverChannels.get("streamAnnouncement")
+                        await streamschan.send(`${newPresence.member} hat angefangen zu Streamen! Schaut doch vorbei?\n${newPresence.activities.find(activity => activity.type === "STREAMING").url} ${this.client.serverRoles.get("streamingPing")}`)
 
                     }
 
-                    await newPresence.member.roles.add(client.dev ? "800110137649135630" : "794685963229069392");
+                    await newPresence.member.roles.add(this.client.serverRoles.get("streamerIsStreaming"));
                 } else {
-                    await newPresence.member.roles.remove(client.dev ? "800110137649135630" : "794685963229069392");
+                    await newPresence.member.roles.remove(this.client.serverRoles.get("streamerIsStreaming"));
                 }
 
             } else {
-                await newPresence.member.roles.remove(client.dev ? "800110137649135630" : "794685963229069392");
+                await newPresence.member.roles.remove(this.client.serverRoles.get("streamerIsStreaming"));
             }
         }
 
@@ -41,27 +41,12 @@ module.exports = class extends Event {
 
             let rolename = activity.name.replace('\'', "_")
 
-            this.client.con.query(`SELECT * FROM \`activityroles\` WHERE \`name\` = '${rolename}'`, async function (err, result) {
-                //Error
-                if (client.dev) return;
+            let roles = this.client.con.getActivity(rolename);
 
-                if (err) return console.error(err);
-                if (result[0]) {
-                    const {roleid} = result[0];
+            if(roles.length > 0) {
+                newPresence.member.roles.add(roles);
+            }
 
-                    try {
-                        await newPresence.member.roles.add(`${roleid}`);
-                    } catch (e) {
-                        console.log(newPresence.member.username)
-                        console.error(e)
-                        console.log(rolename)
-                    }
-
-                    await newPresence.member.roles.add(client.dev ? "800110137582026757" : "795692239263105056");
-
-                }
-
-            });
         })
 
 

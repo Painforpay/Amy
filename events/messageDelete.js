@@ -47,7 +47,7 @@ module.exports = class extends Event {
         const messagecheck = message.content ? message.content : "siehe attachments";
         const nachricht = `\`${messagecheck}\` von '${message.author.tag}' in ${message.channel} wurde von '${moderator ? moderator.tag : message.author.tag}' gelöscht.\n`;
 
-        const channel = message.guild.channels.cache.get(this.client.dev ? "800110139155546208" : "795041075583516702");
+        const channel = this.client.serverChannels.get("messagelog");
         if (channel) channel.send(nachricht, attachments ? {files: attachments} : null);
 
 

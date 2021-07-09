@@ -18,10 +18,10 @@ module.exports = class extends Command {
 
     async run(message) {
 
-        if (message.channel.id !== (this.client.dev ? "800110137820971040" : "796119563803689050") && message.channel.parentID === (this.client.dev ? "800110137820971039" : "796198520616517652")) {
+        if (message.channel !== this.client.serverChannels.get("support") && message.channel.parentID === this.client.serverChannels.get("supportCATEGORY").id) {
             await message.channel.send(`Dieses Ticket wurde von ${message.author} geschlossen!`);
-            await message.channel.setParent(this.client.dev ? "800110139155546210" : "796204539911864340");
-            let category = message.channel.guild.channels.cache.get(this.client.dev ? "800110139155546210" : "796204539911864340");
+            await message.channel.setParent(this.client.serverChannels.get("supportarchiveCATEGORY"));
+            let category = this.client.serverChannels.get("supportarchiveCATEGORY");
 
             await message.channel.overwritePermissions(category.permissionOverwrites, "Channel ins Archiv verschoben")
 

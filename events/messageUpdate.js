@@ -49,12 +49,8 @@ module.exports = class extends Event {
                 //ARMED
                 await newMessage.member.kick(reason);
 
-                let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
-                let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
-
-
-                internerModlog.send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde von ${this.client.user.username} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
-                Modlog.send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde gekickt!`);
+                this.client.serverChannels.get("internalModLog").send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde von ${this.client.user.username} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);
+                this.client.serverChannels.get("modlog").send(`🥾 ${newMessage.author.tag} [${newMessage.author.id}] wurde gekickt!`);
                 return;
             }
         }

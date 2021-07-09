@@ -56,7 +56,7 @@ module.exports = class Bot extends Client {
 
         this.maxChanSize = 4;  //Maximale Größe von UserChanneln
 
-        this.con = new MySQL(options.host, options.username, options.password).createConnection();
+        this.con = new MySQL(options.host, options.username, options.password, this).createConnection();
 
         this.invites = {};
 
@@ -85,6 +85,10 @@ module.exports = class Bot extends Client {
         this.xpMessages = 1;    //XP pro Nachricht
 
         this.xpVoice = 2;   //XP pro Minute
+
+        this.dailyRewardXP = 50;
+
+        this.dailyRewardCoins = 50;
 
         this.messagesPerSecond = 3; //Nachrichten erlaubt pro Sekunde
 
@@ -123,6 +127,14 @@ module.exports = class Bot extends Client {
         this.msgAck = new Collection();
 
         this.vcAck = new Collection();
+
+        this.guild = null;
+
+        this.serverRoles = null;
+
+        this.serverChannels = null;
+
+        this.dailyCooldown = new Collection();
 
     }
 

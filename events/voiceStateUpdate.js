@@ -12,7 +12,7 @@ module.exports = class extends Event {
 
     async run(oldState, newState) {
 
-        let voicecontext = oldState.member.guild.roles.cache.get(this.client.dev ? "800110137553453112" : "795075741955653652")
+        let voicecontext = this.client.serverRoles.get("voicecontext");
 
         if (!oldState.selfDeaf && newState.selfDeaf) {
             //User selfdeafened
@@ -63,9 +63,7 @@ module.exports = class extends Event {
 
             await newState.member.roles.add(voicecontext.id);
 
-            if (newState.channel.id == (this.client.dev ? "804744090637959178" : "804684722763595777")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
-
-
+            if (newState.channel == this.client.serverChannels.get("createuserchanchannel")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
 
 
             if(newState.channel.userLimit > 0 && (newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
@@ -77,7 +75,6 @@ module.exports = class extends Event {
                 } catch (e) {
                     //Can't send Messages to User
                 }
-
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
@@ -121,7 +118,7 @@ module.exports = class extends Event {
             }
 
             if (oldState.channel.members.size < 1) await this.client.utils.deletePVoice(oldState.channel);
-            if (newState.channel.id == (this.client.dev ? "804744090637959178" : "804684722763595777")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
+            if (newState.channel == this.client.serverChannels.get("createuserchanchannel")) await this.client.utils.createPVoice(newState, this.client.maxChanSize)
 
 
 

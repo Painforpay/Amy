@@ -42,8 +42,8 @@ module.exports = class extends Command {
         })
 
 
-        if (!message.member.roles.cache.has(this.client.dev ? "831069345860943904" : "831069006759854150")) {
-            await message.member.roles.add(this.client.dev ? "831069345860943904" : "831069006759854150");
+        if (!message.member.roles.cache.has(this.client.serverRoles.get("afk").id)) {
+            await message.member.roles.add(this.client.serverRoles.get("afk"));
         }
 
         message.channel.send(`${message.member}\nDu wurdest nun als Afk markiert. Wenn du eine Nachricht schreibst, wird dir der Status wieder entfernt!\nWir empfehlen dass du dich auf Nicht Stören stellst, da du immernoch gepingt werden kannst.`).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))

@@ -58,8 +58,8 @@ module.exports = class extends Command {
         //ARMED
         await member.kick(reason);
 
-        let internerModlog = await this.client.channels.fetch(this.client.dev ? "800110138924466195" : "795773658916061264");
-        let Modlog = await this.client.channels.fetch(this.client.dev ? "800110139155546203" : "795773686064873542");
+        let internerModlog = this.client.serverChannels.get("internalModLog");
+        let Modlog = this.client.serverChannels.get("modlog");
 
 
         internerModlog.send(`🥾 ${member.user.tag} [${user.id}] wurde von ${message.author} wegen \`${reason}\` gekickt! XP: ${userData.xp}`);

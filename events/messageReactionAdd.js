@@ -29,37 +29,37 @@ module.exports = class extends Event {
         //Check if reaction happened in #support
         let member = reaction.message.guild.members.cache.get(user.id);
         await member.fetch();
-        if (reaction.message.channel.id === (this.client.dev ? "800110137820971040" : "796119563803689050")) {
+        if (reaction.message.channel === this.client.serverChannels.get("support")) {
 
             await this.client.utils.createTicket(reaction, user);
 
 
         }
 
-        if (reaction.message.channel.id === (this.client.dev ? "800110137820971042" : "794175100118499379")) {
+        if (reaction.message.channel === this.client.serverChannels.get("ideen")) {
 
-            if (reaction.emoji.name === "🗣️" && member.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936")) {
+            if (reaction.emoji.name === "🗣️" && member.roles.cache.get(this.client.serverRoles.get("senior"))) {
                 await this.client.utils.createDiscussion(reaction.message);
             }
 
-            if (reaction.emoji.name === "🗣️" && !member.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936")) {
+            if (reaction.emoji.name === "🗣️" && !member.roles.cache.get(this.client.serverRoles.get("senior"))) {
                 await reaction.users.remove(user);
             }
         }
 
-        if (reaction.message.channel.parentID === (this.client.dev ? "800110137820971041" : "794175912026701850")) {
-            if (reaction.emoji.name === "❌" && member.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936")) {
+        if (reaction.message.channel.parentID === this.client.serverChannels.get("serverentwicklung").channelID) {
+            if (reaction.emoji.name === "❌" && member.roles.cache.get(this.client.serverRoles.get("senior"))) {
                 await this.client.utils.archiveDiscussion(reaction, user);
             }
 
-            if (reaction.emoji.name === "❌" && !member.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936")) {
+            if (reaction.emoji.name === "❌" && !member.roles.cache.get(this.client.serverRoles.get("senior"))) {
                 await reaction.users.remove(user);
             }
         }
 
         if(reaction.message.reactions.cache.has("⭐")) {
             if(reaction.message.reactions.cache.get("⭐").count < this.client.starBoardMinReactions) return;
-            let starboard = await this.client.channels.fetch(this.client.dev ? "850824322523332619" : "850824438991683584")
+            let starboard = this.client.serverChannels.get("starboard");
 
             await reaction.message.fetch();
             let description = `\n\n[Link](https://discord.com/channels/${reaction.message.guild.id}/${reaction.message.channel.id}/${reaction.message.id})`;

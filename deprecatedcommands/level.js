@@ -1,5 +1,5 @@
 ﻿const Discord = require('discord.js');
-const Command = require("../../Structure/Command");
+const Command = require("../Structure/Command");
 
 module.exports = class extends Command {
 
@@ -17,6 +17,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
+        return;
         message.delete();
         let member = message.member;
 

@@ -152,17 +152,15 @@ module.exports = class Util {
     }
 
     async loadAwards() {
-        let client = this.client;
-        client.con.query(`SELECT * FROM awards ORDER BY \`id\` ASC;`, function (err, results) {
-            if(!results) return;
-            results.forEach(result => {
-                client.awards.set(result.id, {
-                    type: result.type,
-                    name: result.name,
-                    requirements: result.requirements
-                })
-            });
-        })
+
+        let results = await this.client.con.getAwards();
+        results.forEach(result => {
+            this.client.awards.set(result.id, {
+                type: result.type,
+                name: result.name,
+                requirements: result.requirements
+            })
+        });
     }
 
     async loadCategories() {
@@ -226,6 +224,18 @@ module.exports = class Util {
         });
     }
 
+    async loadRolesAndChannels() {
+        this.client.guild = await this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
+        this.client.serverRoles = await this.client.con.getServerRoles().catch(e => {
+            console.log(e)
+            return process.exit(1);
+        });
+        this.client.serverChannels = await this.client.con.getServerChannels().catch(e => {
+            console.log(e)
+            return process.exit(1);
+        });
+    }
+
     async handleWrongInput(args, cmdFile) {
 
 
@@ -251,7 +261,7 @@ module.exports = class Util {
     }
 
     async logToGeneral(messageString) {
-        let general = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919").channels.cache.get(this.client.dev ? "800110138027409501" : "793944435809189921");
+        let general = this.client.serverChannels.get("general");
 
         try {
             general.send(messageString);
@@ -266,11 +276,11 @@ module.exports = class Util {
         if (member.voice) {
             member.voice.kick();
         }
-        let internerModlog = this.client.guilds.cache.get(this.client.dev ? "800110137544146954" : "793944435809189919").channels.cache.get(this.client.dev ? "800110138924466195" : "795773658916061264");
+        let internerModlog = this.client.serverChannels.get("internalModLog");
         try {
 
 
-            member.roles.add(this.client.dev ? "828709057103003678" : "828708084674199632");
+            member.roles.add(this.client.serverRoles.get("muted"));
             internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted!`)
             let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`).catch(() => null)
 
@@ -281,7 +291,7 @@ module.exports = class Util {
 
         setTimeout(async () => {
             try {
-                member.roles.remove(this.client.dev ? "828709057103003678" : "828708084674199632");
+                member.roles.remove(this.client.serverRoles.get("muted"));
                 internerModlog.send(`🙉 ${member.user.tag} [${member.user.id}] wurde Automatisch entmuted!`)
                 let m = await member.user.send(`Du wurdest im Wohnzimmer automatisch entmuted.`);
                 m.delete({timeout: (time * 60000) * 3}).catch(() => null)
@@ -405,7 +415,7 @@ module.exports = class Util {
 
         await reaction.users.remove(user);
 
-        let category = reaction.message.guild.channels.cache.get(this.client.dev ? "800110137820971039" : "796198520616517652");
+        let category = this.client.serverChannels.get("supportCATEGORY");
         if (reaction.message.guild.channels.cache.find(channel => channel.topic === user.id && channel.parentID === category.id)) return reaction.message.channel.send(`Du hast bereits ein offenes Ticket! ${user}`).then(m => {
             try {
                 m.delete({timeout: 15000})
@@ -414,8 +424,8 @@ module.exports = class Util {
                 console.error(e);
             }
         });
-        let senior = reaction.message.guild.roles.cache.get(this.client.dev ? "800110137649135632" : "794154756179623936");
-        let mod = reaction.message.guild.roles.cache.get(this.client.dev ? "800110137632882781" : "798293308937863219");
+        let senior = this.client.serverRoles.get("senior");
+        let mod = this.client.serverRoles.get("moderator");
         let supportchan = await reaction.message.guild.channels.create(user.tag, {
             type: "text",
             topic: user.id,
@@ -426,7 +436,7 @@ module.exports = class Util {
             }, {id: senior.id, allow: "VIEW_CHANNEL"}]
         });
 
-        supportchan.send(`${user}; <@&${senior.id}>; <@${mod.id}>`).then(m => {
+        supportchan.send(`${user}; ${senior}; ${mod}`).then(m => {
             try {
                 m.delete({timeout: 300});
             } catch (e) {
@@ -506,13 +516,7 @@ module.exports = class Util {
 
     async getGuildMember(id) {
 
-        let guild;
-        guild = await this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
-
-        let member;
-        member = await guild.member(id);
-
-        return member;
+        return await this.client.guild.member(id);
 
     }
 
@@ -633,10 +637,8 @@ module.exports = class Util {
 
                 let dateString = "";
 
-
-
                 usermonth = months[b.month - 1]
-                let remainingDays
+                let remainingDays;
                 if(useryear) {
                     dateString = `${useryear}, ${b.month}, ${userday}`;
                     remainingDays = client.utils.getRemainingDays(dateString);
@@ -644,6 +646,7 @@ module.exports = class Util {
                     dateString = `0000, ${b.month}, ${userday}`
                     remainingDays = client.utils.getRemainingDays(dateString);
                 }
+
 
                 if (embed.fields.find(f => f.name === usermonth)) {
                     let fieldcontent = embed.fields.find(f => f.name === usermonth).value;
@@ -773,18 +776,7 @@ module.exports = class Util {
         }
     }
 
-    async getPlacementforUser(id, xp) {
-        let client = this.client;
-        return new Promise((resolve) => {
 
-            client.con.query(`SELECT * FROM users WHERE xp >= ${xp-1};`, function (err, results) {
-                if (results) {
-                    resolve(results.length);
-                }
-            });
-        });
-
-    }
 
     async profanityFilter(string) {
 
@@ -815,14 +807,14 @@ module.exports = class Util {
         if (member.user.bot) return;
         amount = parseInt(amount);
         amount = Math.abs(amount);
-        amount = member.roles.cache.find(r => r.name === "Unterstützer") && giveboost ? (amount * 1.02) : amount;
+        amount = member.roles.cache.has(this.client.serverRoles.get("booster").id) && giveboost ? (amount * 1.02) : amount;
         if (isNaN(amount)) {
-            console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
+            console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} XP (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
             return;
         }
 
         let client = this.client
-        this.client.con.query(`SELECT * FROM users WHERE id = ${member.user.id};`, async function (err, result) {
+        this.client.con.con.query(`SELECT * FROM users WHERE id = ${member.user.id};`, async function (err, result) {
             if (err) throw err;
 
             if (result[0]) {
@@ -897,18 +889,46 @@ module.exports = class Util {
                     return;
                 }
 
-                client.con.query(`UPDATE users SET xp = '${togive}', inactive = 0, originxp = NULL WHERE id = ${member.user.id}`, function (err) {
+                client.con.con.query(`UPDATE users SET xp = '${togive}', inactive = 0, originxp = NULL WHERE id = ${member.user.id}`, function (err) {
                     if (err) throw err;
 
                 });
             } else {
-                client.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
+                client.con.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
                     if (err) throw err;
 
                     console.log(`[MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
 
                 });
             }
+
+
+        });
+    }
+
+    async coinsadd(member, amount, giveboost = true) {
+        let unwashed = amount;
+        if (!amount) return;
+        if (member.user.bot) return;
+        amount = parseInt(amount);
+        amount = Math.abs(amount);
+        amount = member.roles.cache.find(this.client.serverRoles.get("booster")) && giveboost ? (amount * 1.02) : amount;
+        if (isNaN(amount)) {
+            console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} Coins (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
+            return;
+        }
+
+        let client = this.client
+        this.client.con.query(`SELECT * FROM users WHERE id = ${member.user.id};`, async function (err, result) {
+            if (err) throw err;
+
+                client.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
+                    if (err) throw err;
+
+                    console.log(`[MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
+
+                });
+
 
 
         });
@@ -939,7 +959,7 @@ module.exports = class Util {
 
     log(message) {
 
-        let botlogs = this.client.channels.cache.get(this.client.dev ? "803530075571224627" : "803530018369830922");
+        let botlogs = this.client.serverChannels.get("botlogs");
         try {
             botlogs.send(message);
         } catch (e) {
@@ -1022,10 +1042,10 @@ module.exports = class Util {
 
     async createDiscussion(message) {
 
-        let category = message.guild.channels.cache.get(this.client.dev ? "800110137820971041" : "794175912026701850");
+        let category = this.client.serverChannels.get("serverentwicklung");
 
         let concept;
-        concept = message.guild.roles.cache.get(this.client.dev ? "800110137632882782" : "798294227968458752");
+        concept = this.client.serverRoles.get("konzeptentwicklung");
 
         let ideen = await message.guild.channels.create(message.content.split("\n")[1] ? (message.content.split("\n")[0].split(" ").join("-").length > 32 ? `Vorschlag von: ${message.author.tag}` : message.content.split("\n")[0]) : `Vorschlag von: ${message.author.tag}`, {
             type: "text",
@@ -1074,15 +1094,10 @@ module.exports = class Util {
 
     async archiveDiscussion(reaction) {
 
-        await reaction.message.channel.setParent(this.client.dev ? "803231244670205953" : "803231120090988594");
+        await reaction.message.channel.setParent(this.client.serverChannels.get("ideenarchiveCATEGORY"));
         reaction.message.channel.send(`Channel wurde archiviert!`);
         await reaction.users.fetch();
-        reaction.users.cache.forEach(user => {
-            setTimeout(function () {
-                reaction.users.remove(user);
-            }, 2000);
-
-        })
+        reaction.users.removeAll();
 
 
     }
@@ -1125,36 +1140,8 @@ module.exports = class Util {
 
     }
 
-    async getUserAwards(userid) {
-        let client = this.client;
-        return [`Dieses Feature befindet sich im Aufbau!`];
-
-        return new Promise((resolve) => {
-            let awards = [];
-            client.con.query(`SELECT * FROM userawards WHERE userID = \"${userid}\";`, async function (err, results) {
-
-                if (results) {
-
-
-                    await results.forEach(r => {
-                        let awardData = client.awards.get(r.awardID);
-                        if(awardData.type.includes("total")) {
-                            awards.push(`${awardData.name}`)
-                        } else {
-                            awards.push(`${r.amount}x ${awardData.name}`)
-                        }
-                    })
-                    resolve(awards);
-                }
-            });
-        });
-
-
-
-    }
-
     addUserMessages(userID, amount) {
-        this.client.con.query(`UPDATE \`users\` SET \`totalMessagesSent\` = \`totalMessagesSent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
+        this.client.con.con.query(`UPDATE \`users\` SET \`totalMessagesSent\` = \`totalMessagesSent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
     }
@@ -1164,13 +1151,13 @@ module.exports = class Util {
         amount = parseInt(amount);
         amount = Math.abs(amount);
         if (isNaN(amount)) return;
-        this.client.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
+        this.client.con.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
     }
 
     async setBiography(userID, biography) {
-        this.client.con.query(`UPDATE \`users\` SET \`userBio\` = \"${biography}\" WHERE \`id\` = ${userID};`, function (err, result) {
+        this.client.con.con.query(`UPDATE \`users\` SET \`userBio\` = \"${biography}\" WHERE \`id\` = ${userID};`, function (err, result) {
             if (err) throw err;
         });
     }
@@ -1215,5 +1202,29 @@ module.exports = class Util {
 
         let days = (((remainingTime / 1000) / 60) / 60) / 24;
         return Math.floor(days+1);
+    }
+
+    getRemainingTime(dateString) {
+        let today = new Date();
+        let birthDate = new Date(dateString);
+        let m = today.getMonth() - birthDate.getMonth();
+        let isNextYear;
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+        {
+            isNextYear = false;
+        } else {
+            isNextYear = true;
+        }
+
+        let dateStringArr = dateString.split(",");
+        let year = today.getFullYear();
+        if(isNextYear) {
+            year += 1;
+        }
+        dateString = `${year}, ${dateStringArr[1]}, ${dateStringArr[2]}`;
+
+
+        let nextBirthday = Date.parse(new Date(dateString));
+        return nextBirthday/1000;
     }
 }

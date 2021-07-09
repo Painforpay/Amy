@@ -26,7 +26,7 @@ module.exports = class extends Command {
 
 
                     try {
-                        (await this.client.channels.fetch(this.client.dev ? "803530075571224627" : "803530018369830922", true)).send(`Status: Shutting Down...`);
+                        this.client.serverChannels.get("botlog").send(`Status: Shutting Down...`);
                         await this.client.utils.giveRemaining(message)
                         await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
                         await m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
