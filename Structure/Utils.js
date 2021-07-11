@@ -1010,7 +1010,7 @@ module.exports = class Util {
                 monthly: amount
             })
         }
-        let data = new Collection().set("totalUserMinutes", amount);
+        let data = new Collection().set("totalVoiceMinsSpent", amount);
         return await this.client.con.updateUser(userID, data).catch(err => this.client.console.reportError(err.stack));
 
 
