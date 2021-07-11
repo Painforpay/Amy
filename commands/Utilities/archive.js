@@ -35,8 +35,8 @@ module.exports = class extends Command {
 
                 }
 
-                    message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                    return m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    message.delete().catch(err => this.client.console.reportError(err.stack));
+                    return m.delete().catch(err => this.client.console.reportError(err.stack));
 
             });
 

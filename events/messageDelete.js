@@ -12,7 +12,7 @@ module.exports = class extends Event {
 
             if (message.channel) {
                 const messageembed = await (this.client.channels.cache.get(message.channel.id)).messages.fetch((this.client.evals.get(message.id)));
-                messageembed.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                messageembed.delete().catch(err => this.client.console.reportError(err.stack));
             }
             return this.client.evals.delete(message.id);
         }

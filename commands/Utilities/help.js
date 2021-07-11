@@ -16,7 +16,7 @@ module.exports = class extends Command {
     async run(message, args) {
 
 
-            message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            message.delete().catch(err => this.client.console.reportError(err.stack));
 
 
         if (!args.length) {
@@ -33,7 +33,7 @@ module.exports = class extends Command {
 
             embed.setFooter(`Beispiel: !help ${this.client.categories.first().name} bzw. !help ${this.client.commands.last().name} ${this.client.isBeta ? `| Beta v${this.client.version}` : ""}`);
 
-            message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            message.channel.send(embed).then(m => m.delete({timeout: 30000})).catch(err => this.client.console.reportError(err.stack));
 
 
         } else {
@@ -43,7 +43,7 @@ module.exports = class extends Command {
 
             const result = this.client.categories.get(searchQuery.toLowerCase()) || this.client.commands.get(searchQuery.toLowerCase()) || this.client.commands.get(this.client.aliases.get(searchQuery.toLowerCase()));
 
-            if (!result) return message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 30000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+            if (!result) return message.channel.send(`Diese Suche hat kein Ergebnis geliefert!`).then(m => m.delete({timeout: 30000}).catch(err => this.client.console.reportError(err.stack)));
 
             if (result instanceof Command) {
 
@@ -90,7 +90,7 @@ module.exports = class extends Command {
                     embed.setDescription(description)
 
 
-                    message.channel.send(embed).then(m => m.delete({timeout: 30000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                    message.channel.send(embed).then(m => m.delete({timeout: 30000}).catch(err => this.client.console.reportError(err.stack)));
 
                 }
 
@@ -139,7 +139,7 @@ module.exports = class extends Command {
 
                 message.channel.send({embed: embed}).then(m => {
 
-                        m.delete({timeout: (30000)}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        m.delete({timeout: (30000)}).catch(err => this.client.console.reportError(err.stack));
 
 
                 })

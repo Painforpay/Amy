@@ -29,7 +29,7 @@ module.exports = class extends Event {
 
         if (newMessage.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g) && !newMessage.member.hasPermission("MANAGE_MESSAGES")) {
 
-            newMessage.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            newMessage.delete().catch(err => this.client.console.reportError(err.stack));
             newMessage.channel.send(`${newMessage.member}, du darfst keine Invites posten!`);
 
             if((Date.parse(new Date()) - newMessage.member.joinedTimestamp) < 604800000) {
@@ -83,7 +83,7 @@ module.exports = class extends Event {
                         if (response instanceof MessageEmbed) {
 
                             if (newMessage.attachments.map(x => x)[0]) {
-                                await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                                await message.delete().catch(err => this.client.console.reportError(err.stack));
                                 let evalresponse = await newMessage.channel.send(response);
                                 this.client.evals.set(newMessage.id, evalresponse.id);
                             } else {
@@ -92,7 +92,7 @@ module.exports = class extends Event {
 
 
                         } else if (response instanceof MessageAttachment) {
-                            await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                            await message.delete().catch(err => this.client.console.reportError(err.stack));
                             let evalresponse = await newMessage.channel.send(response);
                             this.client.evals.set(newMessage.id, evalresponse.id);
                         }

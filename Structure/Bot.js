@@ -2,6 +2,7 @@ const {Client, Collection, Permissions} = require('discord.js');
 const Util = require('./Utils.js');
 const MySQL = require('./MySQL.js');
 const RESTApi = require('./RESTApi.js');
+const ConsoleOutputting = require('./ConsoleOutputting.js');
 
 module.exports = class Bot extends Client {
 
@@ -49,6 +50,8 @@ module.exports = class Bot extends Client {
         this.subCommands = new Collection();
 
         this.utils = new Util(this);
+
+        this.console = new ConsoleOutputting(this);
 
         this.owners = options.owners;
 
@@ -128,7 +131,7 @@ module.exports = class Bot extends Client {
 
         this.vcAck = new Collection();
 
-        this.guild = null;
+        this.guild = this.dev ? "800110137544146954" : "793944435809189919";
 
         this.serverRoles = null;
 
@@ -162,7 +165,7 @@ module.exports = class Bot extends Client {
     async start(token = this.token) {
 
         this.owners = await this.utils.getOwners(this.owners);
-        //new RESTApi(this).createServer();
+        new RESTApi(this).createServer();
 
         await this.utils.loadAwards();
         await this.utils.loadCategories();

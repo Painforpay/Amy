@@ -19,12 +19,12 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        message.delete().catch(err => this.client.console.reportError(err.stack));
 
 
         if (isNaN(args[0])) return message.channel.send("Bitte gib eine Zahl als Parameter an!").then(m => {
 
-                m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                m.delete({timeout: 5000}).catch(err => this.client.console.reportError(err.stack))
 
         });
 
@@ -32,7 +32,7 @@ module.exports = class extends Command {
         let channel = message.channel;
         if (test.get(channel.id)) return message.channel.send("Dieser Channel befindet sich bereits im Slowmode! Gesetzt für " + test.get(channel.id) + " Sekunden").then(m => {
 
-                m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                m.delete({timeout: 5000}).catch(err => this.client.console.reportError(err.stack))
 
         });
 
@@ -46,7 +46,7 @@ module.exports = class extends Command {
             limit = 2;
         }
         await channel.setRateLimitPerUser(limit, `Executed by ${message.author.tag} for ${time} Seconds`);
-        this.client.utils.log(`Slowmode in ${channel} aktiviert von ${message.author} für ${time} Sekunden ${args[1] ? (`(${limit} Sekunden pro Nachricht)`) : ""}`)
+        this.client.console.reportLog(`Slowmode in ${channel} aktiviert von ${message.author} für ${time} Sekunden ${args[1] ? (`(${limit} Sekunden pro Nachricht)`) : ""}`, true, true)
 
         test.set(channel.id, time.toString());
         setTimeout(() => {
@@ -56,14 +56,14 @@ module.exports = class extends Command {
 
         message.channel.send(`Der Channel wurde für ${time} Sekunden in den Slowmode versetzt! ${args[1] ? (`(${limit} Sekunden pro Nachricht)`) : ""}`).then(m => {
 
-                m.delete({timeout: 15000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
 
         })
 
         setTimeout(() => {
             test.delete(channel.id);
             channel.setRateLimitPerUser(original, `[Reverted to Original] Executed by ${message.author.tag} for ${time} Seconds`);
-            this.client.utils.log(`Slowmode in ${channel} deaktiviert`)
+            this.client.console.reportLog(`Slowmode in ${channel} deaktiviert`, true, true)
 
         }, time * 1000)
 

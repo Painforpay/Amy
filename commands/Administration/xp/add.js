@@ -20,7 +20,7 @@ module.exports = class extends SubCommand {
         let memberID = message.mentions.members.first() || args[0];
 
         let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(err => {
-            this.client.utils.log(`Fehler beim Fetchen des Nutzers.\n\`\`\`${err}\`\`\``)
+            this.client.console.reportError(err.stack)
             message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
 
         });
@@ -29,19 +29,19 @@ module.exports = class extends SubCommand {
         let value = args.pop();
         if(isNaN(value)) {
             return message.channel.send(`Bitte einen numerischen Wert für die Menge angeben`).then(m => {
-                m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
             })
         }
 
 
         await client.utils.xpadd(member, value, false);
-        client.utils.log(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` erhöht!`);
+        client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` erhöht!`, true, true);
 
 
         message.channel.send(`Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${value}\` erhöht!`).then(m => {
-            m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            m.delete({timeout: 15000}).catch(err => this.client.console.reportError(err.stack))
         })
-        message.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+        message.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
 
     }
 

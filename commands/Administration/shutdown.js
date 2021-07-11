@@ -28,8 +28,8 @@ module.exports = class extends Command {
                     try {
                         this.client.serverChannels.get("botlog").send(`Status: Shutting Down...`);
                         await this.client.utils.giveRemaining(message)
-                        await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                        await m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        await message.delete().catch(err => this.client.console.reportError(err.stack));
+                        await m.delete().catch(err => this.client.console.reportError(err.stack));
                         this.client.destroy()
                         return process.exit();
                     } catch (e) {
@@ -40,8 +40,8 @@ module.exports = class extends Command {
 
                 } else {
                     try {
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                        return m.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        message.delete().catch(err => this.client.console.reportError(err.stack));
+                        return m.delete().catch(err => this.client.console.reportError(err.stack));
                     } catch (e) {
                         //Error
                         console.error(e);

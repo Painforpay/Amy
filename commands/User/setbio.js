@@ -19,7 +19,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        message.delete().catch(err => this.client.console.reportError(err.stack));
         let reason = args.join(" ");
         let bio = reason;
         reason = reason.replace(/(<.*:.+:.+>)|(:.*:)/gi, "");
@@ -28,15 +28,13 @@ module.exports = class extends Command {
 
         if (fResult["is-bad"]) {
 
-            message.channel.send(`Diese Biographie enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+            message.channel.send(`Diese Biographie enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack)));
             return;
         }
         if(bio.length > 190) {
             bio = `${bio.slice(0, 190 - 3)}...`
         }
-        await this.client.utils.setBiography(message.member.id, bio);
-
-        message.reply(`Deine Biographie wurde Aktualisiert!\n\`${bio}\``).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
+        await this.client.utils.setBiography(message, bio);
 
     }
 };

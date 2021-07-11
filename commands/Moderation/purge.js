@@ -18,7 +18,7 @@ module.exports = class extends Command {
 
     async run(message, args) {
 
-        await message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        await message.delete().catch(err => this.client.console.reportError(err.stack));
 
         const deleteCount = Math.abs(args[0]);
         const user = message.mentions.users.first();
@@ -31,7 +31,7 @@ module.exports = class extends Command {
         if (user) filteredMessages = fetchedMessages.filter(msg => msg.author.id === user.id);
         else filteredMessages = filteredMessages.array().slice(0, deleteCount);
 
-        const deletedMessages = await message.channel.bulkDelete(filteredMessages, true).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        const deletedMessages = await message.channel.bulkDelete(filteredMessages, true).catch(err => this.client.console.reportError(err.stack));
         if (!deletedMessages) return message.channel.send("Ein Fehler ist aufgetreten, bitte versuche es nochmal!");
 
         const deletedCount = deletedMessages.size;

@@ -5,10 +5,10 @@ const Command = require('./Command.js');
 const SubCommand = require('./SubCommand.js');
 const Event = require('./Event.js');
 const {MessageEmbed, Collection, MessageAttachment, TextChannel} = require('discord.js');
+const Discord = require('discord.js');
 const {inspect} = require('util');
 const {Type} = require('@anishshobith/deeptype')
 const fetch = require('node-fetch')
-const ms = require("ms");
 
 
 module.exports = class Util {
@@ -65,14 +65,11 @@ module.exports = class Util {
     }
 
     getRandom(array) {
-
         return array[Math.floor(Math.random() * array.length)];
     }
 
     async getOwners(ArrOwners) {
-
         let OwnerObj = [];
-
         for (const id of ArrOwners) {
             OwnerObj.push(await this.client.users.fetch(id))
         }
@@ -84,7 +81,6 @@ module.exports = class Util {
     }
 
     getSubCommands(cmd) {
-
         return this.client.subCommands.filter((v) => v.parent === cmd);
     }
 
@@ -117,13 +113,6 @@ module.exports = class Util {
         return new Intl.ListFormat('en-GB', {style: 'short', type: type}).format(array);
     }
 
-    async reactvoting(message) {
-
-        await message.react("🔺");
-        await message.react("🔻");
-
-    }
-
     async duration(ms) {
         const sec = Math.floor((ms / 1000) % 60).toString()
         const min = Math.floor((ms / (1000 * 60)) % 60).toString()
@@ -132,23 +121,6 @@ module.exports = class Util {
         const months = Math.floor((ms / (1000 * 60 * 60 * 24 * 30)) % 60).toString()
         const years = Math.floor((ms / (1000 * 60 * 60 * 24 * 365.25)) % 60).toString()
         return `${years > 0 ? years.padStart(1, '0')+ `Jahr${years > 1 ? "e": ""} `: ""}${days > 0 ? days.padStart(1, '0')+` Tag${days > 1 ? "e": ""} `: ""}${hrs > 0 ? hrs.padStart(2, '0')+` Stunde${hrs > 1 ? "n": ""} `: ""}${min > 0 ? min.padStart(2, '0')+` Minute${min > 1 ? "n": ""} `: ""}${sec > 0 ? sec.padStart(2, '0')+` Sekunde${sec > 1 ? "n": ""}`: ""}`
-    }
-
-    async getUserData(id) {
-        let client = this.client;
-        return new Promise((resolve, reject) => {
-
-            client.con.query(`SELECT * FROM users WHERE id = ${id}`, function (err, result) {
-                if (err) reject(err.name);
-
-                if (result[0]) {
-                    resolve(result[0]);
-                }
-
-            })
-
-        })
-
     }
 
     async loadAwards() {
@@ -225,7 +197,7 @@ module.exports = class Util {
     }
 
     async loadRolesAndChannels() {
-        this.client.guild = await this.client.guilds.fetch(this.client.dev ? "800110137544146954" : "793944435809189919");
+        this.client.guild = await this.client.guilds.fetch(this.client.guild);
         this.client.serverRoles = await this.client.con.getServerRoles().catch(e => {
             console.log(e)
             return process.exit(1);
@@ -260,21 +232,9 @@ module.exports = class Util {
 
     }
 
-    async logToGeneral(messageString) {
-        let general = this.client.serverChannels.get("general");
-
-        try {
-            general.send(messageString);
-
-        } catch (e) {
-            console.log(e);
-        }
-
-    }
-
     async muteMember(member, time, mod, reason) {
         if (member.voice) {
-            member.voice.kick();
+            await member.voice.kick();
         }
         let internerModlog = this.client.serverChannels.get("internalModLog");
         try {
@@ -286,7 +246,7 @@ module.exports = class Util {
 
             m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
         } catch (e) {
-            console.error(e);
+            this.client.console.reportError(e);
         }
 
         setTimeout(async () => {
@@ -342,7 +302,7 @@ module.exports = class Util {
             const start = process.hrtime();
             evaled = eval(code);
             if (evaled instanceof Promise) {
-                evaled = await evaled;
+                evaled = evaled;
             }
             const stop = process.hrtime(start);
             let response = [
@@ -421,7 +381,7 @@ module.exports = class Util {
                 m.delete({timeout: 15000})
             } catch (e) {
                 //Error
-                console.error(e);
+                this.client.console.reportError(e.stack);
             }
         });
         let senior = this.client.serverRoles.get("senior");
@@ -514,11 +474,6 @@ module.exports = class Util {
 
     }
 
-    async getGuildMember(id) {
-
-        return await this.client.guild.member(id);
-
-    }
 
 
     async VoiceUserChannelChangeXP(oldState) {
@@ -526,43 +481,32 @@ module.exports = class Util {
             this.client.VoiceUsers.delete(oldState.member.id);
             this.client.VoiceUsers.set(oldState.member.id, {
                 user: oldState.member.id,
-                time: Date.parse(new Date())
+                time: Date.parse(new Date().toString())
             });
         } else if (this.client.VoiceUsers.has(oldState.member.id)) {
 
-            let timespentmills = Date.parse(new Date()) - this.client.VoiceUsers.get(oldState.member.id).time;
-
             if (oldState.channel.members.size > 1) {
-                let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
-
-                await this.client.utils.xpadd(oldState.member, amount);
-                await this.addUserMinutes(oldState.member.id, parseInt((timespentmills / 1000) / 60));
-                if(this.client.vcAck.has(oldState.member.id)) {
-
-                    let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
-
-
-                    this.client.vcAck.set(oldState.member.id, {
-                        today: today + ((timespentmills / 1000) / 60),
-                        weekly: weekly + ((timespentmills / 1000) / 60),
-                        monthly: monthly + ((timespentmills / 1000) / 60)
-                    })
-
-                } else {
-                    this.client.vcAck.set(oldState.member.id, {
-                        today: ((timespentmills / 1000) / 60),
-                        weekly: ((timespentmills / 1000) / 60),
-                        monthly: ((timespentmills / 1000) / 60)
-                    })
-                }
+               await this.rewardUserMinutes(oldState.member);
             }
             this.client.VoiceUsers.delete(oldState.member.id);
             this.client.VoiceUsers.set(oldState.member.id, {
                 user: oldState.member.id,
-                time: Date.parse(new Date())
+                time: Date.parse(new Date().toString())
             });
 
         }
+    }
+
+    async rewardUserMinutes(member) {
+        let timespan = Date.parse(new Date().toString()) - this.client.VoiceUsers.get(member.id).time;
+        let amount = this.client.xpVoice * ((timespan / 1000) / 60);
+        let amountMinutes = (timespan / 1000) / 60;
+        if (!amount) return;
+        amount = Math.abs(amount);
+        if (isNaN(amount)) return;
+        await this.client.utils.xpAdd(member, amount);
+        await this.addUserMinutes(member.id, amountMinutes);
+
     }
 
     async VoiceUserDisconnectXP(oldState, override = false) {
@@ -570,35 +514,14 @@ module.exports = class Util {
             this.client.VoiceUsers.delete(oldState.member.id);
             this.client.VoiceUsers.set(oldState.member.id, {
                 user: oldState.member.id,
-                time: Date.parse(new Date())
+                time: Date.parse(new Date().toString())
             });
         } else if (this.client.VoiceUsers.has(oldState.member.id)) {
 
-            let timespentmills = Date.parse(new Date()) - this.client.VoiceUsers.get(oldState.member.id).time;
+
 
             if (oldState.channel.members.size > 0 || override) {
-                let amount = this.client.xpVoice * ((timespentmills / 1000) / 60);
-
-                await this.client.utils.xpadd(oldState.member, amount);
-                await this.addUserMinutes(oldState.member.id, parseInt((timespentmills / 1000) / 60));
-                if(this.client.vcAck.has(oldState.member.id)) {
-
-                    let { today, weekly, monthly } = this.client.vcAck.get(oldState.member.id);
-
-
-                    this.client.vcAck.set(oldState.member.id, {
-                        today: today + ((timespentmills / 1000) / 60),
-                        weekly: weekly + ((timespentmills / 1000) / 60),
-                        monthly: monthly + ((timespentmills / 1000) / 60)
-                    })
-
-                } else {
-                    this.client.vcAck.set(oldState.member.id, {
-                        today: ((timespentmills / 1000) / 60),
-                        weekly: ((timespentmills / 1000) / 60),
-                        monthly: ((timespentmills / 1000) / 60)
-                    })
-                }
+                await this.rewardUserMinutes(oldState.member);
             }
             this.client.VoiceUsers.delete(oldState.member.id);
 
@@ -611,8 +534,10 @@ module.exports = class Util {
         let birthdaylist = new Collection();
         let embedwaiting = await message.channel.send("Embed wird geladen...");
 
-        await this.client.con.query(`SELECT * FROM users WHERE bday > 0 ORDER BY bmonth ASC, bday ASC`, async function (err, result) {
-            if (err) throw err;
+
+        let result = await this.client.con.executeQuery(`SELECT * FROM users WHERE bday > 0 ORDER BY bmonth ASC, bday ASC`).catch(err => this.client.console.reportError(err.stack));
+
+        if(!result) return message.channel.send(`Es gab einen Fehler bei der Anfrage der Nutzerdaten!`).then(m => m.delete({timeout: 5000})).catch(() => null);
             for (const r of result) {
                 let user = await client.users.fetch(`${r.id}`, true, true);
                 if (message.guild.members.cache.get(user.id) || client.dev) {
@@ -638,15 +563,12 @@ module.exports = class Util {
                 let dateString = "";
 
                 usermonth = months[b.month - 1]
-                let remainingDays;
                 if(useryear) {
                     dateString = `${useryear}, ${b.month}, ${userday}`;
-                    remainingDays = client.utils.getRemainingDays(dateString);
                 } else {
                     dateString = `0000, ${b.month}, ${userday}`
-                    remainingDays = client.utils.getRemainingDays(dateString);
                 }
-
+                let remainingDays = client.utils.getRemainingDays(dateString);
 
                 if (embed.fields.find(f => f.name === usermonth)) {
                     let fieldcontent = embed.fields.find(f => f.name === usermonth).value;
@@ -672,7 +594,7 @@ module.exports = class Util {
             })
 
 
-        });
+
 
     }
 
@@ -727,7 +649,7 @@ module.exports = class Util {
 
         } else {
 
-            let UserData = await this.client.utils.getUserData(newState.member.id);
+            let UserData = await this.client.con.getUserData(newState.member.id);
 
             let name = UserData.pChannelName == null ? `${newState.member.nickname != null ? newState.member.nickname : newState.member.user.username}s Sprachkanal` : UserData.pChannelName;
             if (name.length > 32) {
@@ -801,63 +723,40 @@ module.exports = class Util {
     }
 
 
-    async xpadd(member, amount, giveboost = true) {
+    async xpAdd(member, amount, giveboost = true) {
         let unwashed = amount;
-        if (!amount) return;
         if (member.user.bot) return;
-        amount = parseInt(amount);
-        amount = Math.abs(amount);
+
         amount = member.roles.cache.has(this.client.serverRoles.get("booster").id) && giveboost ? (amount * 1.02) : amount;
         if (isNaN(amount)) {
             console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} XP (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
             return;
         }
 
-        let client = this.client
-        this.client.con.con.query(`SELECT * FROM users WHERE id = ${member.user.id};`, async function (err, result) {
-            if (err) throw err;
+        let data = new Collection().set("xp", {operator: "+", value: amount}).set("inactive", 0).set("originxp", "NULL");
 
-            if (result[0]) {
+        let result = await this.client.con.updateUser(member.id, data);
 
-                let currentlevel = await client.utils.getLevelforXp(result[0].xp);
-                let leveluserhastoget = await client.utils.getLevelforXp(result[0].xp + amount);
+                let currentlevel = await this.client.utils.getLevelforXp(result.old ? result.old.xp : 0);
+                let leveluserhastoget = await this.client.utils.getLevelforXp(result.new.xp);
 
-                let nextlevel = await client.utils.getLevelXp(leveluserhastoget + 1);
-                if (client.verbose) {
-                    console.log(`Current Level: ${currentlevel}
-                                 Old Xp: ${result[0].xp}
-                                 Amount to add: ${amount}
-                                 New Xp: ${result[0].xp + amount}
-                                 Level to Give: ${leveluserhastoget}\n`);
-                }
+                let nextlevel = await this.client.utils.getLevelXp(leveluserhastoget + 1);
 
-
-
-                let togive = result[0].xp + amount;
 
 
                 if (currentlevel !== leveluserhastoget) {
-                    let embed = new MessageEmbed()
-                        .setTitle("**Levelup!**")
-                        .setColor("#FFD700")
-                        .setFooter(`Du benötigst nun ${(Math.round((nextlevel - (togive)) * 100) / 100).toFixed(0)} Erfahrungspunkte für Level ${leveluserhastoget + 1}!`)
-                        .setDescription(`Du bist jetzt Level ${leveluserhastoget}!`);
-
-                    try {
-                        member.send({embed: embed}).then(m => m.delete({timeout: 3600000}));
-                    } catch (e) {
-
-                        // Der Bot kann dem User keine DMs schicken!
-                    }
-
+                    this.sendLevelupEmbed({
+                        member: member,
+                        currentLevel: leveluserhastoget,
+                        remainingXP: nextlevel - (result.new.xp)
+                    });
                 }
 
 
-                let roletogive = await member.guild.roles.fetch((await client.utils.checkLevelRole(leveluserhastoget)))
 
-
+                let roletogive = await member.guild.roles.fetch((await this.client.utils.checkLevelRole(leveluserhastoget)))
                 try {
-                    let rolestoremove = await client.utils.getRolestoRemove();
+                    let rolestoremove = await this.client.utils.getRolestoRemove();
 
                     rolestoremove.forEach(r => {
 
@@ -872,66 +771,41 @@ module.exports = class Util {
                         }
 
                     })
-                } catch (e) {
-                    //Error
-                    console.error(e);
-                }
-
-
-                try {
                     member.roles.add(roletogive);
                 } catch (e) {
                     //Error
                     console.error(e);
                 }
-                if (isNaN(togive)) {
-                    console.error(`${client.utils.getDateTime()} Error while giving ${amount} to ${member.id} - Section 2`)
-                    return;
-                }
-
-                client.con.con.query(`UPDATE users SET xp = '${togive}', inactive = 0, originxp = NULL WHERE id = ${member.user.id}`, function (err) {
-                    if (err) throw err;
-
-                });
-            } else {
-                client.con.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
-                    if (err) throw err;
-
-                    console.log(`[MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
-
-                });
-            }
-
-
-        });
     }
 
-    async coinsadd(member, amount, giveboost = true) {
+    sendLevelupEmbed(data) {
+        let embed = new MessageEmbed()
+        .setTitle("**Levelup!**")
+        .setColor("#FFD700")
+        .setFooter(`Du benötigst nun ${(Math.round((data.remainingXP) * 100) / 100).toFixed(0)} Erfahrungspunkte für Level ${data.currentLevel + 1}!`)
+        .setDescription(`Du bist jetzt Level ${data.currentLevel}!`);
+        data.member.send({embed: embed}).then(m => m.delete({timeout: 3600000})).catch(() => null);
+    }
+
+    async coinsAdd(member, amount, giveboost = true) {
         let unwashed = amount;
         if (!amount) return;
         if (member.user.bot) return;
         amount = parseInt(amount);
         amount = Math.abs(amount);
-        amount = member.roles.cache.find(this.client.serverRoles.get("booster")) && giveboost ? (amount * 1.02) : amount;
+        amount = member.roles.cache.has(this.client.serverRoles.get("booster")) && giveboost ? (amount * 1.02) : amount;
         if (isNaN(amount)) {
             console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} Coins (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
             return;
         }
 
         let client = this.client
-        this.client.con.query(`SELECT * FROM users WHERE id = ${member.user.id};`, async function (err, result) {
-            if (err) throw err;
-
-                client.con.query(`INSERT INTO \`users\` (\`id\`, \`xp\`, \`originxp\`,\`bday\`, \`bmonth\`) VALUES ('${member.id}', '0', NULL, NULL, NULL);`, function (err) {
-                    if (err) throw err;
-
-                    console.log(`[MySQL] Successfully created Entry for User with ID '${member.id}' in users`);
-
-                });
 
 
+            let data = new Collection().set("balance", amount)
+            await this.client.con.updateUser(member.id, data).catch(err => this.client.console.reportError(err.stack));
 
-        });
+
     }
 
     // noinspection JSUnusedLocalSymbols,JSUnusedLocalSymbols
@@ -957,18 +831,6 @@ module.exports = class Util {
 
     }
 
-    log(message) {
-
-        let botlogs = this.client.serverChannels.get("botlogs");
-        try {
-            botlogs.send(message);
-        } catch (e) {
-            //Error
-            console.error(`Logging to Serverlogs failed:\n${e.stack}`);
-        }
-
-
-    }
 
     getLevelGrowth(level) {
 
@@ -1003,7 +865,7 @@ module.exports = class Util {
                     let role = message.guild.roles.cache.find(role => role.id === colors[(message.content) - 1]);
 
 
-                    console.log(`[${this.getDateTime()}] Trying to add "${role.name}" to "${message.member.user.tag} [${message.member.user.id}]"`);
+                    this.client.console.reportLog(`[${this.getDateTime()}] Trying to add "${role.name}" to "${message.member.user.tag} [${message.member.user.id}]"`);
 
                     colors.forEach(color => {
 
@@ -1012,12 +874,12 @@ module.exports = class Util {
                         }
 
                     })
-                    message.member.roles.add(role).catch(err => this.client.utils.log(`Error while giving ${member} the ${role.name} Role:\n${err.stack}`));
+                    message.member.roles.add(role).catch(err => this.client.console.reportError(err.stack));
 
 
                 } catch (e) {
                     //Error
-                    console.error(e);
+                    this.client.console.reportError(e);
 
                 }
 
@@ -1027,13 +889,13 @@ module.exports = class Util {
                 message.delete();
             } catch (e) {
                 //Error
-                console.error(e);
+                this.client.console.reportError(e);
             }
 
 
         } catch (e) {
             //Error
-            console.error(e);
+            this.client.console.reportError(e);
         }
 
 
@@ -1084,8 +946,7 @@ module.exports = class Util {
             try {
                 m.delete({timeout: 1000});
             } catch (e) {
-                //Error
-                console.error(e);
+                this.client.console.reportError(e);
             }
 
         });
@@ -1114,52 +975,59 @@ module.exports = class Util {
 
     async setBirthday(message, day, month, year) {
 
-        message.channel.send(`Ich versuche den ${day}.${month}.${year} als deinen Geburtstag einzutragen...`).then(m => {
-            this.client.con.query(`UPDATE \`users\` SET \`bday\` = ${day}, \`bmonth\` = ${month}, \`byear\` = ${year} WHERE \`id\` = ${message.author.id};`, function (err, result) {
-                if (err) throw err;
+        let m = await message.channel.send(`Ich versuche den ${day}.${month}.${year} als deinen Geburtstag einzutragen...`);
 
-                if (result) {
-                    // noinspection JSUnresolvedVariable
-                    console.log(`[MySQL] Successfully Updated Entry for User with ID '${message.author.id}' in users [Query: Affecting bday, bmonth, byear]`);
+        let data = new Collection().set("bday", day).set("bmonth", month).set("byear", year);
 
-                    try {
-                        m.delete({timeout: 3000});
-                        return message.channel.send(`Eintragung erfolgreich!`).then(m => m.delete({timeout: 6000}));
+        let result = await this.client.con.updateUser(message.member.id, data).catch(err => this.client.console.reportError(err.stack));
 
-                    } catch (e) {
-                        //Error
-                        console.error(e);
-                    }
+        if (result) {
+            m.edit(`Erfolgreich eingetragen!`).then(m => m.delete({timeout: 5000})).catch(() => null);
+        } else {
+            m.edit(`Es gab einen Fehler beim updaten!`).then(m => m.delete({timeout: 5000})).catch(() => null);
+        }
 
-                }
+    }
 
-            });
+    async addUserMessages(userID, amount) {
+        let data = new Collection().set("totalMessagesSent", amount);
+        return await this.client.con.updateUser(userID, data).catch(err => this.client.console.reportError(err.stack));
+    }
 
-        })
+    async addUserMinutes(userID, amount) {
+        if(this.client.vcAck.has(userID)) {
+            let { today, weekly, monthly } = this.client.vcAck.get(userID);
+            this.client.vcAck.set(userID, {
+                today: today + amount,
+                weekly: weekly + amount,
+                monthly: monthly + amount
+            })
+
+        } else {
+            this.client.vcAck.set(userID, {
+                today: amount,
+                weekly: amount,
+                monthly: amount
+            })
+        }
+        let data = new Collection().set("totalUserMinutes", amount);
+        return await this.client.con.updateUser(userID, data).catch(err => this.client.console.reportError(err.stack));
 
 
     }
 
-    addUserMessages(userID, amount) {
-        this.client.con.con.query(`UPDATE \`users\` SET \`totalMessagesSent\` = \`totalMessagesSent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
-            if (err) throw err;
-        });
-    }
+    async setBiography(message, biography) {
+        let m = await message.channel.send(`Ich versuche deine Biographie einzutragen...`);
 
-    addUserMinutes(userID, amount) {
-        if (!amount) return;
-        amount = parseInt(amount);
-        amount = Math.abs(amount);
-        if (isNaN(amount)) return;
-        this.client.con.con.query(`UPDATE \`users\` SET \`totalVoiceMinsSpent\` = \`totalVoiceMinsSpent\` + ${amount} WHERE \`id\` = ${userID};`, function (err, result) {
-            if (err) throw err;
-        });
-    }
+        let data = new Collection().set("userBio", biography);
 
-    async setBiography(userID, biography) {
-        this.client.con.con.query(`UPDATE \`users\` SET \`userBio\` = \"${biography}\" WHERE \`id\` = ${userID};`, function (err, result) {
-            if (err) throw err;
-        });
+
+        let result = await this.client.con.updateUser(message.author.id, data).catch(err => this.client.console.reportError(err.stack));
+        if (result) {
+            m.edit(`Deine Biographie wurde erfolgreich angepasst zu:\n\`${biography}\``).then(m => m.delete({timeout: 5000})).catch(err => this.client.console.reportError(err.stack));
+        } else {
+            m.edit(`Es gab einen Fehler beim eintragen deiner Biographie!`).then(m => m.delete({timeout: 5000})).catch(err => this.client.console.reportError(err.stack));
+        }
     }
 
 
@@ -1227,4 +1095,7 @@ module.exports = class Util {
         let nextBirthday = Date.parse(new Date(dateString));
         return nextBirthday/1000;
     }
+
+
+
 }

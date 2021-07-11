@@ -62,12 +62,12 @@ module.exports = class extends Command {
 
             message.channel.send({embed: embed}).then(m => {
 
-               m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+               m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
 
 
             })
 
-            message.delete().catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+            message.delete().catch(err => client.console.reportError(err.stack))
 
 
 

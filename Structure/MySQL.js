@@ -44,10 +44,12 @@ module.exports = class MySQL {
         return new Promise((resolve, reject) => {
 
             this.con.query(`SELECT * FROM users WHERE id = ${id}`, function (err, result) {
-                if (err) resolve(null);
+                if (err) reject(err);
 
-                if (result[0]) {
+                if (result !== undefined) {
                     resolve(result[0]);
+                } else {
+                    resolve(null);
                 }
 
             })
@@ -161,7 +163,7 @@ module.exports = class MySQL {
 
         return new Promise((resolve) => {
             let awards = [];
-            client.con.query(`SELECT * FROM userawards WHERE userID = \"${userid}\";`, async function (err, results) {
+            this.con.query(`SELECT * FROM userawards WHERE userID = \"${userid}\";`, async function (err, results) {
 
                 if (results) {
                     await results.forEach(r => {
@@ -178,5 +180,199 @@ module.exports = class MySQL {
         });
     }
 
+    async buildQuery(data){
+        let sqlQuery = ``;
+        let { table, params, sqlType, conditions } = data;
+
+        let keys = [];
+        let values = [];
+        let updateData = [];
+
+
+
+        switch(sqlType.toLowerCase()) {
+
+            case "insert": {
+                params.forEach((v, k) => {
+                    keys.push(k);
+                    values.push(v);
+                })
+                sqlQuery = `INSERT INTO \`${table}\` (\`${keys.join("\`, \`")}\`) VALUES ('${values.join("', '")}')`;
+            }
+            break;
+            case "update": {
+                params.forEach((v, k) => {
+                    if(v.operator) {
+                        updateData.push(`\`${k}\` = \`${k}\` ${v.operator} ${v.value}`);
+                    } else {
+                        updateData.push(`\`${k}\` = ${v == "NULL" ? "NULL": `'${v}'`}`);
+                    }
+
+
+                    keys.push(k);
+                })
+                let condition = [];
+                if(conditions) {
+                    conditions.forEach((v, k) => {
+                        condition.push(`\`${k}\` ${v.operator} '${v.value}'`);
+                    })
+                } else {
+                    condition.push("1");
+                }
+                sqlQuery = `UPDATE \`${table}\` SET ${updateData.join(", ")} WHERE ${condition};`;
+            }
+            break;
+            case "select": {
+                let condition = [];
+                if(conditions) {
+                    conditions.forEach((v, k) => {
+                        condition.push(`\`${k}\` ${v.operator} '${v.value}'`);
+                    })
+                } else {
+                    condition.push("1");
+                }
+                sqlQuery = `SELECT ${params.join(", ")} FROM \`${table}\` WHERE ${condition};`;
+            }
+            break;
+            case "delete": {
+                let condition = [];
+                if(conditions) {
+                    conditions.forEach((v, k) => {
+                        condition.push(`\`${k}\` ${v.operator} '${v.value}'`);
+                    })
+                } else {
+                    condition.push("1");
+                }
+                sqlQuery = `DELETE FROM \`${table}\` WHERE ${condition};`;
+            }
+            break;
+
+
+        }
+
+        return sqlQuery;
+
+    }
+
+    async updateUser(userid, data) {
+        let client = this.client;
+        let UserData = await this.getUserData(userid);
+
+        let sqlQuery;
+        let keys = [];
+
+        let builderData = {
+            table: "users",
+            sqlType: "unknown",
+            conditions: new Discord.Collection(),
+            params: new Discord.Collection()
+        }
+        if(UserData) {
+            builderData.sqlType = "UPDATE";
+
+            data.forEach((v, k) => {
+                keys.push(k);
+                builderData.params.set(k, v);
+            })
+
+            builderData.conditions.set("id", {operator: "=", value: userid})
+
+        } else if(!UserData) {
+
+            builderData.sqlType = "INSERT";
+            builderData.params.set("id", userid);
+            keys.push("id");
+            data.forEach((v, k) => {
+                builderData.params.set(k, v.value ? v.value : v);
+                keys.push(k);
+            })
+
+        }
+
+        sqlQuery = await this.buildQuery(builderData);
+
+        return new Promise((resolve, reject) => {
+            this.con.query(sqlQuery, async function (err, result) {
+
+                if(err) {
+                    client.console.reportLog(`[MySQL] Error while ${UserData ? "Updating" : "Creating"} Entry for UserID '${userid}' in users [Query: Affecting ${keys.join(", ")}]`, true, true)
+                    reject(err);
+                }
+
+                if(!UserData) {
+                    client.console.reportLog(`[MySQL] Successfully ${UserData ? "Updated" : "Created"} Entry for UserID '${userid}' in users [Query: Affecting ${keys.join(", ")}]`, false, false);
+                }
+                let resultNew = await client.con.getUserData(userid);
+                resolve({old:UserData, new: resultNew});
+
+            });
+        });
+
+    }
+
+    async executeQuery(sqlQuery) {
+        let client = this.client;
+        return new Promise((resolve, reject) => {
+            this.con.query(sqlQuery, async function (err, data) {
+
+                if(err) {
+                    return reject(err);
+                }
+                resolve(data);
+
+            });
+        });
+
+    }
+
+    async clearDB() {
+
+        let builderData = {
+            sqlType: "SELECT",
+            table: "users",
+            params: ["*"]
+        }
+
+        let sqlQuery = await this.buildQuery(builderData);
+
+        let results = await this.executeQuery(sqlQuery);
+
+        for await (const rowData of results) {
+
+            let member = this.client.guild.members.resolve(rowData.id);
+
+            if(!member) {
+                this.client.console.reportLog(`${rowData.id} has left the Server! Deleting Row...`);
+
+                let builderData = {
+                    sqlType: "DELETE",
+                    table: "users",
+                    conditions: new Discord.Collection()
+                }
+
+                builderData.conditions.set("id", {operator: "=", value: rowData.id});
+
+                let sqlQuery = await this.buildQuery(builderData);
+
+                await this.executeQuery(sqlQuery);
+            }
+
+        }
+
+    }
+
+    async resetInactivity() {
+        let builderData = {
+            sqlType: "UPDATE",
+            table: "users",
+            params: new Discord.Collection()
+        }
+
+        builderData.params.set("inactive", 0);
+
+        let sqlQuery = await this.buildQuery(builderData);
+
+        return (await this.executeQuery(sqlQuery));
+    }
 
 }

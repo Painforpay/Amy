@@ -1,5 +1,5 @@
 const Event = require('../Structure/Event');
-
+const { Collection } = require('discord.js');
 
 module.exports = class extends Event {
 
@@ -57,27 +57,34 @@ module.exports = class extends Event {
         let member = reaction.message.guild.members.cache.get(user.id);
         await member.fetch();
 
-        this.client.con.query(`SELECT * FROM rroles WHERE messageid = '${reaction.message.id}'`, function (err, result) {
-            if (err) throw err;
+        let builderData = {
+            sqlType: "SELECT",
+            table: "rroles",
+            conditions: new Collection(),
+            params: ["roleid", "emoji"]
+        }
 
+        builderData.conditions.set("messageid", {operator: "=", value:reaction.message.id})
 
-            if (member) {
-                result.forEach(async r => {
+        let sqlQuery = await this.client.con.buildQuery(builderData);
 
-                    if (r.emoji === reaction.emoji.name) {
-                        try {
-                            await member.roles.remove(r.roleid);
-                        } catch (e) {
-                            client.utils.log(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
-                        }
+        let result = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err.stack));
 
+        if(result.length > 0) {
+            result.forEach(async r => {
+
+                if (r.emoji === reaction.emoji.name) {
+                    try {
+                        await member.roles.remove(r.roleid);
+                    } catch (e) {
+                        client.utils.log(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
                     }
 
-                })
-            }
+                }
 
+            })
+        }
 
-        });
 
 
     }

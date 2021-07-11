@@ -99,14 +99,14 @@ module.exports = class extends Command {
 
             message.channel.send({embed: embed}).then(m => {
 
-                    m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                    m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
 
 
             })
 
         } else {
             message.channel.send(`Keine Nutzerdaten für ${member.nickname || member.user.username} gefunden!`).then(m => {
-                m.delete({timeout: 15000}).catch(err => client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+                m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
             })
         }
 

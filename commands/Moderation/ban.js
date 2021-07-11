@@ -23,7 +23,7 @@ module.exports = class extends Command {
         let BanmemberID = message.mentions.members.first() || args[0];
 
         let user = await this.client.users.fetch(BanmemberID.id ? BanmemberID.id : BanmemberID).catch(err => {
-            this.client.utils.log(`Fehler beim Fetchen des Nutzers.\n\`\`\`${err}\`\`\``)
+            this.client.console.reportError(err.stack)
             message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
 
         });

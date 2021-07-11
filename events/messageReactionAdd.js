@@ -1,5 +1,5 @@
 const Event = require('../Structure/Event');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Collection } = require('discord.js');
 module.exports = class extends Event {
 
     constructor(...args) {
@@ -47,7 +47,7 @@ module.exports = class extends Event {
             }
         }
 
-        if (reaction.message.channel.parentID === this.client.serverChannels.get("serverentwicklung").channelID) {
+        if (reaction.message.channel.parentID === this.client.serverChannels.get("serverentwicklung").id) {
             if (reaction.emoji.name === "❌" && member.roles.cache.get(this.client.serverRoles.get("senior"))) {
                 await this.client.utils.archiveDiscussion(reaction, user);
             }
@@ -102,29 +102,36 @@ module.exports = class extends Event {
 
         }
 
+        let builderData = {
+            sqlType: "SELECT",
+            table: "rroles",
+            conditions: new Collection(),
+            params: ["roleid", "categoryid", "emoji"]
+        }
 
-        this.client.con.query(`SELECT * FROM rroles WHERE messageid = '${reaction.message.id}'`, function (err, result) {
-            if (err) return console.error(err);
+        builderData.conditions.set("messageid", {operator: "=", value:reaction.message.id})
 
+        let sqlQuery = await this.client.con.buildQuery(builderData);
 
+        let result = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err.stack));
+
+        if(result.length > 0) {
             result.forEach(async r => {
 
                 if (r.emoji === reaction.emoji.name) {
-
                     try {
-
                         await member.roles.add(r.roleid);
                         if (!member.roles.cache.has(r.categoryid)) {
                             await member.roles.add(r.categoryid);
                         }
                     } catch (e) {
-                        client.utils.log(`\nError while adding Reactionrole\nRoleID: ${r.roleid}\nCategoryID: ${r.categoryid}\n${e.stack}`)
+                        client.utils.log(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
                     }
+
                 }
 
-            });
-
-        });
+            })
+        }
 
 
     }

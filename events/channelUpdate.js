@@ -1,5 +1,5 @@
 ﻿const Event = require('../Structure/Event');
-
+const { Collection } = require('discord.js');
 
 // noinspection EqualityComparisonWithCoercionJS
 module.exports = class extends Event {
@@ -21,12 +21,18 @@ module.exports = class extends Event {
 
                 if (fResult["is-bad"]) {
                     let user = this.client.users.resolve(this.client.PVoices.get(newChannel.id).userid);
-                    user.send(`Dieser Channelname enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                    user.send(`Dieser Channelname enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack)));
                     await newChannel.setName(oldChannel.name);
                     return;
 
                 }
-                this.client.con.query(`UPDATE \`users\` SET \`pChannelName\` = '${newChannel.name}' WHERE \`users\`.\`id\` = '${this.client.PVoices.get(newChannel.id).userid}';`)
+
+                let data = new Collection().set("pChannelName", newChannel.name);
+
+
+                await this.client.con.updateUser(this.client.PVoices.get(newChannel.id).userid, data).catch(err => this.client.console.reportError(err.stack));
+
+
             }
         }
 

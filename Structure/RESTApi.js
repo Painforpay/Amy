@@ -4,6 +4,8 @@ const colors = require('colors/safe');
 const app = express();
 const port = 3000;
 
+const path = require('path');
+
 module.exports = class RESTApi {
 
     constructor(client) {
@@ -13,19 +15,20 @@ module.exports = class RESTApi {
     }
 
     createServer() {
-        let ClientBot = this.client;
-        app.use(bodyParser.urlencoded({extended: false}));
+        let client = this.client;
+        const RESTApi = this;
+        app.use(bodyParser.urlencoded({extended: true}));
         app.use(bodyParser.json());
 
 
         app.post('/xp', async (req, res) => {
-            const body = req.body;
+            const { auth, id, xp } = req.body;
 
-            if(!ClientBot.enableAPIXP) return;
+            if(!client.enableAPIXP) return;
 
             let ref;
-            switch (body.auth) {
-                case "TVKpT8SZZu": {
+            switch (auth) {
+                case "aUnGH5aUi": {
                     ref = "Charlie [BOT]";
                 }
                 break;
@@ -33,7 +36,7 @@ module.exports = class RESTApi {
                     res.status(401)
 
 
-                    console.error(colors.yellow(`Denied Request\n${JSON.stringify(body)}`))
+                    this.client.console.reportError(colors.yellow(`Denied Request:\n${JSON.stringify(req.body)}`))
                     return res.json({
                         "status": 401,
                         "response": "Authorization Failed"
@@ -41,17 +44,17 @@ module.exports = class RESTApi {
                 }
             }
 
-            await this.addUserXP(body.id, body.xp, ref)
+            await this.addUserXP(id, xp, ref)
 
             res.status(200);
 
-            let amount = Math.abs(body.xp);
-            amount = (await ClientBot.utils.getGuildMember(body.id)).roles.cache.has(ClientBot.serverRoles.get("booster").id) ? amount * 1.02 : amount;
+            let amount = Math.abs(xp);
+            amount = (await this.client.guild.member(await this.client.users.fetch(id))).roles.cache.has(client.serverRoles.get("booster").id) ? amount * 1.02 : amount;
 
 
             return res.json({
                 "status": 200,
-                "id": body.id,
+                "id": id,
                 "xp": amount
             })
 
@@ -60,25 +63,25 @@ module.exports = class RESTApi {
 
 
 
-        let ThisClass = this;
+        
 
         app.post('/dblwebhook', async function (req, res) {
 
-            if(req.headers.authorization !== ClientBot.topggtoken) return;
-            let vote = req.body;
+            if(req.headers.authorization !== client.topggtoken) return;
+            const {type, user} = req.body;
 
-            if(ClientBot.dev) {
-                console.log(vote)
+            if(client.dev) {
+                console.log(req.body);
             } else {
-                if(vote.type !== "upvote") return;
+                if(type !== "upvote") return;
             }
 
-            ClientBot.channels.fetch(ClientBot.serverChannels.get("bumpchannel")).then(c => {
+            client.channels.fetch(client.serverChannels.get("bumpchannel")).then(c => {
 
-                c.send(`<@${vote.user}> hat erfolgreich für unseren Server gevoted und ${ClientBot.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
+                c.send(`<@${user}> hat erfolgreich für unseren Server gevoted und ${client.voteReward} xp erhalten!\nVote auch du jetzt: https://top.gg/servers/793944435809189919/vote`)
 
             })
-            await ThisClass.addUserXP(vote.user, ClientBot.voteReward, "Voting")
+            await RESTApi.addUserXP(user, client.voteReward, "Voting")
 
             res.sendStatus(200);
             res.end();
@@ -92,13 +95,13 @@ module.exports = class RESTApi {
 
 
     async addUserXP(id, xp, ref) {
-        await this.client.utils.xpadd((await this.client.utils.getGuildMember(id)), xp)
+        const guildMember = (await this.client.guild.member(await this.client.users.fetch(id)))
+        await this.client.utils.xpAdd(guildMember, xp)
 
         let amount = Math.abs(xp);
-        amount = (await this.client.utils.getGuildMember(id)).roles.cache.has(this.client.serverRoles.get("booster").id) ? amount * 1.02 : amount;
+        amount = guildMember.roles.cache.has(this.client.serverRoles.get("booster").id) ? amount * 1.02 : amount;
 
-        this.client.utils.log(`${ref ? "**" + ref + ":**" : "**Quelle Unbekannt!**"} \`${(await this.client.utils.getGuildMember(id)).user.tag}\` wurden \`${amount}\` Erfahrungspunkte über die API hinzugefügt!`)
-        console.log(colors.green(`${ref ? ref + ":" : "Quelle Unbekannt!"} ${(await this.client.utils.getGuildMember(id)).user.tag} wurden ${amount} Erfahrungspunkte über die API hinzugefügt!`))
+        this.client.console.reportLog(`${ref ? ref : "**Quelle Unbekannt!**"} \`${guildMember.user.tag}\` wurden \`${amount}\` Erfahrungspunkte über die API hinzugefügt!`, true, true)
     }
 
 }

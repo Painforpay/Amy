@@ -21,7 +21,7 @@ module.exports = class extends SubCommand {
 
             return message.channel.send((args[0] ? `Du hast einen Formatierungsfehler gemacht!` : `Ohne deinen Geburtstag zu kennen, kann ich leider nichts einspeichern ^^`) + `\nBitte gib deinen Geburtstag im Folgendem Format an: \`!bday set 30.01.2003\``).then(m => {
 
-                    m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
             });
         }
@@ -35,7 +35,7 @@ module.exports = class extends SubCommand {
         if (day > 31 || month > 12) {
             return message.channel.send(`Uhm... Ein ${day > 31 ? "Monat" : (month > 12 ? "Jahr" : "")} hat nur maximal ${day > 31 ? "31 Tage" : (month > 12 ? "12 Monate" : "")}. Bitte versuche es erneut.`).then(m => {
 
-                    m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
             });
 
@@ -47,7 +47,7 @@ module.exports = class extends SubCommand {
             day = 1;
             await message.channel.send("Für diesen ungewöhnlichen Tag muss ich das Datum auf den **ersten März** setzen. Ich hoffe das ist Okay!").then(m => {
 
-                    m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
             });
         }
@@ -61,7 +61,7 @@ module.exports = class extends SubCommand {
                 if (month > 30) {
                     return message.channel.send("Uhm... Der " + months[month - 1] + " hat nur maximal 30 Tage. Bitte versuch es erneut.").then(m => {
 
-                            m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                            m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
                     });
                 }
@@ -69,7 +69,7 @@ module.exports = class extends SubCommand {
         }
         if(!year || year.length > 4 || year < 1945) return message.channel.send("Ich benötige ein Jahr, welches ich nutzen kann!").then(m => {
 
-            m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+            m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
         });
         await this.client.utils.setBirthday(message, day, month, year);

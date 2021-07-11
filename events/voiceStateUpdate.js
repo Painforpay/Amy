@@ -42,7 +42,7 @@ module.exports = class extends Event {
 
             this.client.VoiceUsers.set(newState.member.id, {
                 user: newState.member.id,
-                time: Date.parse(new Date())
+                time: Date.parse(new Date().toString())
             });
 
             // await this.client.utils.createLounge();
@@ -54,7 +54,7 @@ module.exports = class extends Event {
                 if (!this.client.VoiceUsers.has(member.map(x => x)[0].id)) {
                     this.client.VoiceUsers.set(member.map(x => x)[0].id, {
                         user: member.map(x => x)[0].id,
-                        time: Date.parse(new Date())
+                        time: Date.parse(new Date().toString())
                     });
                 }
 

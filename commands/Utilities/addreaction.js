@@ -22,7 +22,7 @@ module.exports = class extends Command {
 
         let reactionTargetMessage = await message.channel.messages.fetch(args[0], true, true);
         let emoji = args[1];
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``))
+        message.delete().catch(err => this.client.console.reportError(err.stack))
         await reactionTargetMessage.react(emoji).catch(err => this.client.utils.log(`Es konnte nicht auf Nachricht reagiert werden!\n\`\`\`${err.stack}\`\`\``))
 
 

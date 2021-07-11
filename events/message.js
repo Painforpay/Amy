@@ -46,7 +46,7 @@ module.exports = class extends Event {
                 let gif = this.client.utils.getRandom(compliments)
                 return message.channel.send(gif).then(m => {
 
-                        m.delete({timeout: 3600000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        m.delete({timeout: 3600000}).catch(err => this.client.console.reportError(err.stack));
 
 
                 });
@@ -65,7 +65,7 @@ module.exports = class extends Event {
 
                 await message.member.roles.remove(afkRole);
             }
-            message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
+            message.channel.send(`${message.member}, du bist nun nicht mehr als Afk Markiert!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack)))
         }
 
         if (message.mentions.members.size > 0) {
@@ -104,7 +104,7 @@ module.exports = class extends Event {
 
         if (message.content.match(/discord(.gg|app.com\/invite)\/[a-zA-Z0-9]+/g) && !message.member.hasPermission("MANAGE_MESSAGES")) {
 
-                message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                message.delete().catch(err => this.client.console.reportError(err.stack));
                 message.channel.send(`${message.member}, du darfst keine Invites posten!`);
 
                 if((Date.parse(new Date()) - message.member.joinedTimestamp) < 604800000) {
@@ -141,7 +141,7 @@ module.exports = class extends Event {
         }
 
         //Spamprotection
-        if(this.client.antispam.has(message.author.id) && message.channel.parentID !== this.client.serverChannels.get("minigamesbotCategory")) {
+        if(this.client.antispam.has(message.author.id) && message.channel.parentID !== this.client.serverChannels.get("minigamesbotCategory").id) {
 
             let messageCount = this.client.antispam.get(message.author.id).messageCount;
 
@@ -156,7 +156,7 @@ module.exports = class extends Event {
                     await message.channel.send(`${message.author}\nHör auf zu Spammen! Du kannst für ${this.client.spamMuteTime} Minuten keine Nachrichten mehr senden!`)
 
                 message.delete();
-                this.client.antispam.set(message.author.id, { GuildMember: message.member, messageCount: this.client.spamMuteTime*60});
+                newMessageCount = this.client.spamMuteTime*60;
             }
 
             this.client.antispam.set(message.author.id, { GuildMember: message.member, messageCount: newMessageCount});
@@ -174,9 +174,9 @@ module.exports = class extends Event {
 
                      let timespentmills = Date.parse(new Date()) - this.client.picCooldown.get(message.author.id);
 
-                    message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(-timespentmills/1000)} Sekunden!`).then(m => m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                    message.channel.send(`Du darfst noch kein neues Bild reinschicken! Bitte warte noch ${Math.floor(-timespentmills/1000)} Sekunden!`).then(m => m.delete({timeout: 5000}).catch(err => this.client.console.reportError(err.stack)));
 
-                    message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    message.delete().catch(err => this.client.console.reportError(err.stack));
 
                 } else {
                     let timeout = this.client.picCooldownSecs * (message.attachments.size == 0 ? 1 : message.attachments.size) * 1000
@@ -197,7 +197,7 @@ module.exports = class extends Event {
 
         if (!message.content.startsWith(prefix || "+")) {
 
-            if (message.channel.parentID === this.client.serverChannels.get("supportarchiveCATEGORY").channelID) {
+            if (message.channel.parentID === this.client.serverChannels.get("supportarchiveCATEGORY").id) {
 
                 await message.channel.setParent(this.client.serverChannels.get("supportCATEGORY"));
                 let mod = this.client.serverRoles.get("moderator");
@@ -211,7 +211,7 @@ module.exports = class extends Event {
             }
 
 
-            await this.client.utils.xpadd(message.member, this.client.xpMessages);
+            await this.client.utils.xpAdd(message.member, this.client.xpMessages);
 
             if(this.client.msgAck.has(message.member.id)) {
 
@@ -236,7 +236,9 @@ module.exports = class extends Event {
 
             switch (message.channel.name) {
                 case "ideen": {
-                    return message.client.utils.reactvoting(message);
+                    await message.react("🔺");
+                    await message.react("🔻");
+                    return;
                 }
 
                 case "voice-kontext": {
@@ -248,16 +250,6 @@ module.exports = class extends Event {
 
             }
 
-            if (message.content.toLowerCase().match(/.*(script\n*.*kiddie).*/g) && message.channel.name !== "ideen") {
-                await message.react("✅");
-                message.channel.send("Echt So, Pain!").then(m => {
-
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                        return m.delete({timeout: 120000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-
-                });
-            }
-
         } else {
 
             if (message.guild && !this.client.cmdAllowedChannels.find(c => c === message.channel.id) && !this.client.dev && !message.member.permissions.has("ADMINISTRATOR")) {
@@ -266,8 +258,8 @@ module.exports = class extends Event {
 
                 await message.channel.send("Befehle sind hier deaktviert!").then(m => {
 
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                        return m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        message.delete().catch(err => this.client.console.reportError(err.stack));
+                        return m.delete({timeout: 5000}).catch(err => this.client.console.reportError(err.stack));
 
                 });
             } else {
@@ -280,7 +272,7 @@ module.exports = class extends Event {
 
                         //User is not allowed to use this command, we don't want to do anything as it is not needed
 
-                        return message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        return message.delete().catch(err => this.client.console.reportError(err.stack));
                     }
 
 
@@ -288,22 +280,22 @@ module.exports = class extends Event {
                     if (command.guildOnly && !message.guild) {
 
                         //We cannot delete Messages in DMs other than ours so we skip deleting the message
-                        return message.channel.send('Entschuldige, aber dieser Befehl kann nicht im Privatchat ausgeführt werden.').then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                        return message.channel.send('Entschuldige, aber dieser Befehl kann nicht im Privatchat ausgeführt werden.').then(m => m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack)));
                     }
 
 
                     //Check if the Command is a NSFW Type Command and skip if the Channels is not suited for it.
                     if (command.nsfw && !message.channel.nsfw) {
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                        return message.channel.send((await this.client.utils.NSFWEmbed(message, command))).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
+                        message.delete().catch(err => this.client.console.reportError(err.stack));
+                        return message.channel.send((await this.client.utils.NSFWEmbed(message, command))).then(m => m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack)))
 
                     }
 
                     // Check if the Command has a specified minimal Number of Args and then check if the message contains the right amount
                     if (command.minArgs && args.length < command.minArgs) {
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        message.delete().catch(err => this.client.console.reportError(err.stack));
                         return message.channel.send(`Entschuldige, aber es werden mehr Argumente benötigt - Angegeben: ${args.length}, Benötigt: ${command.minArgs}\nNutzung: \`${this.client.prefix}${command.name} ${command.argsDef.join(" ")}\``).then(m => {
-                            m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                            m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack));
                         });
 
                     }
@@ -320,16 +312,16 @@ module.exports = class extends Event {
                             //Check if the Member has missing Permissions
                             const missing = message.channel.permissionsFor(message.member).missing(userPermCheck);
                             if (missing.length) {
-                                message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                                return message.channel.send(`Entschuldige, aber dir fehlt die folgende Berechtigung für diesen Befehl: \`${this.client.utils.formatArray(missing.map(this.client.utils.formatPerms))}\`.`).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                                message.delete().catch(err => this.client.console.reportError(err.stack));
+                                return message.channel.send(`Entschuldige, aber dir fehlt die folgende Berechtigung für diesen Befehl: \`${this.client.utils.formatArray(missing.map(this.client.utils.formatPerms))}\`.`).then(m => m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack)));
 
                             }
                         }
 
                         //Lastly - Check if Command was Disabled
                         if (this.client.disabledCommands.find(element => element === command.name) && command.name !== "eval") {
-                            message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
-                            return message.channel.send(`Entschuldige, aber dieser Befehl ist gegenwärtig deaktiviert!`).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                            message.delete().catch(err => this.client.console.reportError(err.stack));
+                            return message.channel.send(`Entschuldige, aber dieser Befehl ist gegenwärtig deaktiviert!`).then(m => m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack)));
 
                         }
 
@@ -337,12 +329,12 @@ module.exports = class extends Event {
                     }
 
                     if (command.cooldown > 0 && command.cooldownPeople.has(message.author.id) && !message.member.hasPermission("ADMINISTRATOR")) {
-                        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                        message.delete().catch(err => this.client.console.reportError(err.stack));
 
                         let timespentmills = Date.parse(new Date().toString()) - command.cooldownPeople.get(message.author.id);
 
                         let duration = await this.client.utils.duration(-timespentmills)
-                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf dem \`${command.name}\` Befehl! Bitte warte noch \`${duration}\`!`).then(m => m.delete({timeout: 5000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                        return message.channel.send(`Entschuldige, aber du hast noch einen Cooldown auf dem \`${command.name}\` Befehl! Bitte warte noch \`${duration}\`!`).then(m => m.delete({timeout: 5000}).catch(err => this.client.console.reportError(err.stack)));
 
 
                     }

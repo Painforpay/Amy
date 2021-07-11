@@ -1,5 +1,5 @@
 const Event = require('../Structure/Event');
-const {MessageEmbed} = require("discord.js");
+const {MessageEmbed, Collection} = require("discord.js");
 const schedule = require("node-schedule");
 const colors = require('colors/safe');
 require("node-fetch");
@@ -36,7 +36,7 @@ module.exports = class extends Event {
 
             if(!client.isBeta) {
                 if(charlie.presence.status === "online") {
-                    this.client.user.setActivity(`auf ${memberCount} Nutzer`, {type: "LISTENING"});
+                    this.client.user.setActivity(`${memberCount} Nutzern`, {type: "LISTENING"});
                 } else {
                     this.client.user.setActivity(`wo Charlie hin ist :(`, {type: "WATCHING"});
                 }
@@ -70,7 +70,8 @@ module.exports = class extends Event {
         const VoiceChannels = guild.channels.cache.filter(c => c.type === 'voice');
 
         for (const [channelID, channel] of VoiceChannels) {
-            if (channel.parentID === (this.client.serverChannels.get("userchannelCATEGORY").channelID)) {
+            let category = this.client.serverChannels.get("userchannelCATEGORY").id;
+            if (channel.parentID === category) {
                 if (channel !== this.client.serverChannels.get("createuserchanchannel")) {
                     let channelauthor = channel.permissionOverwrites.map(permission => permission.id)[0]
                     this.client.PVoices.set(channelauthor, {
@@ -90,7 +91,7 @@ module.exports = class extends Event {
             } else {
                 for (const [memberID, member] of channel.members) {
 
-                    this.client.VoiceUsers.set(member.id, {user: member.id, time: Date.parse(new Date())});
+                    this.client.VoiceUsers.set(member.id, {user: member.id, time: Date.parse(new Date().toString())});
                 }
             }
 
@@ -216,45 +217,70 @@ module.exports = class extends Event {
         }, 60000)
 
 
-        schedule.scheduleJob('0 0 * * *', () => {
+        schedule.scheduleJob('0 0 * * *', async () => {
             //Increment daily for all
-            //UPDATE `users` SET `inactive` = `inactive` + 1 WHERE 1
-            console.log(colors.yellow(`\nStart of XPloss at [${this.client.utils.getDateTime()}]`));
-            this.client.con.query(`UPDATE \`users\` SET \`inactive\` = \`inactive\` + 1 WHERE 1`, function (err) {
-                if (err) throw err;
-            })
 
-            this.client.con.query(`SELECT * FROM users WHERE inactive >= 30`, function (err, result) {
-                if (err) throw err;
-                if (result[0]) {
-                    result.forEach(async r => {
+            console.log(colors.yellow(`\nStart of XPloss [${this.client.utils.getDateTime()}]`));
+
+            let builderData1 = {
+                table: "users",
+                params: new Collection(),
+                sqlType: "UPDATE"
+            }
+
+            builderData1.params.set("inactive", {operator: "+", value: 1});
+
+            let sqlIncrementQuery = await this.client.con.buildQuery(builderData1);
+
+            await this.client.con.executeQuery(sqlIncrementQuery);
+
+
+            let builderData2 = {
+                table: "users",
+                sqlType: "SELECT",
+                params: ["*"],
+                conditions: new Collection()
+            }
+
+            builderData2.conditions.set("inactive", {operator: ">=", value: 30});
+            let sqlQuery = await this.client.con.buildQuery(builderData2);
+
+            let results = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err.stack));
+
+            if (results[0]) {
+                    results.forEach(async r => {
+                        let member = this.client.guild.members.resolve(r.id);
+
+                        if (!member || member.user.bot) return;
                         let xp = r.xp;
 
 
                         if (xp === 0) return;
                         let days = r.inactive - 30;
+                        if(days < 0) days = 0;
 
-                        let xploss = 0.5 * (days / 100);
+
                         let originxp = r.originxp == null ? xp : r.originxp; //ist standartmäßig 0
-                        let xptoloose = originxp * xploss;
-                        let newXP = originxp - xptoloose
-                        let currentlevel = await client.utils.getLevelforXp(xp);
-                        let leveluserhastoget = await client.utils.getLevelforXp(newXP);
+                        let toget = originxp - (originxp * (0.5 * (days / 100)))
+                        let newXP = toget <= 0 ? 0 : toget
+                        let currentlevel = await this.client.utils.getLevelforXp(xp);
+                        let leveluserhastoget = await this.client.utils.getLevelforXp(newXP);
 
 
                         //Update xp for User
-                        client.con.query(`UPDATE users SET ${days === 0 ? `\`originxp\` = ${xp}` : `\`xp\` = ${newXP}`} WHERE id = ${r.id};`, function (err) {
-                            if (err) throw err;
-                            console.log(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${newXP}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
-                        });
+                        let builderData3 = new Collection()
 
+                        if(days === 0) {
+                            builderData3.set("originxp", xp);
+                        } else {
+                            builderData3.set("xp", newXP);
+                        }
 
+                        let result = await this.client.con.updateUser(member.id, builderData3);
+                        this.client.console.reportLog(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${newXP}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
 
+                        
 
-                        //Tryblock #1
-                        try {
-                            let member = await client.guild.member(r.id);
-                            if (member.user.bot) return;
                             let inactive = 0;
                             if (days >= 14) {
                                 inactive = 1;
@@ -284,27 +310,11 @@ module.exports = class extends Event {
                                 //member.roles.remove(client.dev ? '800110137632882778' : '794158777435029535');
                             }
                             await member.roles.add(roletogive);
-                        } catch (e) {
-                            console.log(colors.red(`\n-- Start of Error --`));
-                            console.log(colors.red(`User: ${r.id}\n\nThrown while in Tryblock #1`));
-                            console.error(colors.red(e));
-                            console.log(colors.red(`--- End of Error ---\n`));
-
-                            if (e.httpStatus === "404") {
-                                client.con.query(`DELETE FROM users WHERE id = ${r.id};`, function (err) {
-                                    if (err) throw err;
-                                    console.log(`[MySQL] Successfully Deleted Entry for User with ID '${r.id}' in users`);
-                                });
-
-                            }
-                        }
+                        
 
 
                     })
                 }
-
-            })
-
 
         });
 
@@ -376,9 +386,9 @@ module.exports = class extends Event {
                             .setFooter(`Das Servergeschenk von ${client.birthdayReward}xp wurde dir gutgeschrieben!`)
                             .setTimestamp();
                         general.send(embed).catch(e => console.log());
-                        general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+                        general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.console.reportError(err.stack)));
 
-                        await client.utils.xpadd(member, client.birthdayReward);
+                        await client.utils.xpAdd(member, client.birthdayReward);
 
                     });
 
@@ -421,7 +431,7 @@ module.exports = class extends Event {
         });
 
         //Monthly
-        schedule.scheduleJob('0 0 1 * *', () => {
+        schedule.scheduleJob('0 0 1 * *', async () => {
 
             this.client.vcAck.forEach((v, k) => {
                 v.monthly = 0
@@ -431,75 +441,18 @@ module.exports = class extends Event {
                 v.monthly = 0
             })
 
+            await this.client.con.clearDB();
+
         });
 
 
-
-
-        /*schedule.scheduleJob('1 18 * * *', async () => {
-            let freegameschan = await client.channels.fetch(this.client.dev ? "800110899565690900" : "797531759159803944");
-
-            let messages;
-            messages = await freegameschan.messages.fetch({limit: 3});
-            await fetch("https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=de&country=DE&allowCountries=DE", {
-                "credentials": "omit",
-                "referrer": "https://www.epicgames.com/store/de/free-games",
-                "method": "GET"
-            }).then(res => res.json().then(result => result.data.Catalog.searchStore.elements.forEach(game => {
-                if (game.promotions && game.promotions.promotionalOffers && game.promotions.promotionalOffers.length > 0) {
-
-                    messages = messages.filter(message => message.author.id === this.client.User.id)
-
-                    if (!messages.first() || !messages.first().embeds[0] || messages.first().embeds[0].title !== game.title) {
-                        //game was not announced yet
-                        console.log(`(${new Date().toLocaleString('de-DE', {timeZone: 'UTC'})})\n[Free Games] Found new game! Trying to add...`)
-                        let embed = new MessageEmbed()
-                            .setTitle(game.title)
-                            .setURL(`https://www.epicgames.com/store/de/product/${game.productSlug}`)
-                            .setThumbnail(game.keyImages[1] ? game.keyImages[1].url : null)
-                            .setFooter("Das nächste Spiel gibt es nächsten Donnerstag um 17:00 Uhr!")
-                            .addField("Preis:", `~~${game.price.totalPrice.fmtPrice.originalPrice}~~ -> ${game.price.totalPrice.fmtPrice.intermediatePrice} €`)
-                            .addField("Angebotsbeginn: (UTC)", new Date(game.promotions.promotionalOffers[0].promotionalOffers[0].startDate).toLocaleString('de-DE', {timeZone: 'UTC'}))
-                            .addField("Angebot gilt bis: (UTC)", new Date(game.promotions.promotionalOffers[0].promotionalOffers[0].endDate).toLocaleString('de-DE', {timeZone: 'UTC'}));
-
-                        if (game.productSlug) {
-                            fetch(`https://store-content.ak.epicgames.com/api/de/content/products/${game.productSlug}`, {
-                                "credentials": "omit",
-                                "referrer": `https://www.epicgames.com/store/de/product/${game.productSlug}/home`,
-                                "method": "GET",
-                                "mode": "cors"
-                            }).then(res => res.json().then(result => result.pages.forEach(p => {
-
-                                if (p.type === "productHome") {
-
-                                    embed.setDescription(p.data.about.shortDescription);
-                                    freegameschan.send(`<@&${client.dev ? "800110137553453106" : "797552685103710218"}>`, {embed: embed}).then(m => m.crosspost())
-                                    console.log(`(${new Date().toLocaleString('de-DE', {timeZone: 'UTC'})})\n[Free Games] Posted new Game "${p.data.about.title}"`)
-                                }
-
-                            })))
-                        } else {
-                            freegameschan.send(`<@&${client.dev ? "800110137553453106" : "797552685103710218"}>`, {embed: embed}).then(m => m.crosspost())
-                            console.log(`(${new Date().toLocaleString('de-DE', {timeZone: 'UTC'})})\n[Free Games] Posted new Game "${game.title}"`)
-                        }
-                    } else {
-
-                        console.log(`(${new Date().toLocaleString('de-DE', {timeZone: 'UTC'})})\n[Free Games] No free games available.`)
-                    }
-                }
-            })))
-        });*/
-
-
         setInterval(async function () {
-            client.con.query(`SHOW VARIABLES LIKE '%version%';`, function (err, result) {
-                if (err) client.utils.log(`Heartbeat failed...`)
-            })
+            client.con.executeQuery(`SHOW VARIABLES LIKE '%version%';`).catch(err => this.client.console.reportError(`Heartbeat failed:\n` + err.stack));
         }, 14400000);
 
 
         setInterval(async function () {
-            let categoryid = client.serverChannels.get("userchannelCATEGORY");
+            let categoryid = client.serverChannels.get("userchannelCATEGORY").id;
             const VoiceChannels = guild.channels.cache.filter(c => c.type === 'voice' && c.parentID === categoryid);
             for (const [channelID, channel] of VoiceChannels) {
                 if (channel === client.serverChannels.get("createuserchanchannel")) return;
@@ -512,7 +465,7 @@ module.exports = class extends Event {
         }, 10000)
 
         !this.client.dev ? botlogs.send(`[${this.client.utils.getDateTime()}] Status: Back Online!`) : null;
-        console.log(colors.green(`Bot fully ready and Operational`))
+        this.client.console.reportLog(colors.green(`Bot fully ready and Operational`))
 
     }
 

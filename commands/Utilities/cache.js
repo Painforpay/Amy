@@ -18,13 +18,13 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        message.delete().catch(err => this.client.console.reportError(err.stack));
 
-            let fetched = await message.channel.messages.fetch(args[0], true).catch(err => this.client.utils.log(`Es gab einen Fehler beim Cachen der Nachricht! ID: ${args[0]}${err.httpStatus === 404 ? "\nNachricht konnte nicht gefunden werden. (404 Not Found)" : err.httpStatus}`));
+            let fetched = await message.channel.messages.fetch(args[0], true).catch(err => this.client.console.reportError(`Es gab einen Fehler beim Cachen der Nachricht! ID: ${args[0]}${err.httpStatus === 404 ? "\nNachricht konnte nicht gefunden werden. (404 Not Found)" : err.httpStatus}`));
 
             message.channel.send(`Nachricht mit der ID: ${fetched.id} - Author: ${fetched.author} wurde erfolgreich in den Cache geladen!`).then(m => {
 
-                    m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+                    m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack));
 
             });
 

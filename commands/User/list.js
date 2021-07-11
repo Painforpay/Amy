@@ -20,7 +20,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        message.delete().catch(err => this.client.console.reportError(err.stack));
 
         let role = await message.guild.roles.cache.find(r => r.name.toLowerCase() === args.join(" ").toLowerCase());
         let memberSize = 0;

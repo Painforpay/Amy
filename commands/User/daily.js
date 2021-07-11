@@ -20,20 +20,20 @@ module.exports = class extends Command {
 
             message.channel.send(`Dir wurden deine Täglichen Coins und XP gutgeschrieben!`)
 
-            this.client.dailyCooldown.set(message.member.id, {timestamp: Date.parse(new Date())})
+            this.client.dailyCooldown.set(message.member.id, {timestamp: Date.parse(new Date().toString())})
 
-            await this.client.utils.xpadd(message.member, this.client.dailyRewardXP, false);
-            await this.client.utils.coinsadd(message.member, this.client.dailyRewardCoins, false);
+            await this.client.utils.xpAdd(message.member, this.client.dailyRewardXP, false);
+            await this.client.utils.coinsAdd(message.member, this.client.dailyRewardCoins, false);
 
         } else {
             const today = new Date()
             const tomorrow = new Date(today)
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(0,0,0,0);
-            let timestamp = Date.parse(tomorrow) - Date.parse(new Date());
+            let timestamp = Date.parse(tomorrow.toString()) - Date.parse(new Date().toString());
             let remainingTime = await this.client.utils.duration(timestamp);
 
-           return message.channel.send(`Du kannst deine Täglichen Coins und XP noch nicht abholen! Bitte warte noch ${remainingTime}.`);
+           return message.channel.send(`Du kannst deine Täglichen Coins und XP noch nicht abholen! Bitte warte noch **${remainingTime}**.`);
         }
 
 

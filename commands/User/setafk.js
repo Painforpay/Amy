@@ -18,7 +18,7 @@ module.exports = class extends Command {
 
 
     async run(message, args) {
-        message.delete().catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``));
+        message.delete().catch(err => this.client.console.reportError(err.stack));
         let reason = args.join(" ");
 
         reason = reason.replace(/(<.*:.+:.+>)|(:.*:)/gi, "")
@@ -27,7 +27,7 @@ module.exports = class extends Command {
 
         if (fResult["is-bad"]) {
 
-            message.channel.send(`Dieser Grund enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)));
+            message.channel.send(`Dieser Grund enthält Wörter die ich nicht nutzen kann!`).then(m => m.delete({timeout: 10000}).catch(err => this.client.console.reportError(err.stack)));
             return;
         }
 
@@ -46,7 +46,7 @@ module.exports = class extends Command {
             await message.member.roles.add(this.client.serverRoles.get("afk"));
         }
 
-        message.channel.send(`${message.member}\nDu wurdest nun als Afk markiert. Wenn du eine Nachricht schreibst, wird dir der Status wieder entfernt!\nWir empfehlen dass du dich auf Nicht Stören stellst, da du immernoch gepingt werden kannst.`).then(m => m.delete({timeout: 60000}).catch(err => this.client.utils.log(`Nachricht konnte nicht gelöscht werden!\n\`\`\`${err.stack}\`\`\``)))
+        message.channel.send(`${message.member}\nDu wurdest nun als Afk markiert. Wenn du eine Nachricht schreibst, wird dir der Status wieder entfernt!\nWir empfehlen dass du dich auf Nicht Stören stellst, da du immernoch gepingt werden kannst.`).then(m => m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack)))
 
     }
 };

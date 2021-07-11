@@ -1,5 +1,5 @@
 const Event = require('../Structure/Event');
-
+const { Collection } = require('discord.js');
 module.exports = class extends Event {
 
     constructor(...args) {
@@ -12,14 +12,22 @@ module.exports = class extends Event {
         if (member.bot) return;
         const client = this.client;
 
-        this.client.con.query(`DELETE FROM \`users\` WHERE \`users\`.\`id\` = ${member.id};`, function (err) {
-            if (err) throw err;
+        let builderData = {
+            sqlType: "DELETE",
+            table: "users",
+            conditions: new Collection()
+        }
 
+        builderData.conditions.set('id', {operator: "=", value: member.id});
 
-            console.log(`[${client.utils.getDateTime()}] [MySQL] Successfully deleted Entry for User with ID '${member.id}' from the Database!`)
+        let sqlQuery = await this.client.con.buildQuery(builderData);
 
+        let result = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err.stack));
 
-        });
+        if(result.affectedRows > 0) {
+            this.client.console.reportLog(`[${client.utils.getDateTime()}] [MySQL] Successfully deleted Entry for User with ID '${member.id}' from the Database!`)
+        }
+
         if (this.client.dev) return;
         try {
 
