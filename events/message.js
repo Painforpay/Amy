@@ -29,11 +29,12 @@ module.exports = class extends Event {
 
             if(message.embeds) {
                 if(message.embeds[0].description.search(/👍/)) {
+                        message.channel.send(`Vielen Dank für deine Unterstützung! Ich werde in diesen Channel schreiben, sobald ein erneuter Bump verfügbar ist!`)
                     setTimeout(async () => {
+                        let bumpPing = this.client.serverRoles.get("bumpPing");
+                        message.channel.send(`${bumpPing}\nServerbumping ist wieder verfügbar! Nutze \`!d bump\` um uns zu unterstützen!`)
 
-                        message.channel.send(`Serverbumping ist wieder verfügbar! Nutze \`!d bump\` um uns zu unterstützen!`)
-
-                    }, 7200000)
+                    }, (2 * 60 * 60 * 1000))
                 }
 
             }

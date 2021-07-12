@@ -1,5 +1,5 @@
 const SubCommand = require('../../../Structure/SubCommand');
-
+const Discord = require('discord.js');
 
 module.exports = class extends SubCommand {
 
@@ -16,7 +16,7 @@ module.exports = class extends SubCommand {
 
     async run(message, args) {
         const client = this.client;
-
+        message.delete();
         let memberID = message.mentions.members.first() || args[0];
 
         let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(err => {
@@ -27,40 +27,52 @@ module.exports = class extends SubCommand {
         if (!user) return;
         let member = message.guild.member(user);
         let value = args.pop();
-        if(isNaN(value)) {
+        if (isNaN(value)) {
             return message.channel.send(`Bitte einen numerischen Wert für die Menge angeben`).then(m => {
                 m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
             })
         }
 
         let valueToTake = value;
-        const UserData = this.client.utils.getUserData(member.id);
+        const UserData = await this.client.con.getUserData(member.id);
 
         let currentXP = UserData.xp;
         let toMuch = false;
         if (value > currentXP) {
             toMuch = true;
             valueToTake = currentXP;
-
         }
 
-        client.con.query(`UPDATE users SET \`xp\` = \`xp\` - \`${valueToTake}\` WHERE id = ${member.id};`, function (err) {
-            if (err) {
-                client.console.reportError(err.stack);
-                return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
-            }
 
+
+        let builderData = {
+            sqlType: "UPDATE",
+            table: "users",
+            params: new Discord.Collection(),
+            conditions: new Discord.Collection()
+        }
+
+        builderData.conditions.set("id", {operator: "=", value: member.id})
+        builderData.params.set("xp", {operator: "-", value: valueToTake})
+
+        let sqlQuery = await this.client.con.buildQuery(builderData);
+
+        let result = await this.client.con.executeQuery(sqlQuery).catch(err => {
+            client.console.reportError(err.stack);
+            return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
+        });
+
+
+        if (result !== null) {
             message.channel.send(`${toMuch ? `${member.user.tag} hat weniger als ${value} Erfahrung! Ich entferne daher ${valueToTake} Erfahrung und somit alles!\n\n` : ""}Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${valueToTake}\` verringert!`).then(m => {
                 m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
             })
 
 
-            client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` verringert!`, true, true);
-            message.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
+            client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` verringert!`, true, true, false);
 
 
-        })
-
+        }
     }
 
 };

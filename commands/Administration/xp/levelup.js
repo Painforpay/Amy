@@ -15,6 +15,7 @@ module.exports = class extends SubCommand {
     }
 
     async run(message, args) {
+        message.delete();
         const client = this.client;
 
         let memberID = message.mentions.members.first() || args[0];
@@ -43,15 +44,14 @@ module.exports = class extends SubCommand {
 
         let required = nextLevelXP - xp;
 
-        await client.utils.xpadd(member, required, false);
+        await client.utils.xpAdd(member, required, false);
 
-        client.console.reportLog(`${message.author} hat das Level von \`${member.user.tag}\` um \`${levelup}\` erhöht! [${currentLevel} -> ${nextLevel}]`, true, true);
+        client.console.reportLog(`${message.author} hat das Level von \`${member.user.tag}\` um \`${levelup}\` erhöht! [${currentLevel} -> ${nextLevel}]`, true, true, false);
 
 
         message.channel.send(`Level für \`${member.user.tag}\` wurde um \`${value}\` erhöht!`).then(m => {
             m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
         })
-        message.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
 
 
     }

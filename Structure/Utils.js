@@ -733,7 +733,7 @@ module.exports = class Util {
             return;
         }
 
-        let data = new Collection().set("xp", {operator: "+", value: amount}).set("inactive", 0).set("originxp", "NULL");
+        let data = new Collection().set("xp", {operator: "+", value: amount}).set("inactive", 0);
 
         let result = await this.client.con.updateUser(member.id, data);
 
@@ -811,18 +811,18 @@ module.exports = class Util {
     // noinspection JSUnusedLocalSymbols,JSUnusedLocalSymbols
     async giveRemaining(message) {
 
-        const VoiceChannels = message.guild.channels.cache.filter(c => c.type === 'voice');
+        const VoiceChannels = this.client.guild.channels.cache.filter(c => c.type === 'voice');
 
         for (const [channelID, channel] of VoiceChannels) {
             for (const [memberID, member] of channel.members) {
                 if (channel.members.size > 0) {
                     if (this.client.VoiceUsers.has(member.id)) {
 
-                        let timespentmills = Date.parse(new Date()) - this.client.VoiceUsers.get(member.id).time;
+                        let timespentmills = Date.parse(new Date().toString()) - this.client.VoiceUsers.get(member.id).time;
 
                         let amount = this.client.xpVoice * ((timespentmills / 1000) / 60)
 
-                        await this.client.utils.xpadd(member, amount);
+                        await this.client.utils.xpAdd(member, amount);
 
                     }
                 }

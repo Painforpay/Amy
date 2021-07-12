@@ -182,7 +182,7 @@ module.exports = class MySQL {
 
     async buildQuery(data){
         let sqlQuery = ``;
-        let { table, params, sqlType, conditions } = data;
+        let { table, params, sqlType, conditions, orderBy, limit } = data;
 
         let keys = [];
         let values = [];
@@ -231,7 +231,8 @@ module.exports = class MySQL {
                 } else {
                     condition.push("1");
                 }
-                sqlQuery = `SELECT ${params.join(", ")} FROM \`${table}\` WHERE ${condition};`;
+
+                sqlQuery = `SELECT ${params.join(", ")} FROM \`${table}\` WHERE ${condition}${orderBy ? ` ORDER BY ${orderBy.value} ${orderBy.key}` : ""}${limit ? ` LIMIT ${limit}` : ""};`;
             }
             break;
             case "delete": {
@@ -283,6 +284,7 @@ module.exports = class MySQL {
             builderData.params.set("id", userid);
             keys.push("id");
             data.forEach((v, k) => {
+
                 builderData.params.set(k, v.value ? v.value : v);
                 keys.push(k);
             })

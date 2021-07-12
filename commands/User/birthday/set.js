@@ -16,7 +16,7 @@ module.exports = class extends SubCommand {
     }
 
     async run(message, args) {
-
+        message.delete();
         if (!args[0] || !args[0].match(/\d{1,2}\.\d{1,2}/)) {
 
             return message.channel.send((args[0] ? `Du hast einen Formatierungsfehler gemacht!` : `Ohne deinen Geburtstag zu kennen, kann ich leider nichts einspeichern ^^`) + `\nBitte gib deinen Geburtstag im Folgendem Format an: \`!bday set 30.01.2003\``).then(m => {

@@ -12,14 +12,14 @@ module.exports = class Command {
 
         this.client.serverChannels.get("botlogs").send(`\`\`\`${err}\`\`\``)
 
-        if(err.code !== 10008) console.error(red(err));
+        if(!err.startsWith("DiscordAPIError: Unknown Message")) console.error(red(err));
 
 
     }
 
-    reportLog(log, important = false, timestamp = false) {
+    reportLog(log, important = false, timestamp = false, useCodeB = true) {
         if(important) {
-            this.client.serverChannels.get("botlogs").send(`**Logging:**\n\`\`\`${log}\`\`\``)
+            this.client.serverChannels.get("botlogs").send(`**Logging:**\n${useCodeB ? `\`\`\`${log}\`\`\`` : log}`)
             console.log(yellow(`${timestamp ? `[${this.client.utils.getDateTime()}]\n` : ""}`+ log));
         } else {
             console.log(log);

@@ -139,6 +139,8 @@ module.exports = class Bot extends Client {
 
         this.dailyCooldown = new Collection();
 
+        this.workCooldown = new Collection();
+
     }
 
     validate(options) {

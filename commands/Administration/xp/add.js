@@ -15,14 +15,13 @@ module.exports = class extends SubCommand {
     }
 
     async run(message, args) {
+        message.delete();
         const client = this.client;
 
         let memberID = message.mentions.members.first() || args[0];
 
-        let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(err => {
-            this.client.console.reportError(err.stack)
+        let user = await this.client.users.fetch(memberID.id ? memberID.id : memberID).catch(() => {
             message.channel.send(`Es gab einen Fehler beim erkennen des Nutzers.`)
-
         });
         if (!user) return;
         let member = message.guild.member(user);
@@ -34,14 +33,12 @@ module.exports = class extends SubCommand {
         }
 
 
-        await client.utils.xpadd(member, value, false);
-        client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` erhöht!`, true, true);
+        await client.utils.xpAdd(member, value, false);
+        client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` um \`${value}\` erhöht!`, true, true, false);
 
 
-        message.channel.send(`Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${value}\` erhöht!`).then(m => {
-            m.delete({timeout: 15000}).catch(err => this.client.console.reportError(err.stack))
-        })
-        message.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
+        let m = await message.channel.send(`Erfahrungspunkte für \`${member.user.tag}\` wurden um \`${value}\` erhöht!`)
+        m.delete({timeout: 15000}).catch(err => this.client.console.reportError(err.stack))
 
     }
 

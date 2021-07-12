@@ -31,10 +31,9 @@ module.exports = class extends Command {
                     m.delete({timeout: 60000}).catch(err => this.client.console.reportError(err.stack));
                 });
                 return message.delete().catch(err => this.client.console.reportError(err.stack));
-
             }
-            command.run(message, cutArgs);
-            return message.delete({timeout: 15000}).catch(err => this.client.console.reportError(err.stack))
+            return command.run(message, cutArgs);
+
 
         } else {
             return message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))

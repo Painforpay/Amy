@@ -16,7 +16,7 @@ module.exports = class extends Event {
 
     async run() {
         //Log Bot Stats
-
+        await this.client.utils.loadRolesAndChannels();
 
 
         console.log([
@@ -48,12 +48,12 @@ module.exports = class extends Event {
 
         let client = this.client;
 
-        await this.client.utils.loadRolesAndChannels();
+
 
         //Fetch Invites for Invitetracking
         setInterval(async function () {
 
-            client.invites = client.guild.fetchInvites();
+            client.invites = await client.guild.fetchInvites();
 
         }, 1000);
 

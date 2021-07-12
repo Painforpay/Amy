@@ -6,21 +6,27 @@ module.exports = class extends Command {
 
     constructor(...args) {
         super(...args, {
-            aliases: ["streak"],
-            description: 'Hole deine Täglichen Coins und XP ab!',
+            aliases: ["w", "arbeit"],
+            description: '**WIP:** Arbeite um Geld zu verdienen',
             category: 'user',
-            guildOnly: true
+            guildOnly: true,
+            additionalinfo: "WIP"
         });
     }
 
 
     async run(message) {
 
-        if(!this.client.dailyCooldown.has(message.member.id)) {
+       return;
+
+       //Arbeitsname, Länge, Pausenzeit, Verdienst, Wertereq
+
+
+        if(!this.client.workCooldown.has(message.member.id)) {
 
             message.channel.send(`Dir wurden deine Täglichen Coins und XP gutgeschrieben!`)
 
-            this.client.dailyCooldown.set(message.member.id, {timestamp: Date.parse(new Date().toString())})
+            this.client.workCooldown.set(message.member.id, {timestamp: Date.parse(new Date().toString())})
 
             await this.client.utils.xpAdd(message.member, this.client.dailyRewardXP, false);
             await this.client.utils.coinsAdd(message.member, this.client.dailyRewardCoins, false);
@@ -33,9 +39,7 @@ module.exports = class extends Command {
             let timestamp = Date.parse(tomorrow.toString()) - Date.parse(new Date().toString());
             let remainingTime = await this.client.utils.duration(timestamp);
 
-           return message.channel.send(`Du kannst deine Täglichen Coins und XP noch nicht abholen! Bitte warte noch **${remainingTime}**.`);
+            return message.channel.send(`Du kannst noch nicht wieder Arbeiten! Bitte warte noch **${remainingTime}**.`);
         }
-
-
     }
 };

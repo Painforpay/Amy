@@ -1,5 +1,5 @@
 const SubCommand = require('../../../Structure/SubCommand');
-
+const Discord = require('discord.js');
 
 module.exports = class extends SubCommand {
 
@@ -15,6 +15,7 @@ module.exports = class extends SubCommand {
     }
 
     async run(message, args) {
+        message.delete();
         const client = this.client;
 
         let memberID = message.mentions.members.first() || args[0];
@@ -36,19 +37,32 @@ module.exports = class extends SubCommand {
             })
         }
 
+        let builderData = {
+            sqlType: "UPDATE",
+            table: "users",
+            params: new Discord.Collection(),
+            conditions: new Discord.Collection()
+        }
 
-        this.client.con.query(`UPDATE users SET \`xp\` = '${value}' WHERE id = "${member.id}";`, function (err) {
-            if (err) {
-                client.console.reportError(err.stack)
-                return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
-            }
+        builderData.conditions.set("id", {operator: "=", value: member.id})
+        builderData.params.set("xp", value)
 
-            client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` auf \`${value}\` angepasst!`, true, true);
+        let sqlQuery = await this.client.con.buildQuery(builderData);
+
+        let result = await this.client.con.executeQuery(sqlQuery).catch(err => {
+            client.console.reportError(err.stack);
+            return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
+        });
+
+        if(result !== null) {
+            client.console.reportLog(`${message.author} hat die Erfahrungspunkte für \`${member.user.tag}\` auf \`${value}\` angepasst!`, true, true, false);
 
             message.channel.send(`Erfahrungspunkte für \`${member.user.tag}\` wurden auf \`${value}\` angepasst!`).then(m => {
                 m.delete({timeout: 15000}).catch(err => client.console.reportError(err.stack))
             })
-        });
+        }
+
+
     }
 
 };

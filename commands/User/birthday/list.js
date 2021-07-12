@@ -14,6 +14,7 @@ module.exports = class extends SubCommand {
     }
 
     async run(message) {
+        message.delete();
         return this.client.utils.birthdayembed(message);
     }
 }

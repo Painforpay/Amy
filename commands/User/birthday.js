@@ -29,8 +29,8 @@ module.exports = class extends Command {
                 return message.delete().catch(err => this.client.console.reportError(err.stack));
 
             }
-            command.run(message, cutArgs);
-            return message.delete().catch(err => this.client.console.reportError(err.stack));
+            return command.run(message, cutArgs);
+
         } else {
             message.channel.send((await this.client.utils.handleWrongInput(args[0], this)))
             return message.delete().catch(err => this.client.console.reportError(err.stack));

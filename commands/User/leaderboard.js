@@ -18,10 +18,25 @@ module.exports = class extends Command {
     async run(message) {
 
         let client = this.client;
+        //`SELECT * FROM users WHERE xp > 1 ORDER BY xp DESC LIMIT 10;`
 
-        this.client.con.query(`SELECT * FROM users WHERE xp > 1 ORDER BY xp DESC LIMIT 10;`, async function (err, results) {
-            if (err) throw err;
+        let builderData = {
+            table: "users",
+            sqlType: "SELECT",
+            params: ["*"],
+            conditions: new Discord.Collection(),
+            limit: 10,
+            orderBy: {value: "xp", key: "DESC"}
+        }
 
+        builderData.conditions.set("xp", {operator: ">", value: 1})
+
+        let sqlQuery = await this.client.con.buildQuery(builderData);
+
+        let results = await this.client.con.executeQuery(sqlQuery).catch(err => {
+            client.console.reportError(err.stack);
+            return message.channel.send(`Es gab einen Fehler bei der Ausführung des Befehls!`)
+        });
 
             let embed = new Discord.MessageEmbed()
                 .setColor("#ffdab9")
@@ -71,7 +86,7 @@ module.exports = class extends Command {
 
 
 
-        });
+
 
 
     }

@@ -1,4 +1,4 @@
-const Command = require("../../Structure/Command");
+const Command = require("../Structure/Command");
 
 module.exports = class extends Command {
 
@@ -16,7 +16,7 @@ module.exports = class extends Command {
 
 
     async run(message) { //, args) {
-        return message.channel.send(`Dieser Befehl ist zur Zeit deaktiviert.`);
+
         //TODO
         /*const commandName = args[0].toLowerCase();
         const command = message.client.commands.get(commandName) || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
