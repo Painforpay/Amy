@@ -26,7 +26,7 @@ module.exports = class extends Command {
 
 
                     try {
-                        this.client.serverChannels.get("botlog").send(`Status: Shutting Down...`);
+                        this.client.serverChannels.get("botlogs").send(`Status: Shutting Down...`);
                         await this.client.utils.giveRemaining();
                         await message.delete().catch(err => this.client.console.reportError(err.stack));
                         await m.delete().catch(err => this.client.console.reportError(err.stack));
