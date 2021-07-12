@@ -284,7 +284,6 @@ module.exports = class MySQL {
             builderData.params.set("id", userid);
             keys.push("id");
             data.forEach((v, k) => {
-
                 builderData.params.set(k, v.value ? v.value : v);
                 keys.push(k);
             })

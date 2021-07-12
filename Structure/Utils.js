@@ -725,6 +725,7 @@ module.exports = class Util {
 
     async xpAdd(member, amount, giveboost = true) {
         let unwashed = amount;
+        amount = parseInt(amount)
         if (member.user.bot) return;
 
         amount = member.roles.cache.has(this.client.serverRoles.get("booster").id) && giveboost ? (amount * 1.02) : amount;
@@ -733,7 +734,7 @@ module.exports = class Util {
             return;
         }
 
-        let data = new Collection().set("xp", {operator: "+", value: amount}).set("inactive", 0);
+        let data = new Collection().set("xp", {operator: "+", value: amount}).set("inactive", 0).set("originxp", "NULL");
 
         let result = await this.client.con.updateUser(member.id, data);
 
