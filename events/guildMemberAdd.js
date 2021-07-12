@@ -96,7 +96,7 @@ module.exports = class extends Event {
                 console.error(e);
             }
 
-           await this.client.con.updateUser(member.id, {})
+           await this.client.con.updateUser(member.id)
         }
 
 

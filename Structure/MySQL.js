@@ -255,7 +255,7 @@ module.exports = class MySQL {
 
     }
 
-    async updateUser(userid, data) {
+    async updateUser(userid, data = {}) {
         let client = this.client;
         let UserData = await this.getUserData(userid);
 
@@ -270,11 +270,13 @@ module.exports = class MySQL {
         }
         if(UserData) {
             builderData.sqlType = "UPDATE";
+            if(data.size > 0) {
+                data.forEach((v, k) => {
+                    keys.push(k);
+                    builderData.params.set(k, v);
+                })
+            }
 
-            data.forEach((v, k) => {
-                keys.push(k);
-                builderData.params.set(k, v);
-            })
 
             builderData.conditions.set("id", {operator: "=", value: userid})
 
@@ -283,10 +285,12 @@ module.exports = class MySQL {
             builderData.sqlType = "INSERT";
             builderData.params.set("id", userid);
             keys.push("id");
-            data.forEach((v, k) => {
-                builderData.params.set(k, v.value ? v.value : v);
-                keys.push(k);
-            })
+            if(data.size > 0) {
+                data.forEach((v, k) => {
+                    builderData.params.set(k, v.value ? v.value : v);
+                    keys.push(k);
+                })
+            }
 
         }
 
