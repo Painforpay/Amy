@@ -28,7 +28,7 @@ module.exports = class extends Event {
         if(message.author.id === "302050872383242240") {
 
             if(message.embeds) {
-                if(message.embeds[0].description.search(/👍/)) {
+                if(message.embeds[0].description.includes(":thumbsup:")) {
                         message.channel.send(`Vielen Dank für deine Unterstützung! Ich werde in diesen Channel schreiben, sobald ein erneuter Bump verfügbar ist!`)
                     setTimeout(async () => {
                         let bumpPing = this.client.serverRoles.get("bumpPing");
