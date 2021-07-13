@@ -305,7 +305,7 @@ module.exports = class MySQL {
                 }
 
                 if(!UserData) {
-                    client.console.reportLog(`[MySQL] Successfully ${UserData ? "Updated" : "Created"} Entry for UserID '${userid}' in users [Query: Affecting ${keys.join(", ")}]`, false, false);
+                    client.console.reportLog(`[MySQL] Successfully ${UserData ? "Updated" : "Created"} Entry for UserID '${userid}' in users [Query: Affecting ${keys.join(", ")}]`, false, true);
                 }
                 let resultNew = await client.con.getUserData(userid);
                 resolve({old:UserData, new: resultNew});
