@@ -50,7 +50,7 @@ module.exports = class extends Event {
                         m.delete({timeout: 3600000}).catch(err => this.client.console.reportError(err.stack));
 
 
-                });
+                }).catch(err => this.client.console.reportError(err));
             }
 
             return; //await this.client.utils.DeeptalkSender(message);

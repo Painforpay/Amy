@@ -83,7 +83,7 @@ module.exports = class extends Command {
 
                         message.edit(newEmbed)
 
-                        await reaction.users.remove(user);
+                        await reaction.users.remove(user).catch(err => this.client.console.reportError(err));
                     }
                     break;
                 }

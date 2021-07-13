@@ -785,7 +785,7 @@ module.exports = class Util {
         .setColor("#FFD700")
         .setFooter(`Du benötigst nun ${(Math.round((data.remainingXP) * 100) / 100).toFixed(0)} Erfahrungspunkte für Level ${data.currentLevel + 1}!`)
         .setDescription(`Du bist jetzt Level ${data.currentLevel}!`);
-        data.member.send({embed: embed}).then(m => m.delete({timeout: 3600000})).catch(() => null);
+        data.member.send({embed: embed}).then(m => m.delete({timeout: 3600000})).catch(err => this.client.console.reportError(err));
     }
 
     async coinsAdd(member, amount, giveboost = true) {
