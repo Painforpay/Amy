@@ -78,11 +78,15 @@ module.exports = class extends Event {
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
+            if(!oldState.member) return;
+            //User left Server and thus left channel
+
 
             // If necessary - Delete Lounge User was in.
             // await this.client.utils.deleteLounge(oldState);
 
             //Remove VoiceKontext Role
+
             await oldState.member.roles.remove(voicecontext.id);
 
             //give User XP
