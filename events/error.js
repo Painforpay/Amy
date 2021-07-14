@@ -11,7 +11,7 @@ module.exports = class extends Event {
     }
 
     async run(error) {
-        this.client.console.reportError(error);
+        this.client.console.reportError(error.stackTrace);
     }
 
 

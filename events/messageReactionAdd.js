@@ -125,7 +125,7 @@ module.exports = class extends Event {
                             await member.roles.add(r.categoryid);
                         }
                     } catch (e) {
-                        client.utils.log(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`)
+                        client.console.reportLog(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`, true, true)
                     }
 
                 }

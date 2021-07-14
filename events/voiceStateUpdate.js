@@ -78,7 +78,7 @@ module.exports = class extends Event {
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
-            if(!oldState.member) return;
+            if(!oldState.member || !oldState.channel) return;
             //User left Server and thus left channel
 
 
