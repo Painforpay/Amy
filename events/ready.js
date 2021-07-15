@@ -360,42 +360,47 @@ module.exports = class extends Event {
             })
 
 
-            client.con.query(`SELECT * FROM users WHERE bmonth = ${today.getMonth() + 1} && bday = ${today.getDate()}`, function (err, results) {
-                if (err) throw err;
+            let builderData = {
+                sqlType: "SELECT",
+                table: "users",
+                params: ["*"],
+                conditions: new Collection()
+            }
 
+            builderData.conditions.set("bmonth", {operator: "=", value: (today.getMonth() + 1)});
+            builderData.conditions.set("bday", {operator: "=", value: today.getDate()});
+
+            let sqlQuery = await this.client.con.buildQuery(builderData);
+
+            let results = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err));
                 if (results.length > 0) {
                     general.send(`${client.serverRoles.get("birthdayPing")}`)
-                    results.forEach(async r => {
+                    for await (const r of results) {
+                            let dateString = "";
+                            let age = ""
+                            if(r.byear != null) {
+                                dateString = `${r.byear}, ${r.bmonth - 1}, ${r.bday}`;
+                                age = ` **${(client.utils.getAge(dateString)+1)}**ten`
+                            }
+                            let user = client.users.cache.find(u => u.id === r.id);
+                            let member = await guild.members.fetch(user.id);
+                            member.roles.add(birthday_role);
+                            let embed = new MessageEmbed()
+                                .setTitle("Birthday Reminder!")
+                                .setColor("#ffd900")
+                                .setDescription(`Herzlichen Glückwunsch zum${age} Geburtstag, ${user}\nEin tolles Jahr wünscht dir **${general.guild.name}**`)
+                                .setFooter(`Das Servergeschenk von ${client.birthdayReward}xp wurde dir gutgeschrieben!`)
+                                .setTimestamp();
+                            general.send(embed).catch(e => console.log());
+                            general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.console.reportError(err.stack)));
 
-
-                        let dateString = "";
-
-                        let age = ""
-                        if(r.byear != null) {
-                            dateString = `${r.byear}, ${r.bmonth - 1}, ${r.bday}`;
-                            age = ` **${(client.utils.getAge(dateString)+1)}**ten`
-                        }
-
-                        let user = await client.users.cache.find(u => u.id === r.id);
-                        let member = await general.guild.members.fetch(user.id);
-                        await member.roles.add(birthday_role);
-                        let embed = new MessageEmbed()
-                            .setTitle("Birthday Reminder!")
-                            .setColor("#ffd900")
-                            .setDescription(`Herzlichen Glückwunsch zum${age} Geburtstag, ${user}\nEin tolles Jahr wünscht dir ${general.guild.name}`)
-                            .setFooter(`Das Servergeschenk von ${client.birthdayReward}xp wurde dir gutgeschrieben!`)
-                            .setTimestamp();
-                        general.send(embed).catch(e => console.log());
-                        general.send(`${user}`).then(m => m.delete({timeout: 1000}).catch(err => this.client.console.reportError(err.stack)));
-
-                        await client.utils.xpAdd(member, client.birthdayReward);
-
-                    });
+                            await client.utils.xpAdd(member, client.birthdayReward);
+                    }
 
                 }
 
 
-            });
+
 
         });
 

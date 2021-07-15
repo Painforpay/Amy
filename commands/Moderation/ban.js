@@ -39,7 +39,7 @@ module.exports = class extends Command {
         let userData = {xp: "Unbekannt"};
 
         if(member) {
-            userData = await this.client.utils.getUserData(user.id);
+            userData = await this.client.con.getUserData(user.id);
             if (!this.client.utils.comparePerms(message.member, member)) {
                 return message.channel.send(`Du kannst diesen Nutzer nicht bannen!`)
             }

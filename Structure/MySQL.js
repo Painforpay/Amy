@@ -189,7 +189,6 @@ module.exports = class MySQL {
         let updateData = [];
 
 
-
         switch(sqlType.toLowerCase()) {
 
             case "insert": {
@@ -208,7 +207,6 @@ module.exports = class MySQL {
                         updateData.push(`\`${k}\` = ${v == "NULL" ? "NULL": `'${v}'`}`);
                     }
 
-
                     keys.push(k);
                 })
                 let condition = [];
@@ -219,7 +217,7 @@ module.exports = class MySQL {
                 } else {
                     condition.push("1");
                 }
-                sqlQuery = `UPDATE \`${table}\` SET ${updateData.join(", ")} WHERE ${condition};`;
+                sqlQuery = `UPDATE \`${table}\` SET ${updateData.join(", ")} WHERE ${condition.join(" && ")};`;
             }
             break;
             case "select": {
@@ -232,7 +230,7 @@ module.exports = class MySQL {
                     condition.push("1");
                 }
 
-                sqlQuery = `SELECT ${params.join(", ")} FROM \`${table}\` WHERE ${condition}${orderBy ? ` ORDER BY ${orderBy.value} ${orderBy.key}` : ""}${limit ? ` LIMIT ${limit}` : ""};`;
+                sqlQuery = `SELECT ${params.join(", ")} FROM \`${table}\` WHERE ${condition.join(" && ")}${orderBy ? ` ORDER BY ${orderBy.value} ${orderBy.key}` : ""}${limit ? ` LIMIT ${limit}` : ""};`;
             }
             break;
             case "delete": {
@@ -244,7 +242,7 @@ module.exports = class MySQL {
                 } else {
                     condition.push("1");
                 }
-                sqlQuery = `DELETE FROM \`${table}\` WHERE ${condition};`;
+                sqlQuery = `DELETE FROM \`${table}\` WHERE ${condition.join(" && ")};`;
             }
             break;
 

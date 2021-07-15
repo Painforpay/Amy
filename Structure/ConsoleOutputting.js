@@ -12,7 +12,7 @@ module.exports = class Command {
 
         this.client.serverChannels.get("botlogs").send(`\`\`\`${err}\`\`\``)
 
-        if(!err.startsWith("DiscordAPIError: Unknown Message")) console.error(red(err));
+        console.error(red(err));
 
 
     }

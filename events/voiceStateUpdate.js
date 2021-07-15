@@ -78,7 +78,8 @@ module.exports = class extends Event {
             }
         } else if (!newState.channel && oldState.channel) {
             //User left a Channel
-            if(!oldState.member || !oldState.channel) return;
+            if(!oldState.member) return;
+            if(!oldState.channel) return;
             //User left Server and thus left channel
 
 
@@ -113,7 +114,7 @@ module.exports = class extends Event {
 
 
             if (oldState.channel.members.size == 1) {
-
+                if(!oldState.member || !oldState.channel) return;
                 let member = oldState.channel.members.filter(member => member.id !== oldState.member.id);
 
                 await this.client.utils.VoiceUserDisconnectXP(member.map(x => x)[0].voice, true);

@@ -19,8 +19,8 @@ module.exports = class extends Event {
 
                     if (!this.streamUpdated(oldPresence, newPresence) && this.isStreaming(newPresence)) {
 
-                        let streamschan = this.client.serverChannels.get("streamAnnouncement")
-                        await streamschan.send(`${newPresence.member} hat angefangen zu Streamen! Schaut doch vorbei?\n${newPresence.activities.find(activity => activity.type === "STREAMING").url} ${this.client.serverRoles.get("streamingPing")}`)
+
+                        await this.client.serverChannels.get("streamAnnouncement").send(`${newPresence.member} hat angefangen zu Streamen! Schaut doch vorbei?\n${newPresence.activities.find(activity => activity.type === "STREAMING").url} ${this.client.serverRoles.get("streamingPing")}`)
 
                     }
 
