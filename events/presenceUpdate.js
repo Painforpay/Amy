@@ -1,4 +1,5 @@
 const Event = require('../Structure/Event');
+const { Collection } = require('discord.js');
 
 module.exports = class extends Event {
 
@@ -37,17 +38,36 @@ module.exports = class extends Event {
 
         let activities = newPresence.activities.filter(a => a.type === "PLAYING")
 
-        activities.forEach(activity => {
+        for(const activity of activities) {
 
             let rolename = activity.name.replace('\'', "_")
 
-            let roles = this.client.con.getActivity(rolename);
+            let rolestoAdd = await this.client.con.getActivity(rolename, true);
+            let rolestoRemove = await this.client.con.getActivity(rolename, false);
+            if(rolestoAdd != null && rolestoAdd > 1) {
+                if(this.client.gameActivity.has(newPresence.member.id)) {
+                    let UserActivity = this.client.gameActivity.get(newPresence.member.id);
 
-            if(roles.length > 0) {
-                newPresence.member.roles.add(roles);
+                        UserActivity.set(rolename, {timestamp: Date.parse(new Date().toString())})
+
+
+                } else {
+                    this.client.gameActivity.set(newPresence.member.id, new Collection())
+                    this.client.gameActivity.get(newPresence.member.id).set(rolename, {timestamp: Date.parse(new Date().toString())})
+
+
+                }
+
+                    if(rolestoRemove != null) {
+                        newPresence.member.roles.remove(rolestoRemove[0]).catch(err => console.log(err));
+                    }
+                    for (const role of rolestoAdd) {
+                        newPresence.member.roles.add(role).catch(err => console.log(err));
+                    }
+
             }
 
-        })
+        }
 
 
     }

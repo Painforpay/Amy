@@ -846,6 +846,36 @@ module.exports = class Util {
 
     }
 
+    async removeInactiveGameRoles() {
+
+        let builderData = {
+            sqlType: "SELECT",
+            table: "activityroles",
+            params: ["*"]
+        }
+
+        let sqlQuery = await this.client.con.buildQuery(builderData);
+
+        let results = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.con.reportError(err));
+
+        for (const role of results) {
+
+            if(role.roleidActive != null || role.roleidInactive != null) {
+                let ActiveRole = await this.client.guild.roles.fetch(role.roleidActive).catch(() => null);
+
+                let InactiveRole = await this.client.guild.roles.fetch(role.roleidInactive).catch(() => null);
+                if(!ActiveRole.id || !InactiveRole.id) return;
+                for await (const [snowflake, member] of ActiveRole.members) {
+                    member.roles.remove(ActiveRole);
+                    member.roles.add(InactiveRole);
+                }
+            }
+
+
+        }
+
+    }
+
 
     async colorgiver(message) {
         try {

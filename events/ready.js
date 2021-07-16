@@ -164,6 +164,8 @@ module.exports = class extends Event {
 
         }
 
+        await this.client.utils.removeInactiveGameRoles();
+
         //Remove AFK Role from every Member that has it
         {   //brackets so the afkrole variable is available out of scope
             let afkrole = this.client.serverRoles.get("afk");
@@ -215,6 +217,8 @@ module.exports = class extends Event {
             }
 
         }, 10000)
+
+
 
 
         schedule.scheduleJob('0 0 * * *', async () => {
@@ -406,7 +410,7 @@ module.exports = class extends Event {
         //Activityresets
 
         //Daily
-        schedule.scheduleJob('0 0 * * *', () => {
+        schedule.scheduleJob('* * * * *', async () => {
 
             this.client.vcAck.forEach((v, k) => {
                 v.today = 0
@@ -418,6 +422,27 @@ module.exports = class extends Event {
 
             this.client.dailyCooldown.clear();
 
+            if(this.client.gameActivity.size > 0) {
+
+                for (const [UserID, UserData] of this.client.gameActivity) {
+                    for (const [gameName, game] of UserData) {
+                        let timestamp = game.timestamp;
+
+                        if((Date.parse(new Date().toString()) - timestamp) > 1000) {
+                            let gameRoletoRemove = await this.client.con.getActivity(gameName, true);
+                            let gameRoletoAdd = await this.client.con.getActivity(gameName, false);
+
+                            let member = guild.members.cache.get(UserID)
+
+
+                                member.roles.remove(gameRoletoRemove[0]);
+                                member.roles.add(gameRoletoAdd[0]);
+
+                            UserData.delete(gameName)
+                        }
+                    }
+                }
+            }
         });
 
         //Weekly

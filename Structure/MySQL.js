@@ -136,7 +136,7 @@ module.exports = class MySQL {
         })
     }
 
-    async getActivity(activityname) {
+    async getActivity(activityname, active = true) {
 
         return new Promise((resolve) => {
             let client = this.client;
@@ -144,7 +144,8 @@ module.exports = class MySQL {
 
                 if (result[0]) {
                     let roles = []
-                    roles.push(result[0].roleid);
+                    let role = await client.guild.roles.fetch(result[0][`${active ? 'roleidActive' : 'roleidInactive'}`])
+                    roles.push(role);
                     roles.push(client.serverRoles.get("gamesSpacer"));
                     resolve(roles)
                 } else {
