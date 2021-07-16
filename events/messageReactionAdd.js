@@ -120,7 +120,7 @@ module.exports = class extends Event {
 
                 if (r.emoji === reaction.emoji.name) {
                     try {
-                        await member.roles.add(r.roleid);
+                        await member.roles.add(r.roleid ? r.roleid : r.roleidInactive);
                         if (!member.roles.cache.has(r.categoryid)) {
                             await member.roles.add(r.categoryid);
                         }

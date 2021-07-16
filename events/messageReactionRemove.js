@@ -75,7 +75,13 @@ module.exports = class extends Event {
 
                 if (r.emoji === reaction.emoji.name) {
                     try {
-                        await member.roles.remove(r.roleid);
+                        if(r.roleid) {
+                            await member.roles.remove(r.roleid);
+                        } else {
+                            await member.roles.remove(r.roleidActive);
+                            await member.roles.remove(r.roleidInactive);
+                        }
+
                     } catch (e) {
                         client.console.reportLog(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`, true ,true)
                     }
