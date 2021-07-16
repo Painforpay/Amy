@@ -203,7 +203,7 @@ module.exports = class extends Event {
         setInterval(async () => {
             if (this.client.fullMutes.size > 0 && this.client.fullMuteAFK) {
                 this.client.fullMutes.forEach((v, k) => {
-                    if ((Date.parse(new Date()) - v.timestamp) > ((this.client.fullMuteAFKTime * 60) * 1000)) {
+                    if ((Date.parse(new Date().toString()) - v.timestamp) > ((this.client.fullMuteAFKTime * 60) * 1000)) {
 
                         if (v.member.voice.channelID !== v.member.guild.afkChannelID) {
                             v.member.voice.setChannel(v.member.guild.afkChannelID);
@@ -214,7 +214,7 @@ module.exports = class extends Event {
                 })
             }
 
-        }, 60000)
+        }, 10000)
 
 
         schedule.scheduleJob('0 0 * * *', async () => {
@@ -247,8 +247,8 @@ module.exports = class extends Event {
 
             let results = await this.client.con.executeQuery(sqlQuery).catch(err => this.client.console.reportError(err.stack));
 
-            if (results[0]) {
-                    results.forEach(async r => {
+            if (results.length > 0) {
+                    for await (const r of results){
                         let member = this.client.guild.members.resolve(r.id);
 
                         if (!member || member.user.bot) return;
@@ -313,12 +313,10 @@ module.exports = class extends Event {
                         
 
 
-                    })
+                    }
                 }
 
         });
-
-
 
         setInterval(async function () {
 
