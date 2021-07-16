@@ -410,7 +410,7 @@ module.exports = class extends Event {
         //Activityresets
 
         //Daily
-        schedule.scheduleJob('* * * * *', async () => {
+        schedule.scheduleJob('0 0 * * *', async () => {
 
             this.client.vcAck.forEach((v, k) => {
                 v.today = 0
