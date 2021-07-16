@@ -13,6 +13,8 @@ module.exports = class extends Event {
     async run(oldState, newState) {
 
         let voicecontext = this.client.serverRoles.get("voicecontext");
+        if(newState.channel.id !== newState.guild.afkChannelID) {
+
 
         if (!oldState.selfDeaf && newState.selfDeaf) {
             //User selfdeafened
@@ -36,7 +38,7 @@ module.exports = class extends Event {
 
         }
 
-
+        }
         if (newState.channel && !oldState.channel) {
             //User Joined a Channel
 
