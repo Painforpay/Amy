@@ -794,7 +794,7 @@ module.exports = class Util {
         if (member.user.bot) return;
         amount = parseInt(amount);
         amount = Math.abs(amount);
-        amount = member.roles.cache.has(this.client.serverRoles.get("booster")) && giveboost ? (amount * 1.02) : amount;
+        amount = member.roles.cache.has(this.client.serverRoles.get("booster").id) && giveboost ? (amount * 1.02) : amount;
         if (isNaN(amount)) {
             console.error(`${this.client.utils.getDateTime()} Error while giving ${amount} Coins (Unwashed: ${unwashed}) to ${member.id} - Section 1`)
             return;

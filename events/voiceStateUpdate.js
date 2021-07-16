@@ -68,7 +68,7 @@ module.exports = class extends Event {
 
             if(newState.channel.userLimit > 0 && (newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
                 if(newState.member.user.bot) return;
-                if(newState.channel.members.filter(member => !member.user.bot || !member.roles.cache.has(this.client.serverRoles.get("altAccount"))).size <= newState.channel.userLimit) return;
+                if(newState.channel.members.filter(member => !member.user.bot || !member.roles.cache.has(this.client.serverRoles.get("altAccount").id)).size <= newState.channel.userLimit) return;
                 newState.kick(`Tried to join a full Channel!`);
                 try {
                     newState.member.user.send(`Du kannst diesem Channel nicht betreten, da er voll ist!`).then(m => m.delete({timeout:20000}))
@@ -130,7 +130,7 @@ module.exports = class extends Event {
             if(newState.channel.userLimit > 0 && (newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
                 if(newState.member.user.bot) return;
 
-                if(newState.channel.members.filter(member => !member.user.bot || member.roles.cache.has(this.client.serverRoles.get("altAccount"))).size <= newState.channel.userLimit) return;
+                if(newState.channel.members.filter(member => !member.user.bot || member.roles.cache.has(this.client.serverRoles.get("altAccount").id)).size <= newState.channel.userLimit) return;
                 newState.setChannel(oldState.channel, `Tried joining a full Channel`);
                 try {
                     newState.member.user.send(`Du kannst diesem Channel nicht betreten, da er voll ist!`).then(m => m.delete({timeout:20000}))
