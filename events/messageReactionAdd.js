@@ -38,21 +38,21 @@ module.exports = class extends Event {
 
         if (reaction.message.channel === this.client.serverChannels.get("ideen")) {
 
-            if (reaction.emoji.name === "🗣️" && member.roles.cache.get(this.client.serverRoles.get("senior"))) {
+            if (reaction.emoji.name === "🗣️" && member.roles.cache.has(this.client.serverRoles.get("senior").id)) {
                 await this.client.utils.createDiscussion(reaction.message);
             }
 
-            if (reaction.emoji.name === "🗣️" && !member.roles.cache.get(this.client.serverRoles.get("senior"))) {
+            if (reaction.emoji.name === "🗣️" && !member.roles.cache.has(this.client.serverRoles.get("senior").id)) {
                 await reaction.users.remove(user);
             }
         }
 
         if (reaction.message.channel.parentID === this.client.serverChannels.get("serverentwicklung").id) {
-            if (reaction.emoji.name === "❌" && member.roles.cache.get(this.client.serverRoles.get("senior"))) {
+            if (reaction.emoji.name === "❌" && member.roles.cache.get(this.client.serverRoles.get("senior").id)) {
                 await this.client.utils.archiveDiscussion(reaction, user);
             }
 
-            if (reaction.emoji.name === "❌" && !member.roles.cache.get(this.client.serverRoles.get("senior"))) {
+            if (reaction.emoji.name === "❌" && !member.roles.cache.get(this.client.serverRoles.get("senior").id)) {
                 await reaction.users.remove(user);
             }
         }
