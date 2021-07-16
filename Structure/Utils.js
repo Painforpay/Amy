@@ -865,7 +865,7 @@ module.exports = class Util {
 
                 let InactiveRole = await this.client.guild.roles.fetch(role.roleidInactive).catch(() => null);
                 if(!ActiveRole.id || !InactiveRole.id) return;
-                for await (const [snowflake, member] of ActiveRole.members) {
+                for await (const member of ActiveRole.members) {
                     member.roles.remove(ActiveRole);
                     member.roles.add(InactiveRole);
                 }
