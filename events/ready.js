@@ -428,7 +428,7 @@ module.exports = class extends Event {
                     for (const [gameName, game] of UserData) {
                         let timestamp = game.timestamp;
 
-                        if((Date.parse(new Date().toString()) - timestamp) > 1000) {
+                        if((Date.parse(new Date().toString()) - timestamp) > 7 *24 *60 *60 *1000) {
                             let gameRoletoRemove = await this.client.con.getActivity(gameName, true);
                             let gameRoletoAdd = await this.client.con.getActivity(gameName, false);
 

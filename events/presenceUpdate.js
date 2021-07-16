@@ -44,7 +44,14 @@ module.exports = class extends Event {
 
             let rolestoAdd = await this.client.con.getActivity(rolename, true);
             let rolestoRemove = await this.client.con.getActivity(rolename, false);
-            if(rolestoAdd != null && rolestoAdd > 1) {
+            if(rolestoAdd != null && rolestoAdd.length > 1) {
+
+                if(rolestoRemove != null) {
+                    newPresence.member.roles.remove(rolestoRemove[0]).catch(err => console.log(err));
+                }
+                for (const role of rolestoAdd) {
+                    newPresence.member.roles.add(role).catch(err => console.log(err));
+                }
                 if(this.client.gameActivity.has(newPresence.member.id)) {
                     let UserActivity = this.client.gameActivity.get(newPresence.member.id);
 
@@ -58,12 +65,7 @@ module.exports = class extends Event {
 
                 }
 
-                    if(rolestoRemove != null) {
-                        newPresence.member.roles.remove(rolestoRemove[0]).catch(err => console.log(err));
-                    }
-                    for (const role of rolestoAdd) {
-                        newPresence.member.roles.add(role).catch(err => console.log(err));
-                    }
+
 
             }
 
