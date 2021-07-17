@@ -13,10 +13,10 @@ module.exports = class extends Event {
     async run(oldState, newState) {
 
         let voicecontext = this.client.serverRoles.get("voicecontext");
-        if(newState.channel.id !== newState.guild.afkChannelID) {
 
 
-        if (!oldState.selfDeaf && newState.selfDeaf) {
+
+        if (newState.selfDeaf) {
             //User selfdeafened
 
             if (!this.client.fullMutes.has(newState.member.id)) {
@@ -27,7 +27,7 @@ module.exports = class extends Event {
                 });
 
             }
-        } else if (oldState.selfDeaf && !newState.selfDeaf) {
+        } else if (!newState.selfDeaf) {
 
             if (this.client.fullMutes.has(newState.member.id)) {
 
@@ -36,7 +36,7 @@ module.exports = class extends Event {
             }
 
 
-        }
+
 
         }
         if (newState.channel && !oldState.channel) {
