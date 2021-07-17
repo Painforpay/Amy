@@ -48,8 +48,6 @@ module.exports = class extends Event {
 
         let client = this.client;
 
-
-
         //Fetch Invites for Invitetracking
         setInterval(async function () {
 
@@ -206,7 +204,9 @@ module.exports = class extends Event {
             if (this.client.fullMutes.size > 0 && this.client.fullMuteAFK) {
                 this.client.fullMutes.forEach((v, k) => {
                     if ((Date.parse(new Date().toString()) - v.timestamp) > ((this.client.fullMuteAFKTime * 60) * 1000)) {
-
+                        if(!v.member.voice) {
+                            return this.client.fullMutes.delete(v.member.id);
+                        }
                         if (v.member.voice.channelID !== v.member.guild.afkChannelID) {
                             v.member.voice.setChannel(v.member.guild.afkChannelID);
                         }
