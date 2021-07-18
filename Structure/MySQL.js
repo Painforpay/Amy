@@ -297,7 +297,6 @@ module.exports = class MySQL {
 
         return new Promise((resolve, reject) => {
             this.con.query(sqlQuery, async function (err, result) {
-
                 if(err) {
                     client.console.reportLog(`[MySQL] Error while ${UserData ? "Updating" : "Creating"} Entry for UserID '${userid}' in users [Query: Affecting ${keys.join(", ")}]`, true, true)
                     reject(err);

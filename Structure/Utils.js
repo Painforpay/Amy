@@ -244,7 +244,9 @@ module.exports = class Util {
             internerModlog.send(`🙊 ${member.user.tag} [${member.user.id}] wurde von ${mod} für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted!`)
             let m = await member.user.send(`Du wurdest im Wohnzimmer für \`${time}\` Minute${time < 1 || time > 1 ? "n" : ""}${reason ? ` wegen \`${reason}\`` : ""} gemuted. Du kannst im Support einen Antrag auf frühzeitige Entmutung stellen.`).catch(() => null)
 
-            m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
+            if(m) {
+                m.delete({timeout: (time * 60000) + 1000}).catch(() => null)
+            }
         } catch (e) {
             this.client.console.reportError(e);
         }
@@ -1019,6 +1021,20 @@ module.exports = class Util {
             m.edit(`Es gab einen Fehler beim updaten!`).then(m => m.delete({timeout: 5000})).catch(() => null);
         }
 
+    }
+
+    async clearBirthday(message) {
+        let m = await message.channel.send(`Ich versuche deinen Geburtstag zu entfernen...`);
+
+        let data = new Collection().set("bday", "NULL").set("bmonth", "NULL").set("byear", "NULL");
+
+        let result = await this.client.con.updateUser(message.member.id, data).catch(err => this.client.console.reportError(err.stack));
+
+        if (result) {
+            m.edit(`Erfolgreich entfernt!`).then(m => m.delete({timeout: 5000})).catch(() => null);
+        } else {
+            m.edit(`Es gab einen Fehler beim updaten!`).then(m => m.delete({timeout: 5000})).catch(() => null);
+        }
     }
 
     async addUserMessages(userID, amount) {
