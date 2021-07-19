@@ -109,7 +109,7 @@ module.exports = class extends Event {
             params: ["roleid", "categoryid", "emoji"]
         }
 
-        builderData.conditions.set("messageid", {operator: "=", value:reaction.message.id})
+        builderData.conditions.set("messageid", {operator: "=", value: reaction.message.id})
 
         let sqlQuery = await this.client.con.buildQuery(builderData);
 
@@ -120,10 +120,13 @@ module.exports = class extends Event {
 
                 if (r.emoji === reaction.emoji.name) {
                     try {
-                        await member.roles.add(r.roleidInactive ?  r.roleidInactive : r.roleid);
+                        await member.roles.add(r.roleid);
                         if (!member.roles.cache.has(r.categoryid)) {
                             await member.roles.add(r.categoryid);
                         }
+                        let gameRole = await this.removeGameRole(r.roleid);
+
+                        await member.roles.remove(gameRole).catch(() => null);
                     } catch (e) {
                         client.console.reportLog(`\nError while removing Reactionrole\nRoleID: ${r.roleid}\n${e.stack}`, true, true)
                     }
@@ -132,6 +135,24 @@ module.exports = class extends Event {
 
             })
         }
+
+
+    }
+
+    async removeGameRole(roleid) {
+
+        let role = this.client.guild.roles.cache.get(roleid);
+
+        let rolename = role.name.replace('\'', "_")
+
+        let rolestoRemove = await this.client.con.getActivity(rolename, true);
+        if(rolestoRemove != null) {
+            return rolestoRemove[0]
+        } else {
+            return null
+        }
+
+
 
 
     }
