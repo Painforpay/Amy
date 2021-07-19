@@ -197,6 +197,9 @@ module.exports = class Util {
     }
 
     async loadRolesAndChannels() {
+        this.client.levelRoleIDs = this.client.dev ? ['800110137544146962', '800110137544146961', '800110137544146960', '800110137544146959', '800110137544146958', '800110137544146957', '800110137544146956', '800110137544146955', '810591297442283530', '810591409328881715', '810591471144009758'] : ['803039995342225429', '795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543', '810590641745821727', '810590795836686356', '810590814710530098'];
+
+
         this.client.guild = await this.client.guilds.fetch(this.client.guild);
         this.client.serverRoles = await this.client.con.getServerRoles().catch(e => {
             console.log(e)
@@ -601,41 +604,60 @@ module.exports = class Util {
     }
 
     async checkLevelRole(level) {
-
         // level -> current (newest) Level User has
         //let levels = [0, 2, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
-
         if (level >= 2 && level < 10) {
             return this.client.dev ? '824240839139655691' : '824242651321991218';
         } else {
-            let levelIDs = ['803039995342225429', '795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543', '810590641745821727', '810590795836686356', '810590814710530098'];
-            let devlevelIDs = ['800110137544146962', '800110137544146961', '800110137544146960', '800110137544146959', '800110137544146958', '800110137544146957', '800110137544146956', '800110137544146955', '810591297442283530', '810591409328881715', '810591471144009758'];
-
             let cut = (Math.floor(level / 10)).toFixed(0)
-
-            let currentMaxLevel = this.client.currentMaxLevel;
-
-
-            if (cut > currentMaxLevel) {
-                return this.client.dev ? devlevelIDs[currentMaxLevel] : levelIDs[currentMaxLevel];
-            } else {
-                return this.client.dev ? devlevelIDs[cut] : levelIDs[cut];
-            }
+            return this.client.levelRoleIDs[((cut > this.client.currentMaxLevel) ? this.client.currentMaxLevel : cut)];
         }
-
-
     }
 
     async getRolestoRemove() {
+        let roles = this.client.levelRoleIDs
+        this.client.dev ? roles.push('824240839139655691') : roles.push('824242651321991218')
+        return roles;
 
-        if (this.client.dev) {
-            return ['800110137544146962', '824240839139655691', '800110137544146961', '800110137544146960', '800110137544146959', '800110137544146958', '800110137544146957', '800110137544146956', '800110137544146955'];
-        } else {
-            return ['803039995342225429', '824242651321991218', '795733030051512371', '795733038968602673', '795733033150840914', '795733036313870367', '795733048205246464', '795733050772291615', '795735445169897543'];
+    }
 
+    async checkVoiceChannelLimit(newState, oldState) {
+        if(newState.channel.userLimit > 0 && (newState.channel.members.size > newState.channel.userLimit) && !this.client.allowFullChannelJoin){
+            if(newState.member.user.bot) return;
+            let actualUsers = newState.channel.members.filter(member => !member.user.bot && !member.roles.cache.has(this.client.serverRoles.get("altAccount").id))
+            let actualUsersSize = actualUsers.size
+            if(newState.member.roles.cache.has(this.client.serverRoles.get("altAccount").id)) actualUsersSize++;
+            if(actualUsersSize <= newState.channel.userLimit) return;
+            newState.setChannel(oldState.channel, `Tried joining a full Channel`);
+            try {
+                newState.member.user.send(`Du kannst diesem Channel nicht betreten, da er voll ist!`).then(m => m.delete({timeout:20000}))
+                if(this.client.announceFullChannelJoinRequest) {
+
+                    let toPing = [];
+
+                    actualUsers.forEach((member, id) => {
+                        let client = this.client;
+                        if(newState.member.id === id) return;
+
+                        if(!this.client.announceFullChannelpingedUsers.has(id)) {
+                            toPing.push(member);
+                            this.client.announceFullChannelpingedUsers.set(id, member);
+
+                            setTimeout(() => {
+
+                                this.client.announceFullChannelpingedUsers.delete(id);
+
+                            }, this.client.announceFullChannelpingMinutes * 60 *1000)
+                        }
+                    })
+
+
+                    this.client.serverChannels.get("voicecontext").send(`[${this.client.utils.getDateTime()}]\`${newState.member.user.tag}\` möchte dem Sprachkanal ${newState.channel} beitreten\n${toPing.join(", ")}`)
+                }
+            } catch (e) {
+                //Can't send Messages to User
+            }
         }
-
     }
 
     async createPVoice(newState, count) {
@@ -919,12 +941,6 @@ module.exports = class Util {
 
             }
 
-            try {
-                message.delete();
-            } catch (e) {
-                //Error
-                this.client.console.reportError(e);
-            }
 
 
         } catch (e) {

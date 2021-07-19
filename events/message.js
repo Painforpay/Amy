@@ -40,7 +40,23 @@ module.exports = class extends Event {
             }
 
         }
-        if (message.author.bot) return;
+        if (message.author.bot) {
+            if(message.author === this.client.user) {
+                if(message.channel === this.client.serverChannels.get("voicecontext") ) {
+                    this.client.setTimeout(() => {
+                        message.delete().catch(() => null);
+                    }, 10000, message)
+                }
+
+            } else if(message.author.id === "252128902418268161" || message.author.id === "235088799074484224") {
+                if(message.channel === this.client.serverChannels.get("cmds") ) {
+                    this.client.setTimeout(() => {
+                        message.delete().catch(() => null);
+                    }, 2*3600000, message)
+                }
+            }
+            return;
+        }
         if (message.channel.type === "dm") {
 
             if (message.content.toLowerCase().match(/.*(danke\n*.*amy).*/g)) {
@@ -135,12 +151,6 @@ module.exports = class extends Event {
                 }
         }
 
-        if (message.channel.id === (this.client.dev ? "800110137820971047" : "797833037022363659")) {
-
-            await this.client.utils.colorgiver(message);
-
-        }
-
         //Spamprotection
         if(this.client.antispam.has(message.author.id) && message.channel.parentID !== this.client.serverChannels.get("minigamesbotCategory").id) {
 
@@ -233,19 +243,24 @@ module.exports = class extends Event {
                 })
             }
 
-            this.client.utils.addUserMessages(message.member.id, 1);
+            await this.client.utils.addUserMessages(message.member.id, 1);
 
-            switch (message.channel.name) {
-                case "ideen": {
+            switch (message.channel) {
+                case this.client.serverChannels.get("ideen"): {
                     await message.react("🔺");
                     await message.react("🔻");
-                    return;
                 }
+                break;
+                case this.client.serverChannels.get("voicecontext"): {
 
-                case "voice-kontext": {
-
-                        message.delete({timeout: 3600000}).catch(() => null);
-
+                    this.client.setTimeout(() => {
+                        message.delete().catch(() => null);
+                    }, 3600000, message)
+                }
+                break;
+                case this.client.serverChannels.get("steckbriefrollen"): {
+                    await this.client.utils.colorgiver(message);
+                    message.delete().catch(() => null)
                 }
                 break;
 

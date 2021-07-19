@@ -119,6 +119,12 @@ module.exports = class Bot extends Client {
 
         this.allowFullChannelJoin = false; //Wenn wahr, dürfen User mit Move rechten einem vollem Channel joinen!
 
+        this.announceFullChannelJoinRequest = true; //Wenn Wahr, werden User benachrichtigt, falls jemand beitreten möchte!
+
+        this.announceFullChannelpingMinutes = 2; //Zeit in Minuten, nachdem User wieder gepingt werden können
+
+        this.announceFullChannelpingedUsers = new Collection();
+
         this.spamMuteTime = 2; //Zeit in Minuten für welche man gemuted wird, wenn man spammt!
 
         this.starBoardMinReactions = 5; //Mindestmenge an Reaktionen damit eine Nachricht zum Starboard hinzugefügt wird!
@@ -142,6 +148,8 @@ module.exports = class Bot extends Client {
         this.workCooldown = new Collection();
 
         this.gameActivity = new Collection();
+
+        this.levelRoleIDs = [];
 
     }
 
