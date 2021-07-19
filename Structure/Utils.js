@@ -890,9 +890,20 @@ module.exports = class Util {
                 let InactiveRole = await this.client.guild.roles.fetch(role.roleidInactive).catch(() => null);
                 if(!ActiveRole.id || !InactiveRole.id) return;
                 for await (const [snowflake, member] of ActiveRole.members) {
+                    let rolename = role.name.replace('\'', "_")
+                    if(this.client.gameActivity.has(member.id)) {
+                        let UserActivity = this.client.gameActivity.get(member.id);
 
-                    member.roles.remove(ActiveRole);
-                    member.roles.add(InactiveRole);
+                        UserActivity.set(rolename, {timestamp: Date.parse(new Date().toString())})
+
+
+                    } else {
+                        this.client.gameActivity.set(member.id, new Collection())
+                        this.client.gameActivity.get(member.id).set(rolename, {timestamp: Date.parse(new Date().toString())})
+
+
+                    }
+
                 }
             }
 
