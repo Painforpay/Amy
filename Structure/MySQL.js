@@ -201,6 +201,7 @@ module.exports = class MySQL {
             }
             break;
             case "update": {
+
                 params.forEach((v, k) => {
                     if(v.operator) {
                         updateData.push(`\`${k}\` = \`${k}\` ${v.operator} ${v.value}`);
@@ -219,6 +220,7 @@ module.exports = class MySQL {
                     condition.push("1");
                 }
                 sqlQuery = `UPDATE \`${table}\` SET ${updateData.join(", ")} WHERE ${condition.join(" && ")};`;
+
             }
             break;
             case "select": {

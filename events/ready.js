@@ -253,7 +253,7 @@ module.exports = class extends Event {
 
             if (results.length > 0) {
                     for await (const r of results){
-                        let member = this.client.guild.members.resolve(r.id);
+                        let member = this.client.guild.members.fetch(r.id);
 
                         if (!member || member.user.bot) return;
                         let xp = r.xp;
@@ -280,7 +280,7 @@ module.exports = class extends Event {
                             builderData3.set("xp", newXP);
                         }
 
-                        let result = await this.client.con.updateUser(member.id, builderData3);
+                        let result = await this.client.con.updateUser(r.id, builderData3);
                         this.client.console.reportLog(`[MySQL] Successfully Updated Entry for User with ID '${r.id}' in users [Query: Affecting XP (${xp} -> ${newXP}${currentlevel !== leveluserhastoget ? ` | New Level ${leveluserhastoget}` : ""})]`);
 
                         

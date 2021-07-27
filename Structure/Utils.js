@@ -236,7 +236,7 @@ module.exports = class Util {
     }
 
     async muteMember(member, time, mod, reason) {
-        if (member.voice) {
+        if (member.voice.channel) {
             await member.voice.kick();
         }
         let internerModlog = this.client.serverChannels.get("internalModLog");
